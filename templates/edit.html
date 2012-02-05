@@ -1,0 +1,12 @@
+$def with(post, form)
+
+<hl>Edit $form.d.title</hl>
+
+<form action='' method="post">
+	$:form.render()
+</form>
+
+<h2>Delete Post</h2>
+<form action="/delete/$post.id" method="post">
+	<input type="submit" value="Delete post"/>
+</form>

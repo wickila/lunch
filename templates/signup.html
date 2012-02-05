@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content%}
+	<form action="/signup" method="post">
+		<input type="text" name="username" value="{{ username }}"/>{{ usernameErrorMessage }}<br>
+		<input type="password" name="password" />{{ passwordErrorMessage }}<br>
+		<input type="text" name="email" value="{{ email }}"/>{{ emailErrorMessage }}<br>
+		<button type="submit">注册</button>
+	</form>
+{% endblock %}

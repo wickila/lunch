@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<form action="/user/edit" method="post">
+	<table>
+		<tr>
+			<td>手机号:</td><td><input type="text" name="mobile" value="{{user.mobile}}" /></td>
+		</tr>
+		<tr>
+			<td>地址1:</td><td><input type="text" name="adress1" value="{{user.adress1}}" /></td>
+		</tr>
+		<tr>
+			<td>地址2:</td><td><input type="text" name="adress2" value="{{user.adress2}}" /></td>
+		</tr>
+	</table>
+	<button type="submit">完成</button>
+</form>
+{% endblock %}

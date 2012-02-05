@@ -1,0 +1,31 @@
+<html>
+<head>
+<title>Lunch</title>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+<link rel="stylesheet" href="/static/css/lunch.css" type="text/css" media="screen" title="no title" charset="utf-8">
+{% block script %}
+<script type="text/javascript">
+	window.initialize =  function() {
+		
+  	}
+</script>
+{% endblock %}
+</head>
+<body onload="initialize()">
+	<div id="navigate_bar">
+		{% if user %}
+			<a href='/user/edit'>{{user.username}}</a>
+			<a href="/signout">登出</a>
+		{% else %}
+			<a href="/signin">登录</a>
+			<a href="/signup">注册</a>
+		{% endif %}
+	</div>
+	{% block content %}this is the defualt content{% endblock %}
+	<footer>
+		{% block footer %}
+			author:wicki
+		{% endblock %}
+	</footer>
+</body>
+</html>

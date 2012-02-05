@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+	<form action="/restuarant/new" method="post">
+		<input type="hidden" name="lat" value="{{lat}}"/>
+		<input type="hidden" name="lon" value="{{lon}}"/>
+		<table>
+			<tr>
+				<td>店名</td>
+				<td><input type="text" name="rest_name" value="{{rest_name}}"/></td>
+			</tr>
+		</table>
+		<button type="submit">提交</button>
+	</form>
+{% endblock %}
