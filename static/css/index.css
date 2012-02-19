@@ -1,0 +1,110 @@
+@CHARSET "UTF-8";
+#map_canvas{
+	width: 80%;
+	height: 500px;
+	border:5px solid #ffffff;
+	border-radius: 5px;
+	border-collapse: collapse;
+}
+
+#searchBox{
+	margin-top: 10px;
+}
+
+#search_input
+{
+	background-color: #fff;
+    padding: 5px 5px 5px 5px;
+    margin: 0 0 10px 0;
+    width: 353px; /* 353 + 2 + 45 = 400 */
+    border: 1px solid #ccc;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0 1px 1px #ccc inset, 0 1px 0 #fff;
+    -webkit-box-shadow: 0 1px 1px #ccc inset, 0 1px 0 #fff;
+    box-shadow: 0 1px 1px #ccc inset, 0 1px 0 #fff;
+}
+
+#search_input:focus
+{
+    background-color: #fff;
+    border-color: #e8c291;
+    outline: none;
+    -moz-box-shadow: 0 0 0 1px #e8c291 inset;
+    -webkit-box-shadow: 0 0 0 1px #e8c291 inset;
+    box-shadow: 0 0 0 1px #e8c291 inset;
+}
+
+#search_btn
+{        
+    background-color: #ffb94b;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#fddb6f), to(#ffb94b));
+    background-image: -webkit-linear-gradient(top, #fddb6f, #ffb94b);
+    background-image: -moz-linear-gradient(top, #fddb6f, #ffb94b);
+    background-image: -ms-linear-gradient(top, #fddb6f, #ffb94b);
+    background-image: -o-linear-gradient(top, #fddb6f, #ffb94b);
+    background-image: linear-gradient(top, #fddb6f, #ffb94b);
+    
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    
+     -moz-box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+     -webkit-box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.3) inset;    
+    
+    border-width: 1px;
+    border-style: solid;
+    border-color: #d69e31 #e3a037 #d5982d #e3a037;
+
+    height: 28px;
+    width: 80px;
+    cursor: pointer;
+    font: bold 15px Arial, Helvetica;
+    color: #8f5a0a;
+}
+
+#left_bar{
+	width: 20%;
+	height: 93%;
+}
+
+#contextMenu {
+position: absolute;
+min-width: 100px;
+z-index: 1000;
+background: #fff;
+border-top: solid 1px #CCC;
+border-left: solid 1px #CCC;
+border-bottom: solid 1px #676767;
+border-right: solid 1px #676767;
+padding: 0px;
+margin: 0px;
+display:none;
+}
+
+#contextMenu a {
+color: #000;
+text-decoration: none;
+display: block;
+line-height: 22px;
+height: 22px;
+padding: 1px 10px;
+}
+
+#contextMenu li {
+list-style: none;
+padding: 1px;
+margin: 0px;
+}
+
+#contextMenu li.hover a {
+background-color: #A7C4FA;
+}
+
+#contextMenu li.separator {
+border-top: solid 1px #ccc;
+}

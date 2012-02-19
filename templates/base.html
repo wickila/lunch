@@ -1,31 +1,37 @@
+<!DOCTYPE HTML>
 <html>
-<head>
-<title>Lunch</title>
-<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
-<link rel="stylesheet" href="/static/css/lunch.css" type="text/css" media="screen" title="no title" charset="utf-8">
-{% block script %}
-<script type="text/javascript">
-	window.initialize =  function() {
-		
-  	}
-</script>
-{% endblock %}
-</head>
-<body onload="initialize()">
-	<div id="navigate_bar">
-		{% if user %}
-			<a href='/user/edit'>{{user.username}}</a>
-			<a href="/signout">登出</a>
-		{% else %}
-			<a href="/signin">登录</a>
-			<a href="/signup">注册</a>
-		{% endif %}
-	</div>
-	{% block content %}this is the defualt content{% endblock %}
-	<footer>
-		{% block footer %}
-			author:wicki
-		{% endblock %}
-	</footer>
-</body>
+	<head>
+	<title>{% block title %}Lunch{% endblock %}</title>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+	<link rel="stylesheet" href="/static/css/lunch.css" type="text/css" charset="utf-8">
+	{% block style%}
+	{% endblock %}
+	{% block script %}
+	<script type="text/javascript">
+		window.initialize =  function() {
+			
+	  	}
+	</script>
+	{% endblock %}
+	</head>
+	<body onload="initialize()">
+		<div id="navigate_bar">
+			<ul id="navigate_ul">
+				<li><a href="/" class="navigate_a">首页</a></li>
+				{% if user %}
+				<li><a href='/user/edit' class="navigate_a">{{user.username}}</a></li>
+				<li><a href="/signout" class="navigate_a">登出</a></li>
+				{% else %}
+				<li><a href="/signin" class="navigate_a">登录</a></li>
+				<li><a href="/signup" class="navigate_a">注册</a></li>
+				{% endif %}
+			</ul>
+		</div>
+		{% block content %}this is the defualt content{% endblock %}
+		<footer>
+			{% block footer %}
+				author:wicki
+			{% endblock %}
+		</footer>
+	</body>
 </html>

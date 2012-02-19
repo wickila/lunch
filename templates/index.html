@@ -20,10 +20,13 @@
       };
 </script>
 {% endblock %}
+{% block style %}
+	<link rel="stylesheet" href="/static/css/index.css" type="text/css" charset="utf-8">
+{% endblock %}
 {% block content %}
 	<div id="searchBox">
 		<input type="text" name="search" value="" id="search_input"/>
-		<button>搜索</button>
+		<input type="submit" id="search_btn" value="搜索"></input>
 	</div>
 	<div id="map_canvas">
 	</div>
