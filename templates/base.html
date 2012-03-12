@@ -6,12 +6,13 @@
 	<link rel="stylesheet" href="/static/css/lunch.css" type="text/css" charset="utf-8">
 	{% block style%}
 	{% endblock %}
-	{% block script %}
+	<script type="text/javascript" src="/static/js/jquery.js"></script>
 	<script type="text/javascript">
 		window.initialize =  function() {
 			
 	  	}
 	</script>
+	{% block script %}
 	{% endblock %}
 	</head>
 	<body onload="initialize()">
@@ -27,7 +28,9 @@
 				{% endif %}
 			</ul>
 		</div>
-		{% block content %}this is the defualt content{% endblock %}
+		<div id="content">
+			{% block content %}this is the defualt content{% endblock %}
+		</div>
 		<footer>
 			{% block footer %}
 				author:wicki

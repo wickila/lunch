@@ -1,0 +1,79 @@
+@CHARSET "UTF-8";
+#user-content{
+	position:relative;
+	width: 600px;
+	margin-left:50%; 
+	margin-top: 10px; 
+	left:-300px; 
+}
+#setup-content{
+	position:relative;
+	width: 800px;
+	margin-left:50%; 
+	margin-top: 10px; 
+	left:-400px; 
+}
+.baseinfo-td{
+	padding-left: 10px;
+}
+
+#detailinfo{
+	margin-top: 10px;
+	padding: 10px;
+}
+#avatar-div{
+	margin: 10px 20px 10px 10px;
+}
+#username-mark{
+	margin-top: 10px;
+}
+.form-title{
+	font-weight: bold;
+	padding-bottom: 7px;
+	margin-bottom: 7px;
+	border-bottom: solid thin;
+	border-color: gray;
+}
+#setup-sidebar{
+	width: 200px;
+	height: 100%;
+	float: left;
+	padding: 10px 0 10px 0;
+}
+#setup-detail-div{
+	margin-left: 220px;
+	width: 600px;
+}
+#navigation {
+	margin: 0px;
+	padding: 0px;
+}
+#navigation li{
+	display: block;
+	padding: 3px;
+	font-weight: 500;
+	font-size: 16px;
+	line-height: 20px;
+	margin-bottom: 5px;
+	cursor: pointer;
+}
+#navigation li:HOVER{
+	background: #ccf;
+}
+#acc-security-div{
+	display: none;
+}
+#avatar-div{
+	margin: 0 0 10px 0;
+	padding-left: 10px;
+	border-bottom: solid thin gray;
+}
+#avatar-div td{
+	font-weight: bold;
+}
+.selected{
+	background-color: #eef;
+}
+.user-setup-input{
+	width: 480px;
+}

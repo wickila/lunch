@@ -21,7 +21,11 @@ def get_post(id):
 		return None
 	
 def get_user(username):
-	return db.select('user',where='username=$username',vars=locals())[0]
+	users = db.select('user',where='username=$username',vars=locals())
+	if len(users) > 0:
+		return users[0]
+	else:
+		return None
 	
 def new_post(title, text):
 	db.insert('entries',title=title,content=text,posted_on=datetime.datetime.utcnow())
@@ -40,6 +44,10 @@ class user():
 	def __init__(self,username,email):
 		self.username = username
 		self.email = email
+		self.name = ""
+		self.gender = 0
+		self.mark = ""
 		self.mobile = ""
+		self.telephone = ""
 		self.adress1 = ""
 		self.adress2 = ""

@@ -16,14 +16,14 @@
 		<h1>Sign up</h1>
 		<fieldset id="inputs">
 			<table>
-				<tr><td>用戶名:</td><td><input id="username" type="text" name="username"  placeholder="Username" value="{{ username }}" maxLength="16" autofocus required/></td><td class="tip">{% if usernameErrorMessage %}{{usernameErrorMessage}}{%else%}数字字母与下划线,4-16字节{% endif %}</td></tr>
-				<tr><td>密码:</td><td><input id="password" type="password" name="password" placeholder="Password" required/></td><td class="tip">{% if passwordErrorMessage %}{{passwordErrorMessage}}{%else%}数字字母与下划线,最少6字节{% endif %}</td></tr>
-				<tr><td>密码确认:</td><td><input id="repassword" type="password" data-equals="password" customError="valid" placeholder="Password" required/></td></tr>
+				<tr><td>用戶名:</td><td><input id="username" type="text" name="username"  placeholder="Username" value="{{ username }}" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,15}" maxLength="16" autofocus required/></td><td class="tip">{% if usernameErrorMessage %}{{usernameErrorMessage}}{%else%}数字字母与下划线,4-16字节{% endif %}</td></tr>
+				<tr><td>密码:</td><td><input id="password" type="password" name="password" placeholder="Password" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" maxLength="30" required/></td><td class="tip">{% if passwordErrorMessage %}{{passwordErrorMessage}}{%else%}数字字母与下划线,最少6字节{% endif %}</td></tr>
+				<tr><td>密码确认:</td><td><input id="repassword" type="password" name="repassword" customError="valid" placeholder="Password" required/></td></tr>
 				<tr><td>邮箱:</td><td><input type="email" name="email"  placeholder="Email" value="{{ email }}" required/></td><td class="tip">{% if emailErrorMessage %}{{emailErrorMessage}}{%else%}重要,用于找回密码{% endif %}</td></tr>
 			</table>
 		</fieldset>
 		<fieldset id="actions">
-			<input type="submit" id="submit" value="注册">
+			<input type="submit" id="submit" value="注册" onclick="check()">
 		</fieldset>
 	</form>
 {% endblock %}4-16

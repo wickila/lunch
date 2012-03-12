@@ -8,7 +8,7 @@ import hashlib
 import json
 import urllib2
 from json.json import ReadException
-from locale import getlocale
+import jinja2
 #from jinja2 import Environment, PackageLoader
 
 web.config.debug = False
@@ -27,6 +27,16 @@ urls = (
 app = web.application(urls, globals())
 session = web.session.Session(app, web.session.DiskStore('sessions'),initializer={'user':None,'location':None})
 env = Environment(loader=PackageLoader('lunch','templates'))
+
+def gender_filter(gender):
+	if gender == 0:
+		return "未知"
+	elif gender == 1:
+		return "女"
+	else:
+		return "男"
+	
+env.filters['genderfiler'] = gender_filter
 
 def render(template,data):
 	return env.get_template(template).render(data)
@@ -86,33 +96,33 @@ class Signup:
 		passwordError = 0
 		emailError = 0
 		usernameErrorMessage = ['',
-                                '您输入的用户名长度小于3个字符',
-                                '您输入的用户名长度大于12个字符',
+                                '您输入的用户名长度小于4个字符',
+                                '您输入的用户名长度大于16个字符',
                                 '您输入的用户名已存在',
                                 '您输入的用户名格式非法，只能使用字母，数字与下划线']
 		passwordErrorMessage = ['',
                                 '您输入的密码长度小于6位数',
-                                '您输入的密码长度大于12位']
+                                '您输入的密码长度大于32位']
 		emailErrorMessage = ['',
                              'email不能为空',
                              '您输入的email长度大于32位',
                              '您输入的email已经存在',
                              '您输入的email格式不正确']
-		if len(username)<3:
+		if len(username)<4:
 			usernameError = 1#用户名过短
-		elif len(username)>12:
+		elif len(username)>16:
 			usernameError = 2#用户名过长
 		else:
 			if(re.search('^[a-zA-Z0-9\_]+$', username)):
 				q = model.get_user(username)
-				if (len(q) > 0):
+				if q:
 					usernameError = 3#用户名已存在
 			else:
 				usernameError = 4#用户名非法
 		if len(password)<6:
 			passwordError = 1#密码过短
-#        elif len(password)>12:
-#            passwordError = 2#密码过长
+		elif len(password)>32:
+			passwordError = 2#密码过长
 		if (len(email) == 0):
 			emailError = 1#email不能为空
 		else:
@@ -122,8 +132,8 @@ class Signup:
 				p = re.compile(r"(?:^|\s)[-a-z0-9_.]+@(?:[-a-z0-9]+\.)+[a-z]{2,6}(?:\s|$)", re.IGNORECASE)
 				if (p.search(email)):
 					v = {"email":email}
-					q = model.db.select('user',vars=v)
-					if (len(q) > 0):
+					e = model.db.select('user',v, where="email = $email")
+					if (len(e) > 0):
 						emailError = 3#email已经存在
 				else:
 					emailError = 4#email格式不正确
