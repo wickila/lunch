@@ -20,6 +20,25 @@
 		}
 	};
 	
+	window.onSecuritySubmit = function(){
+		var pwd = $("#newpwd").val();
+		var pwd_repeat = $("#newpwd-repeat").val();
+		var rpwd = $("#newpwd-repeat")[0]
+        if(pwd_repeat.length > 0)
+   		{
+   			if(pwd != pwd_repeat)
+   			{
+   				rpwd.setCustomValidity("密码不一致!"); 
+   			}else
+   			{
+   				rpwd.setCustomValidity("");
+   			}
+   		}else
+   		{
+   			rpwd.setCustomValidity("请输入此字段!");
+   		}
+	};
+	
 	$(document).ready(function(){
 		$("#profile-li").addClass("selected");
 		$("#profile-li").click(function() {

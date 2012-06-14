@@ -7,8 +7,7 @@ import re
 import hashlib
 import json
 import urllib2
-from json.json import ReadException
-import jinja2
+import json
 #from jinja2 import Environment, PackageLoader
 
 web.config.debug = False
@@ -21,7 +20,10 @@ urls = (
 	'/signup','Signup',
 	'/user/view/(.*)','user.View',
 	'/user/edit','user.Edit',
+	'/user/security','user.Security',
 	'/restuarant/new','restuarant.New',
+	'/api/localrestuarants','api.LocalRestaurants',
+	'/api/menus/(.*)','api.Menus'
 )
 
 app = web.application(urls, globals())
@@ -38,23 +40,25 @@ def gender_filter(gender):
 	
 env.filters['genderfiler'] = gender_filter
 
-def render(template,data):
-	return env.get_template(template).render(data)
-
 def get_current_user():
 	return web.config._session.user
-	
+
+def render(template,data):
+	data["user"] = get_current_user()
+	return env.get_template(template).render(data)
+
+def write_json(obj):
+	web.header('Content-Type', 'application/json')
+	return json.dumps(obj)
 
 class Index:
 	def get_location(self,ip):
 		try:
 			URL='http://ip.json.dotcloud.com/json/'+ip.strip()
 			tempFile = urllib2.urlopen(URL).read()
-			jsonobj = json.json.read(tempFile)
+			jsonobj = json.load(tempFile)
 			return (float(jsonobj['latitude']),float(jsonobj['longitude']))
-		except ReadException:
-			return (23,110)
-		except KeyError:
+		except:
 			return (23,114)
 	
 	def GET(self):

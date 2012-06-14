@@ -2,7 +2,7 @@
 import web, datetime
 import hashlib
 
-db = web.database(dbn='mysql', db='lunch', user='root', pw='wickila')
+db = web.database(dbn='mysql', db='lunch', user='root', pw='wickilaformysql')
 
 def valid_user(user,pwd):
 	v = {"username":user,"password":hashlib.sha1(pwd).hexdigest()}

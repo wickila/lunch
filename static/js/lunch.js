@@ -3,13 +3,13 @@
  * @fileoverview Provides the core JavaScript functionality for the Geochat
  *   application.
  */
-(function($){
+$(function(){
 	var map = null;
 	var geocoder = null;
 	var user = null;
 	var lastUpdate = 0;
 	
-	window.people = {}
+	restuarants = {}
 	
 	window.initialize =  function() {
 	    var latlng = new google.maps.LatLng(GEOCHAT_VARS['initial_latitude'], GEOCHAT_VARS['initial_longitude']);
@@ -96,7 +96,10 @@
 					break;
 					
 				case 'newRestuarant':
-					window.location.href = "/restuarant/new?lat="+clickedLatLng.lat()+"&lon="+clickedLatLng.lng();
+					$('#lat').val(clickedLatLng.lat());
+					$('#lng').val(clickedLatLng.lng());
+					$('#myModal').modal('show');
+					//window.location.href = "/restuarant/new?lat="+clickedLatLng.lat()+"&lon="+clickedLatLng.lng();
 					break;
 					
 				default:
@@ -117,38 +120,57 @@
 		$.each('click dragstart zoom_changed maptypeid_changed'.split(' '), function(i,name){
 			google.maps.event.addListener(map, name, function(){ contextMenu.hide() });
 		});
+		
+		get_restuarants();
   	}
+	
+	
   	
   	/**
    * Represents each person active within Geochat.
-   * @param {string} name The name of the person in question.
-   * @param {string} email The person's email address.
-   * @param {number} latitude The person's starting latitude.
-   * @param {number} longitude The person's starting longitude.
+   * @param {string} name 
+   * @param {string} type 
+   * @param {number} latitude
+   * @param {number} longitude
    * @constructor
    */
-  var Person =  function(name, email, lat, lng) {
-
-    var me = this;
-    window.people[email] = this;
-
+  var Restuarant =  function(id, name, type, lat, lng) {
+	this.id = id
     this.name = name;
-    this.email = email;
+    this.type = type;
     this.point = new google.maps.LatLng(lat, lng);
     this.marker = new google.maps.Marker({
+      id: id,
       position: this.point,
       title:name
-  });
-
+    });
     this.marker.setMap(map);
+    restuarants[id] = this;
+    google.maps.event.addListener(this.marker, 'click', function() {
+    	var rest = restuarants[this.id];
+    	$.ajax({
+            type: 'GET',
+            url: '/api/menus/'+id,
+            ContentType: "application/json",
+            success: function(data){
+            			var menu;
+            			for(var i in data.menus)
+            			{
+            				menu = data.menus[i];
+            			}
+            		},
+            error: function(){alert('获取本地餐厅失败')}
+        });
+        map.setCenter(this.getPosition());
+    });
   };
   
   /**
-   * Move this Person to the specified latitude and longitude.
+   * Move this Restuarant to the specified latitude and longitude.
    * @param {number} lat The latitude to move to.
    * @param {number} lng The longitude to move to.
    */  
-  Person.prototype.move = function(lat, lng) {
+  Restuarant.prototype.move = function(lat, lng) {
     if (this.point.lat() != lat || this.point.lng() != lng) {
       this.point = new google.maps.LatLng(lat, lng);
       this.marker.setPosition(this.point);
@@ -159,15 +181,14 @@
   };
   
   /**
-   * Make this Person say a specified message.
+   * Make this Restuarant say a specified message.
    * @param {string} message The message to set within the user's chat bubble.
    * @param {boolean} raw Whether or not to sanitize the message.
    */
-  Person.prototype.say = function(message, raw) {
+  Restuarant.prototype.say = function(message, raw) {
   	var infowindow = new google.maps.InfoWindow();
   	infowindow.setContent(message);
 	  infowindow.setPosition(this.point);
-	
 	  infowindow.open(map);
   };
   
@@ -179,7 +200,7 @@
       // Verify whether the speaker exists. If not, create them.
       if (!window.people[users[i].email]) {
       	
-        speaker = new Person(
+        speaker = new Restuarant(
           users[i].nickname,
           users[i].email,
           p[0],
@@ -212,17 +233,13 @@
     var max = bounds.getNorthEast();
     $.ajax({
       type: 'GET',
-      url: '/user/querylocalusers',
-      dataType: "json",
+      url: '/user/restuarant/local',
       ContentType: "application/json",
-      data:{"location":map.getCenter().lat()+","+map.getCenter().lng(),
+      data:{"lat":map.getCenter().lat(),
+    		"lng":map.getCenter().lng(),
       		"percision":map.getZoom()-4},
-//      data: [
-//      	'location=',map.getCenter().lat()+','+map.getCenter().lng(),
-//        '&percision=', map.getZoom()-6
-//        ].join(""),
-      success: updateSuccess,
-      error: updateError
+      		'success': updateSuccess,
+      		'error': updateError
     });
   }
   
@@ -238,29 +255,54 @@
 				'longitude': user.marker.getPosition().lng(),
 			});
 		}
-	};
+  };
   
-  $(document).ready(function(){
-  	geocoder = new google.maps.Geocoder();
-  	geocoder.geocode( { 'address': GEOCHAT_VARS['default_location']}, function(results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-          var latitude = GEOCHAT_VARS['initial_latitude'];
-          var longitude = GEOCHAT_VARS['initial_longitude'];
-          var latlng = results[0].geometry.location
-          if (latlng) {
-//            latitude = latlng.lat();
-//            longitude = latlng.lng();
-          }
-          map.setCenter(new google.maps.LatLng(latitude, longitude), 13);
-          user = new Person(
-              GEOCHAT_VARS['user_nickname'],
-              GEOCHAT_VARS['user_email'],
-              latitude,
-              longitude);
-          // update();
-        } else {
-          alert("Geocode was not successful for the following reason: " + status);
-        }
-      });
-	});
-})(jQuery);
+  window.new_restuarant = function(){
+		$('#new_restuarant_form').ajaxForm({
+				'dataType': 'json',
+				'success':function(data){
+					data = eval(data);
+					if(data.result){
+						r = new Restuarant(data.rest.id,data.rest.name,data.rest.rest_type,data.rest.lat,data.rest.lng);
+						map.setCenter(new google.maps.LatLng(data.rest.lat,data.rest.lng), 13);
+						$('#myModal').modal('hide');
+					}
+				}
+		});
+	}
+  
+  	function get_restuarants(){
+	  	geocoder = new google.maps.Geocoder();
+	  	geocoder.geocode( { 'address': GEOCHAT_VARS['default_location']}, function(results, status) {
+	        if (status == google.maps.GeocoderStatus.OK) {
+	          var latitude = GEOCHAT_VARS['initial_latitude'];
+	          var longitude = GEOCHAT_VARS['initial_longitude'];
+	          var latlng = results[0].geometry.location
+	          if (latlng) {
+	            latitude = latlng.lat();
+	            longitude = latlng.lng();
+	          }
+	          map.setCenter(new google.maps.LatLng(latitude, longitude), 13);
+	          $.ajax({
+	              type: 'GET',
+	              url: '/api/localrestuarants',
+	              ContentType: "application/json",
+	              data:{"lat":map.getCenter().lat(),
+	            		"lng":map.getCenter().lng(),
+	              		"percision":map.getZoom()-4},
+	              		'success': function(data){
+	              			var rest;
+	              			for(var i in data.restuarants)
+	              			{
+	              				rest = data.restuarants[i]
+	              				r = new Restuarant(rest.id,rest.name,rest.rest_type,rest.lat,rest.lng);
+	              			}
+	              		},
+	              		'error': function(){alert('获取本地餐厅失败')}
+	          });
+	        } else {
+	          alert("Geocode was not successful for the following reason: " + status);
+	        }
+	      });
+	};
+});

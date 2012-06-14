@@ -44,24 +44,24 @@
 					<tr>
 						<td>地址2:</td><td colspan="2"><input class="user-setup-input" type="text" name="adress2" value="{{user.adress2}}" /></td>
 					</tr>
-					<tr><td colspan="3" align="right"><button type="submit">完成</button></td></tr>
+					<tr><td colspan="3" align="right"><button type="submit" onclick="check()">完成</button></td></tr>
 				</table>
 			</form>
 		</div>
 		<div id="acc-security-div">
 			<div class="form-title">安全设置</div>
-			<form action="/user/edit" method="post">
+			<form id="security-set-form" action="/user/security" method="post">
 				<table>
 					<tr>
-						<td>原密码:</td><td><input class="user-setup-input" type="password" name="oldpwd" value=""/></td>
+						<td>原密码:</td><td><input class="user-setup-input" type="password" name="oldpwd" required/></td>
 					</tr>
 					<tr>
-						<td>新密码:</td><td><input class="user-setup-input" type="password" name="newpwd" value=""/></td>
+						<td>新密码:</td><td><input class="user-setup-input" type="password" value="" name="newpwd" id="newpwd" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" required/></td>
 					</tr>
 					<tr>
-						<td>确认新密码:</td><td><input class="user-setup-input" type="password" value=""/></td>
+						<td>确认新密码:</td><td><input class="user-setup-input" type="password" value="" name="newpwd-repeat" id="newpwd-repeat" required/></td>
 					</tr>
-					<tr><td colspan="2" align="right"><button type="submit">确认修改</button></td></tr>
+					<tr><td colspan="2" align="right"><button type="submit" onclick="onSecuritySubmit()">确认修改</button></td></tr>
 				</table>
 			</form>
 		</div>
