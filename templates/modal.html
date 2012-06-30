@@ -1,0 +1,38 @@
+<div class="modal fade" id="login">
+<div class="modal-header">
+	<a class="close" data-dismiss="modal">×</a>
+	<h3>Log In</h3>
+</div>
+ <div class="modal-body">
+	<form class="form" id="login-form" action="/signin" method="post">
+    	<fieldset id="inputs">
+	        <input name="username" type="text" placeholder="Username" required><span id="login-message"></span><br/>
+	        <input name="password" type="password" placeholder="Password" required>
+	        <input type="submit" class="btn" value="登录" onclick="login()">
+	        <a href="/forgetpwd" target="_blank">忘记密码?</a>
+	    </fieldset>
+	</form>
+  </div>
+</div>
+
+<div class="modal fade" id="signup">
+  <div class="modal-header">
+    <a class="close" data-dismiss="modal">×</a>
+    <h3>Sign up</h3>
+  </div>
+  <div class="modal-body">
+	<form class="form" id="signup-form" action="/signup" method="post" method="post" onclick="signup()">
+	<fieldset id="inputs">
+		<table>
+			<tr><td>用戶名:</td><td><input id="username" type="text" name="username"  placeholder="Username" value="{{ username }}" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,15}" maxLength="16" required/></td><td id="usernameErrorMessage" class="tip"></td></tr>
+			<tr><td>密码:</td><td><input id="password" type="password" name="password" placeholder="Password" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" maxLength="30" required/></td><td id="passwordErrorMessage" class="tip"></td></tr>
+			<tr><td>密码确认:</td><td><input id="repassword" type="password" name="repassword" customError="valid" placeholder="Password" required/></td></tr>
+			<tr><td>邮箱:</td><td><input type="email" name="email"  placeholder="Email" value="{{ email }}" required/></td><td id="emailErrorMessage" class="tip"></td></tr>
+		</table>
+	</fieldset>
+	<fieldset id="actions">
+		<input type="submit" class="btn" id="submit" value="注册" onclick="check()">
+		</fieldset>
+	</form>
+  </div>
+</div>

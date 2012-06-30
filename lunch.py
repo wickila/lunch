@@ -1,13 +1,12 @@
 #-*- encoding: UTF-8 -*-
 
-import web
-import model
 from jinja2 import Environment, PackageLoader
-import re
 import hashlib
 import json
+import model
+import re
 import urllib2
-import json
+import web
 #from jinja2 import Environment, PackageLoader
 
 web.config.debug = False
@@ -21,9 +20,17 @@ urls = (
 	'/user/view/(.*)','user.View',
 	'/user/edit','user.Edit',
 	'/user/security','user.Security',
+	'/user/email','user.Email',
+	'/user/avatar','user.Avatar',
 	'/restuarant/new','restuarant.New',
+	'/restuarant/edit','restuarant.Edit',
+	'/restuarant/avatar','restuarant.Avatar',
 	'/api/localrestuarants','api.LocalRestaurants',
-	'/api/menus/(.*)','api.Menus'
+	'/api/resturant/view/(.*)','api.ViewRestuarant',
+	'/api/resturant/menus/(.*)','api.ViewMenus',
+	'/api/checklogin','api.CheckLogin',
+	'/api/getmyrest','api.GetMyRest',
+	'/api/menu/view/(.*)','api.ViewMenu',
 )
 
 app = web.application(urls, globals())
@@ -79,13 +86,20 @@ class Signin:
 		user = model.valid_user(u, p)
 		if user:
 			session.user = user
-			raise web.seeother("/")
+			user.registertime = str(user.registertime)
+			user.modifytime = str(user.modifytime)
+			return write_json({'result':True,'message':'login success','user':user})
+		return write_json({'result':False,'message':u'用户名或密码不正确'})
 
 class Signout:
 	def GET(self):
 		session.user = None
 #		session.kill()
 		raise web.seeother('/')
+	
+	def POST(self):
+		session.user = None
+		return write_json({'result':True,'message':'登出成功'})
 	
 class Signup:
 	def GET(self):
@@ -142,19 +156,21 @@ class Signup:
 				else:
 					emailError = 4#email格式不正确
 		if (usernameError + passwordError + emailError)>0:
-			templateData = {}
+			templateData = {'result':False}
 			templateData['username'] = username
 			templateData['password'] = password
 			templateData['email'] = email
 			templateData['usernameErrorMessage'] = usernameErrorMessage[usernameError]
 			templateData['passwordErrorMessage'] = passwordErrorMessage[passwordError]
 			templateData['emailErrorMessage'] = emailErrorMessage[emailError]
-			return env.get_template('signup.html').render(templateData)
+			return write_json(templateData)
 		else:
 			p_sha1 = hashlib.sha1(password).hexdigest()
-			model.db.insert('user',username=username,password=p_sha1,email=email)
-			session.user = model.user(username,email)
-			web.seeother('/')
+			uid = model.db.insert('user',username=username,password=p_sha1,email=email)
+			session.user = model.db.query("select * from user where id=%d" % uid)[0]
+			session.user.registertime = str(session.user.registertime)
+			session.user.modifytime = str(session.user.modifytime)
+			return write_json({'result':True,'message':'signup success','user':session.user})
 
 def getSession():
 	if '_session' not in web.config:

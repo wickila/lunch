@@ -6,12 +6,13 @@
 $(function(){
 	var map = null;
 	var geocoder = null;
-	var user = null;
 	var lastUpdate = 0;
 	
-	restuarants = {}
+	window.restuarants = {}
 	
 	window.initialize =  function() {
+		get_user();
+		
 	    var latlng = new google.maps.LatLng(GEOCHAT_VARS['initial_latitude'], GEOCHAT_VARS['initial_longitude']);
 	    var myOptions = {
 	      zoom: 12,
@@ -134,32 +135,36 @@ $(function(){
    * @param {number} longitude
    * @constructor
    */
-  var Restuarant =  function(id, name, type, lat, lng) {
-	this.id = id
-    this.name = name;
-    this.type = type;
-    this.point = new google.maps.LatLng(lat, lng);
+  var Restuarant =  function(info) {
+	this.id = info.id;
+    this.info = info;
+    this.point = new google.maps.LatLng(info.lat, info.lng);
     this.marker = new google.maps.Marker({
-      id: id,
+      id: this.id,
       position: this.point,
-      title:name
+      title:this.info.name
     });
+    this.menus = [];
+    
     this.marker.setMap(map);
-    restuarants[id] = this;
+    restuarants[this.id] = this;
     google.maps.event.addListener(this.marker, 'click', function() {
     	var rest = restuarants[this.id];
+    	window.current_rest = rest;
+    	$.setSideBarRest(rest);
     	$.ajax({
             type: 'GET',
-            url: '/api/menus/'+id,
+            url: '/api/resturant/menus/'+rest.id,
             ContentType: "application/json",
             success: function(data){
+    					this.menus = data.menus;
             			var menu;
             			for(var i in data.menus)
             			{
             				menu = data.menus[i];
             			}
             		},
-            error: function(){alert('获取本地餐厅失败')}
+            error: function(){alert('获取菜单失败')}
         });
         map.setCenter(this.getPosition());
     });
@@ -263,7 +268,7 @@ $(function(){
 				'success':function(data){
 					data = eval(data);
 					if(data.result){
-						r = new Restuarant(data.rest.id,data.rest.name,data.rest.rest_type,data.rest.lat,data.rest.lng);
+						r = new Restuarant(data.rest);
 						map.setCenter(new google.maps.LatLng(data.rest.lat,data.rest.lng), 13);
 						$('#myModal').modal('hide');
 					}
@@ -295,7 +300,10 @@ $(function(){
 	              			for(var i in data.restuarants)
 	              			{
 	              				rest = data.restuarants[i]
-	              				r = new Restuarant(rest.id,rest.name,rest.rest_type,rest.lat,rest.lng);
+	              				r = new Restuarant(rest);
+	              				if(window.user && window.user.id == r.uid){
+	              					window.user.restuarant = r;
+	              				}
 	              			}
 	              		},
 	              		'error': function(){alert('获取本地餐厅失败')}
@@ -304,5 +312,119 @@ $(function(){
 	          alert("Geocode was not successful for the following reason: " + status);
 	        }
 	      });
+	};
+	
+	function get_user(){
+		$.ajax({
+            type: 'GET',
+            url: '/api/checklogin',
+            ContentType: "application/json",
+    		success: function(data){
+    			window.user = data.user;
+    			if(user){
+    				$('.user').addClass('user-login');
+    				$('.user').removeClass('user');
+    				$('#bottom-nav-user').html(user.username);
+    				if(user.permission > 0){
+    					$('.boss').addClass('boss-login');
+    					$('.boss').removeClass('boss');
+    				}
+    			}
+    		},
+    		error: function(){alert('登录失败')}
+        });
+	}
+	
+	window.login = function(){
+		$('#login-form').ajaxForm({
+			'dataType': 'json',
+			'success':function(data){
+				if(data.result){
+					window.user = data.user
+					$('#login').modal('hide');
+					$('#nav-right').html("<li><a id='nav-username'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li><li><a>首页</a></li>");
+					$('#nav-logout').click(logout);
+					$('.user').addClass('user-login');
+    				$('.user').removeClass('user');
+					if(user.permission > 0){
+						$('.boss').addClass('boss-login');
+    					$('.boss').removeClass('boss');
+					}
+					$('#bottom-nav-user').html(user.username);
+				}else{
+					$('#login-message').html(data.message);
+				}
+			}
+		});
+	}
+	
+	window.signup = function(){
+		$('#signup-form').ajaxForm({
+			'dataType': 'json',
+			'success':function(data){
+				if(data.result){
+					window.user = data.user
+					$('#signup').modal('hide');
+					user = data.user;
+					$('#nav-right').html("<li><a id='nav-username' href='#userview'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li><li><a>首页</a></li>");
+					$('#nav-logout').click(logout);
+					$('#main').append($("<section id='"+ user.username +"' style='left:400%;background-color: #0f0;'>" +
+										"<div>fivth div</div>" +
+										"</section>"));
+					$('.user').addClass('user-login');
+    				$('.user').removeClass('user');
+					if(user.permission > 0){
+						$('.boss').addClass('boss-login');
+    					$('.boss').removeClass('boss');
+					}
+					$('#bottom-nav-user').html(user.username);
+				}else{
+					$('#usernameErrorMessage').html(data.usernameErrorMessage);
+					$('#passwordErrorMessage').html(data.passwordErrorMessage);
+					$('#emailErrorMessage').html(data.emailErrorMessage);
+				}
+			}
+		});
+	}
+	
+	window.logout = function(){
+		$.ajax({
+            type: 'POST',
+            url: '/signout',
+            ContentType: "application/json",
+    		success: function(data){
+				if(data.result){
+					window.user = null;
+					$('#nav-right').html("<li><a data-toggle='modal' data-target='#login'>登录</a></li><li><a id='nav-signup' data-toggle='modal' data-target='#signup'>注册</a></li><li><a>首页</a></li>");
+					$('.user-login').addClass('user');
+    				$('.user-login').removeClass('user-login');
+    				$('.boss-login').addClass('boss');
+					$('.boss-login').removeClass('boss-login');
+					$('#bottom-nav-user').html('游客');
+				}else{
+					alert(data.message);
+				}
+    		},
+    		error: function(){alert('服务器繁忙，请稍后再试')}
+        });
+	};
+	
+	window.check = function() {
+		var password = $("#password").val();
+		var repassword = $("#repassword").val();
+		var rpwd = $("#repassword")[0];
+		if(repassword.length > 0)
+		{
+			if(password != repassword)
+			{
+				rpwd.setCustomValidity("密码不一致!"); 
+			}else
+			{
+				rpwd.setCustomValidity("");
+			}
+		}else
+		{
+			rpwd.setCustomValidity("请输入此字段!");
+		}
 	};
 });

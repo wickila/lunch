@@ -6,7 +6,7 @@ db = web.database(dbn='mysql', db='lunch', user='root', pw='wickilaformysql')
 
 def valid_user(user,pwd):
 	v = {"username":user,"password":hashlib.sha1(pwd).hexdigest()}
-	users = db.select('user',v)
+	users = db.query('select * from user where username=$username and password=$password', v)
 	if len(users) > 0:
 		return users[0]
 	return None

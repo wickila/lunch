@@ -22,8 +22,10 @@ CHARACTER SET utf8
 CREATE TABLE `lunch`.`restuarant` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `rtype` INT UNSIGNED NOT NULL,
+  `avatarurl` TEXT  NOT NULL,
   `uid` INT UNSIGNED NOT NULL,
   `name` TEXT  NOT NULL,
+  `minprice` INT  NOT NULL,
   `lat` FLOAT  NOT NULL,
   `lng` FLOAT  NOT NULL,
   `hash_location` TEXT  NOT NULL,

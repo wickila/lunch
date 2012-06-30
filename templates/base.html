@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html>
+<html ng-app="lunch">
 	<head>
 	<title>{% block title %}Lunch{% endblock %}</title>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
@@ -9,6 +9,7 @@
 	{% block style%}
 	{% endblock %}
 	<script type="text/javascript" src="/static/js/jquery.js"></script>
+	<script type="text/javascript" src="/static/js/components.js"></script>
 	<script type="text/javascript">
 		window.initialize =  function() {
 			
@@ -22,20 +23,25 @@
 			<div class="navbar-inner">
 				<div class="container">
 					<a class="brand" href="/">Lunch</a>
-					<ul class="nav pull-right">
+					<form class="navbar-search pull-left">
+					  <input type="text" class="search-query" placeholder="Search">
+					  <button type="submit" class="btn">搜索</button>
+					</form>
+					<ul id="nav-right" class="nav pull-right">
 						{% if user %}
-							<li><a href='/user/edit'>{{user.username}}</a></li>
-							<li><a href="/signout">登出</a></li>
+							<li><a href="#userview">{{user.username}}</a></li>
+							<li><a onclick="logout()">登出</a></li>
 						{% else %}
-						<li><a href="/signin">登录</a></li>
-						<li><a href="/signup">注册</a></li>
+							<li><a data-toggle="modal" data-target="#login">登录</a></li>
+							<li><a data-toggle="modal" data-target="#signup">注册</a></li>
 						{% endif %}
-						<li><a href="/">首页</a></li>
+						<li><a href="#first">首页</a></li>
 					</ul>
 				</div>
 			</div>
 		</div>
-		<div id="content" class="container">
+		{% include 'modal.html' %}
+		<div id="content">
 			{% block content %}this is the defualt content{% endblock %}
 			<footer class="footer">
 				{% block footer %}

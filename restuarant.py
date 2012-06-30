@@ -3,6 +3,7 @@
 import web
 import model
 import lunch
+import os
 from geo import geohash
 
 class New():
@@ -24,4 +25,43 @@ class New():
             rest = model.db.query('select * from restuarant where id=$rest_id',vars=locals())[0]
             rest.created_time = str(rest.created_time).split('.')[0]
             dic = {'result':True,'type':1,'rest':rest}
-        return lunch.write_json(dic)
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class Eidt():
+    def POST(self):
+        user_data = web.input()
+        name = user_data.name
+        rtype = user_data.rtype
+        description = user_data.description
+        adress = user_data.adress
+        phone = user_data.phone
+        minprice = int(user_data.minprice)
+        user = lunch.get_current_user()
+        if user and user.permission > 0:
+            uid = user.id
+            rid = model.db.update('restuarant',where='uid=$uid',name=name,rtype=rtype,description=description,adress=adress,telephone=phone,minprice=minprice,vars=locals())
+            r = model.db.select('restuarant',where='id=$rid',vars=locals())[0]
+            return lunch.write_json({'result':True,'message':'modified success!','restuarant':r})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+
+class Avatar:
+    def POST(self):
+        user = lunch.get_current_user()
+        if user:
+            post_data = web.input(img={})
+            filedir = '/static/upload/rest-avatar'
+            if not os.path.isdir('.'+filedir):
+                os.mkdir('.'+filedir)
+            if 'img' in post_data: # to check if the file-object is created
+                filepath=post_data.img.filename.replace('\\','/') # replaces the windows-style slashes with linux ones.
+                filename=str(user.id)+'.'+filepath.split('/')[-1].split('.')[1] # splits the and chooses the last part (the filename with extension)
+                fout = open('.'+filedir +'/'+ filename,'wb') # creates the file where the uploaded file should be stored
+                fout.write(post_data.img.file.read()) # writes the uploaded file to the newly created file.
+                fout.close() # closes the file, upload complete.
+                pydic = {'imgurl':filedir +'/'+ filename}
+                id = user.id
+                model.db.update('restuarant',avatarurl=pydic['imgurl'],where='uid=$id',vars=locals())
+                user.avatar_url = pydic['imgurl']
+                web.header('Content-Type', 'application/json')
+                return lunch.write_json(pydic)
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})

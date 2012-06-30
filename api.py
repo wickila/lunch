@@ -12,6 +12,27 @@ import config
 
 from geo import geohash
 
+class CheckLogin:
+    def GET(self):
+        user = lunch.get_current_user()
+        if user:
+            return lunch.write_json({'result':True,'message':'','user':user})
+        return lunch.write_json({'result':False,'message':'you hava not login'})
+    
+class GetMyRest:
+    def GET(self):
+        user = lunch.get_current_user()
+        if user and user.permission>0:
+            uid = user.id
+            rs = model.db.select('restuarant',where='uid=$uid',vars=locals())
+            result = {'result':True,'message':'success'}
+            if len(rs)>0:
+                r = rs[0]
+                r.created_time = str(r.created_time)
+                result['restuarant'] = r
+            return lunch.write_json(result)
+        return lunch.write_json({'result':False,'message':'you have not login or permission is not enough'})
+
 class LocalRestaurants:
     def GET(self):
         data = web.input()
@@ -48,15 +69,23 @@ class LocalRestaurants:
             i-=1
         return result  
 
-class Restuarant():
+class ViewRestuarant():
     def GET(self,id):
         q = model.db.select('resetuarant',where='id=$id',vars=locals())
         if len(q)>0:
             restuarant = q[0]
         return lunch.write_json({'result':True,'restuarant':restuarant})
     
-class Menus():
+class ViewMenus():
     def GET(self,rid):
         q = model.db.select('menu',where='rid=$rid',vars=locals())
         menus = [menu for menu in q]
         return lunch.write_json({'result':True,'menus':menus})
+    
+class ViewMenu():
+    def GET(self,mid):  
+        q = model.db.select('menu',where='id=$mid',vars=locals())
+        if len(q) > 0:
+            menu = q[0]
+            return lunch.write_json({'result':True,'menus':menu})
+        return lunch.write_json({'result':False,'message':'menu not found'})  

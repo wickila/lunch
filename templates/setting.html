@@ -1,0 +1,65 @@
+<link rel="stylesheet" href="/static/css/user.css" type="text/css" charset="utf-8">
+<script type="text/javascript" src="static/js/setting.js"></script>
+<div class="container content">
+	<div class="row-fluid">
+		<div class="span3">
+			<ul class="nav nav-tabs nav-stacked" id="user-leftbar">
+				<li class="active passby" data-sidebar="buy-order"><a href="#userview">买家订单</a></li>
+				<li class="user" data-sidebar="profile"><a href="#userview">个人资料</a></li>
+				<li class="user" data-sidebar="security"><a href="#userview">安全设置</a></li>
+				<hr class="boss"></hr>
+				<li data-sidebar="restuarant" class="boss"><a href="#userview">店铺资料</a></li>
+				<li data-sidebar="menus" class="boss"><a href="#userview">菜单资料</a></li>
+				<li data-sidebar="sell-order" class="boss"><a href="#userview">店家订单</a></li>
+			</ul>
+		</div>
+		<div class="span9">
+			<div class="setting-container active passby" id="buy-order">
+				买家订单
+			</div>
+			<div class="setting-container user" id="profile">
+				<h1>个人资料</h1>
+				<hr></hr>
+				<form id="email_form" method="post" action="/user/email">
+					<h3>修改邮箱</h3>
+					<fieldset>
+						<span>邮箱:</span><input type="email" name="email" placeholder="请在此输入您的新邮箱" required></input><br/>
+						<span>密码:</span><input type="password" name="email_pwd" placeholder="请在此输入您的密码" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" maxLength="30" required><span id="email_pwd_err" style="color:#f00;display:none;margin-left:10px">密码錯误</span></input><br/>
+						<input type="submit" class="btn" onclick="post_email()"></input>
+					</fieldset>
+				</form>
+				<hr></hr>
+				<form id="avatar_form" enctype="multipart/form-data" method="post" action="/user/avatar">
+					<h3>修改头像</h3>
+					<fieldset>
+						<table><tr><td><img id="avatar_img" style="width:35px;height=35px;" src="{{ user.avatar_url }}"></img></td><td><input type="file" name="img" required></input></td><td><input type="submit" value="保存" class="btn" onclick="upload_avatar()"></input></td></tr></table>
+					</fieldset>
+				</form>
+			</div>
+			<div class="setting-container user" id="security">
+				<h1>安全设置</h1>
+				<hr></hr>
+				<form id="pwd_form" method="post" action="/user/security">
+					<h3>修改密码</h3>
+					<fieldset>
+						<table>
+						<tr><td>密码:</td><td><input type="password" name="oldpwd" id="oldpwd" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" maxLength="30" placeholder="原密码" required><span id="pwd_err" style="color:#f00;display:none;margin-left:10px">密码錯误</span></input></td></tr>
+						<tr><td>新密码:</td><td><input type="password" name="newpwd" id="newpwd" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" maxLength="30" placeholder="新密码,数字字母与下划线,4-30字节" required></input></td></tr>
+						<tr><td>确认新密码:</td><td><input type="password" name="repwd" id="repwd" required></input></td></tr>
+						</table>
+						<input type="submit" class="btn" onclick="post_password()"></input>
+					</fieldset>
+				</form>
+			</div>
+			<div class="setting-container boss" id="restuarant">
+				{% include 'restuarant_setting.html' %}
+			</div>
+			<div class="setting-container boss" id="menus">
+				菜单资料
+			</div>
+			<div class="setting-container boss" id="sell-order">
+				店家订单
+			</div>
+		</div>
+	</div>
+</div>
