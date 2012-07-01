@@ -342,7 +342,7 @@ $(function(){
 				if(data.result){
 					window.user = data.user
 					$('#login').modal('hide');
-					$('#nav-right').html("<li><a id='nav-username'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li><li><a>首页</a></li>");
+					$('#nav-right').html("<li><a id='nav-username' href='#userview'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li><li><a>首页</a></li>");
 					$('#nav-logout').click(logout);
 					$('.user').addClass('user-login');
     				$('.user').removeClass('user');

@@ -27,7 +27,7 @@ class New():
             dic = {'result':True,'type':1,'rest':rest}
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
     
-class Eidt():
+class Edit():
     def POST(self):
         user_data = web.input()
         name = user_data.name
@@ -40,7 +40,8 @@ class Eidt():
         if user and user.permission > 0:
             uid = user.id
             rid = model.db.update('restuarant',where='uid=$uid',name=name,rtype=rtype,description=description,adress=adress,telephone=phone,minprice=minprice,vars=locals())
-            r = model.db.select('restuarant',where='id=$rid',vars=locals())[0]
+            r = model.db.select('restuarant',where='uid=$uid',vars=locals())[0]
+            r.created_time = str(r.created_time)
             return lunch.write_json({'result':True,'message':'modified success!','restuarant':r})
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
 

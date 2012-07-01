@@ -1,10 +1,56 @@
 $(function(){
+	var menus;
+	
 	$('#user-leftbar li').live('click',function(e){
 		var link = $(this);
 		link.addClass('active').siblings().removeClass('active');
 		$('#'+link.data('sidebar')).addClass('active').siblings().removeClass('active');
+		switch(link.data('sidebar')){
+		case 'menus':
+			if(!window.user.resturant.menus){
+				$ajax({
+					type: 'GET',
+		            url: '/api/resturant/menus/'+window.user.restuarant.id,
+		            ContentType: "application/json",
+					success:function(data){
+						window.user.resturant.menus = data.menus;
+						if(!menus){
+							menus = new Menus($('#setting-menus-container'),window.user.resturant.menus);
+						}
+					},
+					error:function(){
+						alert('加载菜单失败');
+					}
+				});
+			}else{
+				if(!menus){
+					menus = new Menus($('#setting-menus-container'),window.user.resturant.menus);
+				}
+			}
+		}
 		e.preventDefault();
 	});
+	
+	window.new_menu = function(){
+		$('#setting-menus-form-container').show();
+	}
+	
+	window.close_menu_form = function(){
+		$('#setting-menus-form-container').hide();
+	}
+	
+	window.menu_img_change = function(){
+		$('#setting-menu-imgfile').disabled = $('setting-menu-imgurl').val().length > 0;
+	}
+	
+	window.upload_menu_img = function(){
+		$('#setting-menu-img-form').ajaxForm({
+			'dataType': 'json',
+			'success':function(data){
+				$("#setting-menu-img").attr('src',data.imgurl);
+		}
+	});
+	}
 	
 	window.upload_avatar = function(){
 		$('#avatar_form').ajaxForm({
@@ -62,7 +108,7 @@ $(function(){
 		});
 	};
 
-	window.post_email = function(){
+	window.edit_rest = function(){
 		$('#rest-setting-form').ajaxForm({
 			'dataType': 'json',
 			'success':function(data){

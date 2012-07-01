@@ -49,8 +49,10 @@ $(function(){
 		    				$('#rest-settting-type').val(window.user.restuarant.rtype);
 		    				$('#rest-setting-des').val(window.user.restuarant.description);
 		    				$('#rest-setting-addres').val(window.user.restuarant.adress);
-		    				$('#rest-setting-phone').val(window.user.restuarant.phone);
+		    				$('#rest-setting-phone').val(window.user.restuarant.telephone);
 		    				$('#rest-setting-minprice').val(window.user.restuarant.minprice);
+		    				$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
+		    				$('#setting-avatar-img').attr('src',window.user.avatarurl);
 		    			}
 		    		},
 		    		error: function(){alert('获取餐厅信息失败')}
