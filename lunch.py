@@ -31,6 +31,10 @@ urls = (
 	'/api/checklogin','api.CheckLogin',
 	'/api/getmyrest','api.GetMyRest',
 	'/api/menu/view/(.*)','api.ViewMenu',
+	'/api/menu/thumbnail/(.*)','api.MenuThumbail',
+	'/api/menu/new','api.NewMenu',
+	'/api/menu/edit/(.*)','api.EditMenu',
+	'/api/menu/delete/(.*)','api.DeleteMenu',
 )
 
 app = web.application(urls, globals())

@@ -8,6 +8,7 @@ Created on 2012-6-14
 import lunch
 import model
 import web
+import os
 import config
 
 from geo import geohash
@@ -89,3 +90,74 @@ class ViewMenu():
             menu = q[0]
             return lunch.write_json({'result':True,'menus':menu})
         return lunch.write_json({'result':False,'message':'menu not found'})  
+    
+class MenuThumbail():
+    def POST(self,id):
+        user = lunch.get_current_user()
+        post_data = web.input(imgfile={})
+        if user and user.permission>0:
+            mns = model.db.select('menu',where='id=$id',vars=locals())
+            if len(mns)>0:
+                menu = mns[0]
+                filedir = '/static/upload/menu-thumbnail'
+                if not os.path.isdir('.'+filedir):
+                    os.mkdir('.'+filedir)
+                if 'imgfile' in post_data: # to check if the file-object is created
+                    filepath=post_data.imgfile.filename.replace('\\','/') # replaces the windows-style slashes with linux ones.
+                    filename=str(id)+'.'+filepath.split('/')[-1].split('.')[1] # splits the and chooses the last part (the filename with extension)
+                    fout = open('.'+filedir +'/'+ filename,'wb') # creates the file where the uploaded file should be stored
+                    fout.write(post_data.imgfile.file.read()) # writes the uploaded file to the newly created file.
+                    fout.close() # closes the file, upload complete.
+                    pydic = {'imgurl':filedir +'/'+ filename}
+                    model.db.update('menu',thumbnail=pydic['imgurl'],where='id=$id',vars=locals())
+                    menu.thumbnail = pydic['imgurl']
+                    pydic['menu'] = menu
+                    pydic['message'] = 'success'
+                    web.header('Content-Type', 'application/json')
+                    return lunch.write_json(pydic)
+            else:
+                return lunch.write_json({'result':False,'message':'menu not found'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class NewMenu():
+    def POST(self):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user and user.permission>0:
+            name = post_data.name
+            description = post_data.description
+            price = post_data.price
+            discount = post_data.discount
+            mtype = post_data.mtype
+            thumbnail = post_data.thumbnail
+            rid = model.db.query('select id from restuarant where uid='+str(user.id))[0].id
+            mid = model.db.insert('menu',name=name,description=description,price=price,discount=discount,mtype=mtype,uid=user.id,rid=rid,thumbnail=thumbnail)
+            mns = model.db.select('menu',where='id=$mid',vars=locals())
+            m = mns[0]
+            return lunch.write_json({'result':True,'message':'success','menu':m})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class EditMenu():
+    def POST(self,mid):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user and user.permission>0:
+            name = post_data.name
+            description = post_data.description
+            price = post_data.price
+            discount = post_data.discount
+            mtype = post_data.mtype
+            thumbnail = post_data.thumbnail
+            model.db.update('menu',where='id=$mid',vars=locals(),name=name,description=description,price=price,discount=discount,mtype=mtype,thumbnail=thumbnail)
+            mns = model.db.select('menu',where='id=$mid',vars=locals())
+            m = mns[0]
+            return lunch.write_json({'result':True,'message':'success','menu':m})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+class DeleteMenu():
+    def POST(self,mid):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user and user.permission>0:
+            model.db.delete('menu',where='id=$imd',vars=locals())
+            return lunch.write_json({'result':True,'message':'delete success'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})

@@ -7,15 +7,15 @@ $(function(){
 		$('#'+link.data('sidebar')).addClass('active').siblings().removeClass('active');
 		switch(link.data('sidebar')){
 		case 'menus':
-			if(!window.user.resturant.menus){
-				$ajax({
+			if(!window.user.restuarant.menus){
+				$.ajax({
 					type: 'GET',
 		            url: '/api/resturant/menus/'+window.user.restuarant.id,
 		            ContentType: "application/json",
 					success:function(data){
-						window.user.resturant.menus = data.menus;
+						window.user.restuarant.menus = data.menus;
 						if(!menus){
-							menus = new Menus($('#setting-menus-container'),window.user.resturant.menus);
+							createMenus();
 						}
 					},
 					error:function(){
@@ -24,14 +24,52 @@ $(function(){
 				});
 			}else{
 				if(!menus){
-					menus = new Menus($('#setting-menus-container'),window.user.resturant.menus);
+					createMenus();
 				}
 			}
 		}
 		e.preventDefault();
 	});
 	
-	window.new_menu = function(){
+	function initEvents(){
+		$('#setting-menus-container').find('.menu').live('click',function(){
+			var menu = $(this);
+			mid = menu.data('mid');
+			var m_info;
+			for(var i in window.user.restuarant.menus)
+			{
+				if(window.user.restuarant.menus[i].id==mid){
+					m_info = window.user.restuarant.menus[i];
+					break;
+				}
+			}
+			$('#setting-menu-img').attr('src',m_info.thumbnail);
+			$('#setting-menu-name').val(m_info.name);
+			$('#setting-menu-description').val(m_info.description);
+			$('#setting-menu-price').val(m_info.price);
+			$('#setting-menu-discount').val(m_info.discount);
+			$('#setting-menu-mtype').val(m_info.mtype);
+			$('#setting-menu-imgurl').val(m_info.thumbnail);
+			$('#setting-menu-form').attr('action','/api/menu/edit/'+m_info.id);
+			$('#setting-menus-form-container').show();
+		});
+	}
+	
+	function createMenus(){
+		menus = new Menus($('#setting-menus-container'),window.user.restuarant.menus);
+		initEvents();
+	}
+	
+	function updateMenus(mns){
+		menus.setMenus(mns);
+		initEvents();
+	}
+	
+	window.newMenu = function(){
+		$('#setting-menu-form').attr('action','/api/menu/new');
+		$('#setting-menu-form')[0].reset();
+		$('#setting-menu-img-form')[0].reset();
+		$('#setting-menu-img').attr('src','');
 		$('#setting-menus-form-container').show();
 	}
 	
@@ -40,20 +78,69 @@ $(function(){
 	}
 	
 	window.menu_img_change = function(){
-		$('#setting-menu-imgfile').disabled = $('setting-menu-imgurl').val().length > 0;
+		var s = $('#setting-menu-imgurl').val();
+		var l = s.length;
+		$('#setting-menu-imgfile')[0].disabled = l > 0;
+	}
+	
+	window.uploadMenu = function(){
+		$('#setting-menu-form').ajaxForm({
+			'dataType': 'json',
+			'success':function(data){
+				menu = data.menu
+				$('#setting-menu-img-form').attr('action','/api/menu/thumbnail/'+menu.id);
+				if($('#setting-menu-imgfile').val()){
+					$('#setting-menu-img-form').ajaxForm({
+						'dataType': 'json',
+						'success':function(data){
+							lunchAlert('操作成功');
+							var m = data.menu;
+							for(var i in window.user.restuarant.menus)
+							{
+								if(window.user.restuarant.menus[i].id==mid){
+									window.user.restuarant.menus[i] = m;
+									break;
+								}
+							}
+							updateMenus(window.user.restuarant.menus);
+						}
+					}).submit();
+				}else{
+					lunchAlert('操作成功');
+					var m = data.menu;
+					$('#setting-menu-img').attr('src',m.thumbnail);
+					for(var i in window.user.restuarant.menus)
+					{
+						if(window.user.restuarant.menus[i].id==mid){
+							window.user.restuarant.menus[i] = m;
+							break;
+						}
+					}
+					updateMenus(window.user.restuarant.menus);
+				}
+			}
+		});
+	}
+	
+	window.onMenuImgChoose = function(){
+		var viewFiles = document.getElementById("setting-menu-imgfile");
+	    var viewImg = document.getElementById("setting-menu-img");
+		var file = viewFiles.files[0];
+	    //通过file.size可以取得图片大小
+        var reader = new FileReader();
+        reader.onload = function( evt ){
+            viewImg.src = evt.target.result;
+        }
+        reader.readAsDataURL(file);
 	}
 	
 	window.upload_menu_img = function(){
-		$('#setting-menu-img-form').ajaxForm({
-			'dataType': 'json',
-			'success':function(data){
-				$("#setting-menu-img").attr('src',data.imgurl);
-		}
-	});
+		
 	}
 	
 	window.upload_avatar = function(){
 		$('#avatar_form').ajaxForm({
+				'dataType': 'json',
 				'success':function(data){
 					data = eval(data);
 					$("#avatar_img").attr('src',data.imgurl);

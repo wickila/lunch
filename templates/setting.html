@@ -55,30 +55,37 @@
 				{% include 'restuarant_setting.html' %}
 			</div>
 			<div class="setting-container boss" id="menus">
-				<table width="100%"><tr><td><h3>菜单资料</h3></td><td><a class="btn" style="float: right" onclick="new_menu();">新建菜单</a></td></tr></table>
+				<table width="100%"><tr><td><h3>菜单资料</h3></td><td><a class="btn" style="float: right" onclick="newMenu();">新建菜单</a></td></tr></table>
 				<hr></hr>
 				<div id="setting-menus-form-container">
 					<a class="close" onclick="close_menu_form()">&times;</a>
-					<form id="setting-menu-img-form" enctype="multipart/form-data" method="post" action="/user/avatar">
-						<h3>缩略图</h3>
-						<fieldset>
-							<img id="setting-menu-img" style="width:35px;height=35px;"><br/>
-							图片文件:<input type="file" name="imgfile" id="setting-menu-imgfile" onchange="upload_menu_img()"><br/>
-							图片地址:<input type="text" name="imgurl" id="setting-menu-imgurl" onchange="menu_img_change()" required></input><br/>
-							<input type="submit" value="保存" class="btn" onclick="upload_avatar()">
-						</fieldset>
-					</form>
-					<form id="email_form" method="post" action="/user/email">
-						<h3>菜单资料</h3>
-						<fieldset>
-							<span>名称:</span><input type="text" name="name" required></input><br/>
-							<span>描述:</span><input type="text" name="description" required></input><br/>
-							<span>价格:</span><input type="text" name="price" required></input><br/>
-							<span>折扣:</span><input type="text" name="discount" required></input><br/>
-							<input type="submit" class="btn" onclick="post_email()"></input>
-						</fieldset>
-					</form>
-					<hr></hr>
+					<table>
+						<tr valign="top">
+							<td width="40%">
+								<form id="setting-menu-img-form" enctype="multipart/form-data" method="post" action="/api/menu/thumbnail">
+									<h3>缩略图</h3>
+									<fieldset>
+										<div class='menu-img-container thumbnail'><img id="setting-menu-img" class="menu-img"></div>
+										图片文件:<input type="file" name="imgfile" id="setting-menu-imgfile" onchange="onMenuImgChoose()"><br/>
+									</fieldset>
+								</form>
+							</td>
+							<td width="60%">
+								<form id="setting-menu-form" method="post" action="/api/menu/new">
+									<h3>菜单资料</h3>
+									<fieldset>
+										<span>名称:</span><input type="text" name="name" id="setting-menu-name" required></input><br/>
+										<span>描述:</span><input type="text" name="description" id="setting-menu-description" required></input><br/>
+										<span>价格:</span><input type="text" name="price" id="setting-menu-price" required></input><br/>
+										<span>折扣:</span><input type="text" name="discount" id="setting-menu-discount" value="10" required></input><br/>
+										<span>类型:</span><input type="text" name="mtype" id="setting-menu-mtype" required></input><br/>
+										<span>图片地址:</span><input type="text" name="thumbnail" id="setting-menu-imgurl" onkeyup="menu_img_change()" placeholder="如果选择了上传图片，此选项将被忽略"></input><br/>
+										<input type="submit" class="btn" onclick="uploadMenu()" value="保存"></input>
+									</fieldset>
+								</form>
+							</td>
+						</tr>
+					</table>
 				</div>
 				<hr></hr>
 				<div id="setting-menus-container"></div>

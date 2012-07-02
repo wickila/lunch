@@ -1,5 +1,7 @@
 $(function(){
 	last_hash = location.hash==""?"#overview":location.hash;
+	drawView();
+	initLayout();
 	
 	window.onhashchange = function(){
 		main = $('#main');
@@ -10,7 +12,6 @@ $(function(){
 		last_hash = location.hash;
 		main.animate({left:'0px'});
 		drawView();
-		//setTimeout(function(){main.css('left',0);},1000);
 	};
 	
 	var overview;
@@ -25,10 +26,10 @@ $(function(){
 			break;
 		case "#restview":
 			if(!restview){
-				restview = new RestView($('#restview'),window.current_rest);
+				restview = new RestView($('#restview'),window.currentRest.info);
 			}else{
-				if(restview.getRest != window.current_rest){
-					restview.setRest(window.current_rest);
+				if(restview.getRest != window.currentRest.info){
+					restview.setRest(window.currentRest.info);
 				}
 			}
 			break;
@@ -37,28 +38,39 @@ $(function(){
 		case "#orderview":
 			break;
 		case "#userview":
-			if(window.user && window.user.permission>0 && !window.user.restuarant){
-				$.ajax({
-		            type: 'GET',
-		            url: '/api/getmyrest',
-		            ContentType: "application/json",
-		    		success: function(data){
-		    			if(data.result){
-		    				window.user.restuarant = data.restuarant;
-		    				$('#rest-setting-name').val(window.user.restuarant.name);
-		    				$('#rest-settting-type').val(window.user.restuarant.rtype);
-		    				$('#rest-setting-des').val(window.user.restuarant.description);
-		    				$('#rest-setting-addres').val(window.user.restuarant.adress);
-		    				$('#rest-setting-phone').val(window.user.restuarant.telephone);
-		    				$('#rest-setting-minprice').val(window.user.restuarant.minprice);
-		    				$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
-		    				$('#setting-avatar-img').attr('src',window.user.avatarurl);
-		    			}
-		    		},
-		    		error: function(){alert('获取餐厅信息失败')}
-		        });
-			}
+			getRestuarant();
 			break;
+		}
+	}
+	
+	function initLayout(){
+		overviewHeight = $(window).height()-380;
+		$('#map-canvas').css('height',overviewHeight);
+		$('#left-bar').css('height',overviewHeight);
+		$('#small-menu-container').css('max-height',overviewHeight*0.8);
+	}
+	
+	function getRestuarant(){
+		if(window.user && window.user.permission>0 && !window.user.restuarant){
+			$.ajax({
+	            type: 'GET',
+	            url: '/api/getmyrest',
+	            ContentType: "application/json",
+	    		success: function(data){
+	    			if(data.result){
+	    				window.user.restuarant = data.restuarant;
+	    				$('#rest-setting-name').val(window.user.restuarant.name);
+	    				$('#rest-settting-type').val(window.user.restuarant.rtype);
+	    				$('#rest-setting-des').val(window.user.restuarant.description);
+	    				$('#rest-setting-addres').val(window.user.restuarant.adress);
+	    				$('#rest-setting-phone').val(window.user.restuarant.telephone);
+	    				$('#rest-setting-minprice').val(window.user.restuarant.minprice);
+	    				$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
+	    				$('#setting-avatar-img').attr('src',window.user.avatarurl);
+	    			}
+	    		},
+	    		error: function(){alert('获取餐厅信息失败')}
+	        });
 		}
 	}
 });

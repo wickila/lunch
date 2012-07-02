@@ -31,11 +31,12 @@ var Menu = function(menu){
 };
 
 Menu.prototype.setMenu = function(menu){
-	
+	this.menu = menu;
 };
 
 Menu.prototype.getDiv = function(){
-	var div = "<div class='span4'><img src='"+ this.menu.thumbnail +"'></img>" +
+	var div = "<div class='span3 menu' data-mid='"+ this.menu.id +"'>"+
+			"<div class='menu-img-container thumbnail'><img class='menu-img' src='"+ this.menu.thumbnail +"'></img></div>" +
 			"<div><span class='rm-name'>"+ this.menu.name +"</span><span class='rm-price'>"+ this.menu.price +"</span></div>" +
 			"</div>";
 	return div;
@@ -50,7 +51,8 @@ var Menus = function(jqueryElement,menus){
 };
 
 Menus.prototype.setMenus = function(menus){
-	this.jqueryElement.remove('#menus');
+	this.menus = menus;
+	this.jqueryElement.find('#menus').remove();
 	var m;
 	var mns = [];
 	for(var i in menus)
@@ -60,18 +62,31 @@ Menus.prototype.setMenus = function(menus){
 		mns.push(menu);
 	}
 	var div = "<div id='menus'>";
-	for(i in mns)
+	for(i=0;i<mns.length;i++)
 	{
-		if(i%3 == 0){
+		if(i%4 == 0){
 			div += "<div class='row-fluid'>";
 		}
 		div += mns[i].getDiv();
-		if(i%3 == 2 || i==mns.length-1){
+		if(i%4 == 3 || i==mns.length-1){
 			div += "</div>";
 		}
 	}
 	div += "</div>";
 	this.jqueryElement.append($(div));
+};
+
+var SmallMenu = function(menu){
+	this.menu = menu;
+}
+
+SmallMenu.prototype.getDiv = function(){
+	var div="<div id='small-menu-"+ this.menu.id + "' data-mid='"+this.menu.id+"'>"+
+			"<table width='100%'>" +
+			"<tr><td rowspan='2' width='42'><div class='msb-avatar-container thumbnail'><img class='msb-avatar' src='"+ this.menu.thumbnail +"'></img></div></td><td><span id='msb-name'>"+ this.menu.name +"</span></td></tr>" +
+			"<tr><td><span class='msb-price'>"+ this.menu.price +"￥</span></td><td align='right'><input type='checkbox' name='msb-select'>点选</td></tr>" +
+			"</table></div>";
+	return div;
 };
 
 var RestView = function(jqueryElement,rest){

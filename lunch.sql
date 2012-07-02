@@ -54,4 +54,4 @@ CREATE TABLE `lunch`.`menu` (
   PRIMARY KEY (`id`)
 )
 ENGINE = MyISAM
-CHARACTER SET utf8 COLLATE utf8_general_ci;
+CHARACTER SET utf8

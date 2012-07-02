@@ -9,74 +9,54 @@ $(function(){
 	var lastUpdate = 0;
 	
 	window.restuarants = {}
-	
+	window.currentRest = null;
+	getUser();
+	getRestuarants();
 	window.initialize =  function() {
-		get_user();
-		
 	    var latlng = new google.maps.LatLng(GEOCHAT_VARS['initial_latitude'], GEOCHAT_VARS['initial_longitude']);
 	    var myOptions = {
 	      zoom: 12,
 	      center: latlng,
 	      mapTypeId: google.maps.MapTypeId.ROADMAP
 	    };
-	    map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+	    map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
 	    var contextMenu = $(document.createElement('ul'))
 			.attr('id', 'contextMenu');
-
-		// Fill our context menu with links
 		contextMenu.append(
 			'<li><a href="#zoomIn">Zoom in</a></li>' +
 			'<li><a href="#zoomOut">Zoom out</a></li>' +
 			'<li><a href="#centerHere">Center map here</a></li>' +
 			'<li><a href="#newRestuarant">在此处开店</a></li>'
 		);
-
-		// Disable the browser context menu on our context menu
 		contextMenu.bind('contextmenu', function() { return false; });
-
 		// Append it to the map object
 		$(map.getDiv()).append(contextMenu);
 
 		/**
 		 * Menu events
 		 */
-
-		// Keep track of where you clicked
 		var clickedLatLng;
-
 		// Display and position the menu
 		google.maps.event.addListener(map, 'rightclick', function(e)
 		{
-			// start buy hiding the context menu if its open
 			contextMenu.hide();
-
 			var mapDiv = $(map.getDiv()),
-				x = e.pixel.x,
-				y = e.pixel.y;
-
-			// save the clicked location
+			x = e.pixel.x,
+			y = e.pixel.y;
 			clickedLatLng = e.latLng;
-
-			// adjust if clicked to close to the edge of the map
 			if ( x > mapDiv.width() - contextMenu.width() )
 				x -= contextMenu.width();
-
 			if ( y > mapDiv.height() - contextMenu.height() )
 				y -= contextMenu.height();
-
-			// Set the location and fade in the context menu
 			contextMenu.css({ top: y, left: x }).fadeIn(100);
 		});
 
 		// Set some events on the context menu links
 		contextMenu.find('a').click( function()
 		{
-			// fade out the menu
 			contextMenu.fadeOut(75);
-
 			var action = $(this).attr('href').substr(1);
-
-			switch ( action )
+			switch(action)
 			{
 				case 'zoomIn':
 					map.setZoom(
@@ -84,25 +64,20 @@ $(function(){
 					);
 					map.panTo(clickedLatLng);
 					break;
-
 				case 'zoomOut':
 					map.setZoom(
 						map.getZoom() - 1
 					);
 					map.panTo(clickedLatLng);
 					break;
-
 				case 'centerHere':
 					map.panTo(clickedLatLng);
 					break;
-					
 				case 'newRestuarant':
 					$('#lat').val(clickedLatLng.lat());
 					$('#lng').val(clickedLatLng.lng());
 					$('#myModal').modal('show');
-					//window.location.href = "/restuarant/new?lat="+clickedLatLng.lat()+"&lon="+clickedLatLng.lng();
 					break;
-					
 				default:
 					break;
 			}
@@ -121,20 +96,8 @@ $(function(){
 		$.each('click dragstart zoom_changed maptypeid_changed'.split(' '), function(i,name){
 			google.maps.event.addListener(map, name, function(){ contextMenu.hide() });
 		});
-		
-		get_restuarants();
   	}
 	
-	
-  	
-  	/**
-   * Represents each person active within Geochat.
-   * @param {string} name 
-   * @param {string} type 
-   * @param {number} latitude
-   * @param {number} longitude
-   * @constructor
-   */
   var Restuarant =  function(info) {
 	this.id = info.id;
     this.info = info;
@@ -150,26 +113,10 @@ $(function(){
     restuarants[this.id] = this;
     google.maps.event.addListener(this.marker, 'click', function() {
     	var rest = restuarants[this.id];
-    	window.current_rest = rest;
-    	$.setSideBarRest(rest);
-    	$.ajax({
-            type: 'GET',
-            url: '/api/resturant/menus/'+rest.id,
-            ContentType: "application/json",
-            success: function(data){
-    					this.menus = data.menus;
-            			var menu;
-            			for(var i in data.menus)
-            			{
-            				menu = data.menus[i];
-            			}
-            		},
-            error: function(){alert('获取菜单失败')}
-        });
+    	setCurrentRest(rest);
         map.setCenter(this.getPosition());
     });
   };
-  
   /**
    * Move this Restuarant to the specified latitude and longitude.
    * @param {number} lat The latitude to move to.
@@ -275,8 +222,9 @@ $(function(){
 				}
 		});
 	}
-  
-  	function get_restuarants(){
+
+  	var isInit = false;
+  	function getRestuarants(){
 	  	geocoder = new google.maps.Geocoder();
 	  	geocoder.geocode( { 'address': GEOCHAT_VARS['default_location']}, function(results, status) {
 	        if (status == google.maps.GeocoderStatus.OK) {
@@ -297,6 +245,7 @@ $(function(){
 	              		"percision":map.getZoom()-4},
 	              		'success': function(data){
 	              			var rest;
+	              			var r;
 	              			for(var i in data.restuarants)
 	              			{
 	              				rest = data.restuarants[i]
@@ -304,6 +253,10 @@ $(function(){
 	              				if(window.user && window.user.id == r.uid){
 	              					window.user.restuarant = r;
 	              				}
+	              			}
+	              			if(!isInit){
+	              				setCurrentRest(r);
+	              				isInit = true;
 	              			}
 	              		},
 	              		'error': function(){alert('获取本地餐厅失败')}
@@ -314,7 +267,7 @@ $(function(){
 	      });
 	};
 	
-	function get_user(){
+	function getUser(){
 		$.ajax({
             type: 'GET',
             url: '/api/checklogin',
@@ -334,6 +287,21 @@ $(function(){
     		error: function(){alert('登录失败')}
         });
 	}
+	
+	  window.setCurrentRest = function(rest){
+		window.currentRest = rest;
+	  	$.setSideBarRest(rest);
+	  	$.ajax({
+	          type: 'GET',
+	          url: '/api/resturant/menus/'+rest.id,
+	          ContentType: "application/json",
+	          success: function(data){
+	  					this.menus = data.menus;
+	  					$.setSideBarMenus(this.menus);
+	          		},
+	          error: function(){alert('获取菜单失败')}
+	    });
+	  }
 	
 	window.login = function(){
 		$('#login-form').ajaxForm({
