@@ -32,7 +32,7 @@
 				<form id="avatar_form" enctype="multipart/form-data" method="post" action="/user/avatar">
 					<h3>修改头像</h3>
 					<fieldset>
-						<table><tr><td><img id="setting-avatar-img" style="width:35px;height=35px;" src="{{ user.avatar_url }}"></img></td><td><input type="file" name="img" required></input></td><td><input type="submit" value="保存" class="btn" onclick="upload_avatar()"></input></td></tr></table>
+						<table><tr><td><img id="setting-avatar-img" style="width:35px;height=35px;" src="{{ user.avatarurl }}"></img></td><td><input type="file" name="img" required></input></td><td><input type="submit" value="保存" class="btn" onclick="uploadAvatar()"></input></td></tr></table>
 					</fieldset>
 				</form>
 			</div>

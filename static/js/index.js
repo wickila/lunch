@@ -1,5 +1,6 @@
 $(function(){
 	last_hash = location.hash==""?"#overview":location.hash;
+	
 	drawView();
 	initLayout();
 	
@@ -19,58 +20,43 @@ $(function(){
 	var menuview;
 	var orderview;
 	var otherview;
+	window.shoppintCart = null;
 	
 	function drawView(){
 		switch(last_hash){
-		case "#overview":
-			break;
-		case "#restview":
-			if(!restview){
-				restview = new RestView($('#restview'),window.currentRest.info);
-			}else{
-				if(restview.getRest != window.currentRest.info){
-					restview.setRest(window.currentRest.info);
+			case "#overview":
+				creatShoppingCart();
+				break;
+			case "#restview":
+				if(!restview){
+					restview = new RestView($('#restview'),window.currentRest.info);
+				}else{
+					if(restview.getRest != window.currentRest.info){
+						restview.setRest(window.currentRest.info);
+					}
 				}
+				creatShoppingCart();
+				break;
+			case "#menuview":
+				creatShoppingCart();
+				break;
+			case "#orderview":
+				break;
+			case "#userview":
+				break;
+		}
+		function creatShoppingCart(){
+			if(!window.shoppintCart){
+				window.shoppingCart = new ShoppingCart($('#shoppingCart'));
 			}
-			break;
-		case "#menuview":
-			break;
-		case "#orderview":
-			break;
-		case "#userview":
-			getRestuarant();
-			break;
 		}
 	}
 	
 	function initLayout(){
-		overviewHeight = $(window).height()-380;
+		overviewHeight = $(window).height()-400;
 		$('#map-canvas').css('height',overviewHeight);
 		$('#left-bar').css('height',overviewHeight);
 		$('#small-menu-container').css('max-height',overviewHeight*0.8);
-	}
-	
-	function getRestuarant(){
-		if(window.user && window.user.permission>0 && !window.user.restuarant){
-			$.ajax({
-	            type: 'GET',
-	            url: '/api/getmyrest',
-	            ContentType: "application/json",
-	    		success: function(data){
-	    			if(data.result){
-	    				window.user.restuarant = data.restuarant;
-	    				$('#rest-setting-name').val(window.user.restuarant.name);
-	    				$('#rest-settting-type').val(window.user.restuarant.rtype);
-	    				$('#rest-setting-des').val(window.user.restuarant.description);
-	    				$('#rest-setting-addres').val(window.user.restuarant.adress);
-	    				$('#rest-setting-phone').val(window.user.restuarant.telephone);
-	    				$('#rest-setting-minprice').val(window.user.restuarant.minprice);
-	    				$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
-	    				$('#setting-avatar-img').attr('src',window.user.avatarurl);
-	    			}
-	    		},
-	    		error: function(){alert('获取餐厅信息失败')}
-	        });
-		}
+		$('#shoppingCart-container').css('left',($(window).width()-$('#shoppingCart-container').width())*0.5);
 	}
 });

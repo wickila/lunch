@@ -84,7 +84,7 @@ SmallMenu.prototype.getDiv = function(){
 	var div="<div id='small-menu-"+ this.menu.id + "' data-mid='"+this.menu.id+"'>"+
 			"<table width='100%'>" +
 			"<tr><td rowspan='2' width='42'><div class='msb-avatar-container thumbnail'><img class='msb-avatar' src='"+ this.menu.thumbnail +"'></img></div></td><td><span id='msb-name'>"+ this.menu.name +"</span></td></tr>" +
-			"<tr><td><span class='msb-price'>"+ this.menu.price +"￥</span></td><td align='right'><input type='checkbox' name='msb-select'>点选</td></tr>" +
+			"<tr><td><span class='msb-price'>"+ this.menu.price +"￥</span></td><td align='right'><input type='checkbox'"+(this.menu.checked?" checked='checked'":'')+" name='msb-select' data-mid='"+this.menu.id+"'>点选</td></tr>" +
 			"</table></div>";
 	return div;
 };
@@ -104,3 +104,32 @@ RestView.prototype.setRest = function(rest){
 RestView.prototype.getRest = function(){
 	return this.rest;
 };
+
+var ShoppingCart = function(jqueryElement){
+	this.jqueryElement = jqueryElement;
+}
+
+ShoppingCart.prototype.addMenu = function(m){
+	if(window.currentRest.info.orderMenus.length<7){
+			var div = "<div style='float:left' id='shopping-cart-menu-"+m.id+"'>" +
+			"<div class='menu' data-mid='"+ m.id +"'>"+
+			"<div class='menu-img-container thumbnail'><img class='menu-img' src='"+ m.thumbnail +"'></img></div>" +
+			"<div><span class='rm-name'>"+ m.name +"</span><span class='rm-price'>"+ m.price +"</span></div>" +
+			"</div>" +
+			"</div>";
+		this.jqueryElement.append($(div));
+	}else{
+		
+	}
+}
+
+ShoppingCart.prototype.removeMenu = function(m){
+	this.jqueryElement.find('#shopping-cart-menu-'+m.id).remove();
+}
+
+ShoppingCart.prototype.setMenus = function(menus){
+	this.jqueryElement.empty();
+	for(var i in menus){
+		this.addMenu(menus[i]);
+	}
+}

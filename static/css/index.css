@@ -78,6 +78,17 @@ section{
 	width: 100%;
 }
 
+.bottom-nav-a{
+	color: white;
+	font-size: 12pt;
+}
+
+#shoppingCart-container{
+	position: fixed;
+	bottom: 80px;
+	min-height: 180px;
+}
+
 #contextMenu {
 position: absolute;
 min-width: 100px;

@@ -43,20 +43,34 @@
 			{% include 'setting.html' %}
 		</section>
 	</div>
-	<div class="container"></div>
+	<div id="shoppingCart-container" class="container">
+		<table style="height:190px;width:100%;">
+			<strong>已选美味</strong>
+			<tbody>
+				<tr>
+					<td width="4%" style="background-color: whiteSmoke" align="center">&lt</td>
+					<td><div id="shoppingCart"></div></td>
+					<td width="4%" style="background-color: whiteSmoke" align="center">&gt</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 	<div class="navbar navbar-fixed-bottom">
 		<div class="navbar-inner">
-			<div class="container">
-			  <div class="nav-collapse">
-				<a href="#overview">首页</a>
-				<a href="#restview">餐厅</a>
-				<a href="#menuview">菜单</a>
-				<a href="#orderview">订单</a>
+			<div class="container" style="text-align: center;">
+			  <div class="nav-collapse" style="font-size: 12pt">
+			  	<br></br>
+				---⊙---<a href="#overview" class="bottom-nav-a">首页</a>---⊙---
+				<a href="#restview" class="bottom-nav-a">餐厅</a>---⊙---
+				<a href="#menuview" class="bottom-nav-a">菜单</a>---⊙---
+				<a href="#orderview" class="bottom-nav-a">订单</a>---⊙---
 				{% if user %}
-					<a id="bottom-nav-user" href="#userview">{{ user.username }}</a>
+					<a id="bottom-nav-user" href="#userview" class="bottom-nav-a">{{ user.username }}</a>
 				{% else %}
-					<a id="bottom-nav-user" href="#userview">游客</a>
+					<a id="bottom-nav-user" href="#userview" class="bottom-nav-a">游客</a>
 				{% endif %}
+				---⊙---
+				<br></br>
 			  </div>
 			</div>
 		  </div>

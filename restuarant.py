@@ -21,6 +21,9 @@ class New():
         user = lunch.get_current_user()
         dic = {'result':False,'type':0}
         if user:
+            rests = model.db.query('select id from restuarant where uid=%d' % user.id)
+            if len(rests>0):
+                return lunch.write_json({'result':False,'message':'you already have a shop'})
             rest_id = model.db.insert('restuarant',hash_location=geohash.encode(lat, lng, 12),name=rest_name,uid=user.id,lat=lat,lng=lng)
             rest = model.db.query('select * from restuarant where id=$rest_id',vars=locals())[0]
             rest.created_time = str(rest.created_time).split('.')[0]

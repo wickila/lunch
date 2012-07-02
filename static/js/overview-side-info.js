@@ -7,11 +7,31 @@ $(function(){
 	}
 	
 	$.setSideBarMenus = function(menus){
+		$('#small-menu-container').find('input').unbind('click',onCheckClick);
 		$('#small-menu-container').empty();
+		
 		for(var i in menus)
 		{
 			var menu = new SmallMenu(menus[i]);
 			$('#small-menu-container').append($(menu.getDiv()));
+		}
+		$('#small-menu-container').find('input').bind('click',onCheckClick);
+		function onCheckClick(){
+			var input = $(this);
+			var mid = parseInt(input.data('mid'));
+			var m;
+			for(var i in menus){
+				if(menus[i].id == mid){
+					m = menus[i];
+					break;
+				}
+			}
+			m.checked = input.attr('checked');
+			if(input.attr('checked')){
+				window.addOrderMenu(m);
+			}else{
+				window.removeOrderMenu(m);
+			}
 		}
 	}
 });

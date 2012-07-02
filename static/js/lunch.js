@@ -11,7 +11,6 @@ $(function(){
 	window.restuarants = {}
 	window.currentRest = null;
 	getUser();
-	getRestuarants();
 	window.initialize =  function() {
 	    var latlng = new google.maps.LatLng(GEOCHAT_VARS['initial_latitude'], GEOCHAT_VARS['initial_longitude']);
 	    var myOptions = {
@@ -74,9 +73,17 @@ $(function(){
 					map.panTo(clickedLatLng);
 					break;
 				case 'newRestuarant':
-					$('#lat').val(clickedLatLng.lat());
-					$('#lng').val(clickedLatLng.lng());
-					$('#myModal').modal('show');
+					if(!window.user){
+						alert('您尚未登录');
+					}else if(window.user.permission < 1){
+						alert('您的权限不够')
+					}else if(window.user.restuarant){
+						alert('您已经有一家店啦');
+					}else{
+						$('#lat').val(clickedLatLng.lat());
+						$('#lng').val(clickedLatLng.lng());
+						$('#myModal').modal('show');
+					}
 					break;
 				default:
 					break;
@@ -96,11 +103,14 @@ $(function(){
 		$.each('click dragstart zoom_changed maptypeid_changed'.split(' '), function(i,name){
 			google.maps.event.addListener(map, name, function(){ contextMenu.hide() });
 		});
+		
+		getRestuarants();
   	}
 	
   var Restuarant =  function(info) {
 	this.id = info.id;
     this.info = info;
+    this.info.orderMenus = [];
     this.point = new google.maps.LatLng(info.lat, info.lng);
     this.marker = new google.maps.Marker({
       id: this.id,
@@ -223,7 +233,6 @@ $(function(){
 		});
 	}
 
-  	var isInit = false;
   	function getRestuarants(){
 	  	geocoder = new google.maps.Geocoder();
 	  	geocoder.geocode( { 'address': GEOCHAT_VARS['default_location']}, function(results, status) {
@@ -254,9 +263,8 @@ $(function(){
 	              					window.user.restuarant = r;
 	              				}
 	              			}
-	              			if(!isInit){
+	              			if(!window.currentRest){
 	              				setCurrentRest(r);
-	              				isInit = true;
 	              			}
 	              		},
 	              		'error': function(){alert('获取本地餐厅失败')}
@@ -282,25 +290,56 @@ $(function(){
     					$('.boss').addClass('boss-login');
     					$('.boss').removeClass('boss');
     				}
+    				getRestuarant();
     			}
     		},
     		error: function(){alert('登录失败')}
         });
 	}
 	
+	window.getRestuarant = function(){
+		if(window.user && window.user.permission>0 && !window.user.restuarant){
+			$.ajax({
+	            type: 'GET',
+	            url: '/api/getmyrest',
+	            ContentType: "application/json",
+	    		success: function(data){
+	    			if(data.result){
+	    				window.user.restuarant = data.restuarant;
+	    				$('#rest-setting-name').val(window.user.restuarant.name);
+	    				$('#rest-settting-type').val(window.user.restuarant.rtype);
+	    				$('#rest-setting-des').val(window.user.restuarant.description);
+	    				$('#rest-setting-addres').val(window.user.restuarant.adress);
+	    				$('#rest-setting-phone').val(window.user.restuarant.telephone);
+	    				$('#rest-setting-minprice').val(window.user.restuarant.minprice);
+	    				$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
+	    				$('#setting-avatar-img').attr('src',window.user.avatarurl);
+	    			}
+	    		},
+	    		error: function(){alert('获取餐厅信息失败')}
+	        });
+		}
+	}
+	
 	  window.setCurrentRest = function(rest){
+		if(window.currentRest == rest)return;
 		window.currentRest = rest;
 	  	$.setSideBarRest(rest);
-	  	$.ajax({
-	          type: 'GET',
-	          url: '/api/resturant/menus/'+rest.id,
-	          ContentType: "application/json",
-	          success: function(data){
-	  					this.menus = data.menus;
-	  					$.setSideBarMenus(this.menus);
-	          		},
-	          error: function(){alert('获取菜单失败')}
-	    });
+	  	window.shoppingCart.setMenus(rest.info.orderMenus)
+	  	if(!window.currentRest.info.menus){
+	  		$.ajax({
+		          type: 'GET',
+		          url: '/api/resturant/menus/'+rest.id,
+		          ContentType: "application/json",
+		          success: function(data){
+		  					rest.info.menus = data.menus;
+		  					$.setSideBarMenus(data.menus);
+		          		},
+		          error: function(){alert('获取菜单失败')}
+		    });
+	  	}else{
+	  		$.setSideBarMenus(rest.info.menus);
+	  	}
 	  }
 	
 	window.login = function(){
@@ -395,4 +434,14 @@ $(function(){
 			rpwd.setCustomValidity("请输入此字段!");
 		}
 	};
+	
+	window.addOrderMenu = function(m){
+		window.currentRest.info.orderMenus.push(m);
+		window.shoppingCart.addMenu(m);
+	}
+	
+	window.removeOrderMenu = function(m){
+		window.currentRest.info.orderMenus.splice(window.currentRest.info.orderMenus.indexOf(m),1);
+		window.shoppingCart.removeMenu(m);
+	}
 });

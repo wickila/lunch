@@ -138,11 +138,10 @@ $(function(){
 		
 	}
 	
-	window.upload_avatar = function(){
+	window.uploadAvatar = function(){
 		$('#avatar_form').ajaxForm({
 				'dataType': 'json',
 				'success':function(data){
-					data = eval(data);
 					$("#avatar_img").attr('src',data.imgurl);
 				}
 			});

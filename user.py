@@ -28,7 +28,7 @@ class Avatar:
                 fout.close() # closes the file, upload complete.
                 pydic = {'imgurl':filedir +'/'+ filename}
                 id = user.id
-                model.db.update('user',avatar_url=pydic['imgurl'],where='id=$id',vars=locals())
+                model.db.update('user',avatarurl=pydic['imgurl'],where='id=$id',vars=locals())
                 user.avatar_url = pydic['imgurl']
                 web.header('Content-Type', 'application/json')
                 return lunch.write_json(pydic)
