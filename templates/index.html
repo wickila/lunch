@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% block script %}
-<!-- <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script> -->
-<script type="text/javascript" src="static/js/map.js"></script>
 <script type="text/javascript" src="static/js/jquery.js"></script>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script type="text/javascript" src="static/js/jquery.form.js"></script>
 <script type="text/javascript" src="static/js/bootstrap.js"></script>
 <script type="text/javascript" src="static/js/lunch.js"></script>
@@ -27,19 +26,21 @@
 {% endblock %}
 {% block content %}
 	<div id="main">
-		<section id="overview" style="left:0;background-color: #f00;">
+		<section id="overview" style="left:0;">
 			{% include 'overview.html' %}
 		</section>
-		<section id="restview" style="left:100%;background-color: #ff0;">
+		<section id="restview" style="left:100%;">
 			{% include 'restuarant.html' %}
 		</section>
+		<!-- 
 		<section id="menuview" style="left:200%;background-color: #0ff;">
 			<div>third div</div>
 		</section>
-		<section id="orderview" style="left:300%;background-color: #f0f;">
+		 -->
+		<section id="orderview" style="left:200%;">
 			<div>forth div</div>
 		</section>
-		<section id="userview" style="left:400%;background-color: #fff;">
+		<section id="userview" style="left:300%;">
 			{% include 'setting.html' %}
 		</section>
 	</div>
@@ -48,9 +49,9 @@
 			<strong>已选美味</strong>
 			<tbody>
 				<tr>
-					<td width="4%" style="background-color: whiteSmoke" align="center">&lt</td>
-					<td><div id="shoppingCart"></div></td>
-					<td width="4%" style="background-color: whiteSmoke" align="center">&gt</td>
+					<td width="4%" id="shopping-cart-pre" style="background-color: whiteSmoke;" align="center">&lt</td>
+					<td><div id="shopping-cart-wrapper" style="width: 100%;overflow-x: hidden;"><div id="shopping-cart"></div></div></td>
+					<td width="4%" id="shopping-cart-next" style="background-color: whiteSmoke;" align="center">&gt</td>
 				</tr>
 			</tbody>
 		</table>
@@ -58,11 +59,10 @@
 	<div class="navbar navbar-fixed-bottom">
 		<div class="navbar-inner">
 			<div class="container" style="text-align: center;">
-			  <div class="nav-collapse" style="font-size: 12pt">
-			  	<br></br>
+			  <div class="nav-collapse" style="font-size: 12pt;padding-bottom: 10px;padding-top: 10px;">
 				---⊙---<a href="#overview" class="bottom-nav-a">首页</a>---⊙---
 				<a href="#restview" class="bottom-nav-a">餐厅</a>---⊙---
-				<a href="#menuview" class="bottom-nav-a">菜单</a>---⊙---
+				<!-- <a href="#menuview" class="bottom-nav-a">菜单</a>---⊙--- -->
 				<a href="#orderview" class="bottom-nav-a">订单</a>---⊙---
 				{% if user %}
 					<a id="bottom-nav-user" href="#userview" class="bottom-nav-a">{{ user.username }}</a>
@@ -70,7 +70,6 @@
 					<a id="bottom-nav-user" href="#userview" class="bottom-nav-a">游客</a>
 				{% endif %}
 				---⊙---
-				<br></br>
 			  </div>
 			</div>
 		  </div>

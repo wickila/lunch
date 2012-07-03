@@ -34,4 +34,14 @@ $(function(){
 			}
 		}
 	}
+	
+	$.updateSideBarMenu = function(menu,checked){
+		var chs = $('#small-menu-container').find('input');
+		chs.each(function(){
+			var ch = $(this);
+			if(parseInt(ch.data('mid')) == menu.id){
+				ch.attr('checked',checked);
+			}
+		});
+	}
 });

@@ -235,15 +235,15 @@ $(function(){
 
   	function getRestuarants(){
 	  	geocoder = new google.maps.Geocoder();
-	  	geocoder.geocode( { 'address': GEOCHAT_VARS['default_location']}, function(results, status) {
-	        if (status == google.maps.GeocoderStatus.OK) {
+//	  	geocoder.geocode( { 'address': GEOCHAT_VARS['default_location']}, function(results, status) {
+//	        if (status == google.maps.GeocoderStatus.OK) {
 	          var latitude = GEOCHAT_VARS['initial_latitude'];
 	          var longitude = GEOCHAT_VARS['initial_longitude'];
-	          var latlng = results[0].geometry.location
-	          if (latlng) {
-	            latitude = latlng.lat();
-	            longitude = latlng.lng();
-	          }
+//	          var latlng = results[0].geometry.location
+//	          if (latlng) {
+//	            latitude = latlng.lat();
+//	            longitude = latlng.lng();
+//	          }
 	          map.setCenter(new google.maps.LatLng(latitude, longitude), 13);
 	          $.ajax({
 	              type: 'GET',
@@ -269,10 +269,10 @@ $(function(){
 	              		},
 	              		'error': function(){alert('获取本地餐厅失败')}
 	          });
-	        } else {
-	          alert("Geocode was not successful for the following reason: " + status);
-	        }
-	      });
+//	        } else {
+//	          alert("Geocode was not successful for the following reason: " + status);
+//	        }
+//	      });
 	};
 	
 	function getUser(){
@@ -436,11 +436,16 @@ $(function(){
 	};
 	
 	window.addOrderMenu = function(m){
+		if(window.currentRest.info.orderMenus.indexOf(m)>-1){
+			window.lunchAlert('你已经选过这道菜啦，如果要再来一份，请在选择数量');
+			return;
+		}
 		window.currentRest.info.orderMenus.push(m);
 		window.shoppingCart.addMenu(m);
 	}
 	
 	window.removeOrderMenu = function(m){
+		$.updateSideBarMenu(m,false);
 		window.currentRest.info.orderMenus.splice(window.currentRest.info.orderMenus.indexOf(m),1);
 		window.shoppingCart.removeMenu(m);
 	}
