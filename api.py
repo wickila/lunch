@@ -11,6 +11,7 @@ import web
 import os
 import config
 
+import json
 from geo import geohash
 
 class CheckLogin:
@@ -20,12 +21,55 @@ class CheckLogin:
             return lunch.write_json({'result':True,'message':'','user':user})
         return lunch.write_json({'result':False,'message':'you hava not login'})
     
+class GetMyConcacts:
+    def GET(self):
+        user = lunch.get_current_user()
+        if user:
+            username = user.username
+            concacts = model.db.select('concact',where='username=$username',vars=locals())
+            ccs = [concact for concact in concacts]
+            return lunch.write_json({'result':True,'message':'success','concacts':ccs})
+        return lunch.write_json({'result':False,'message':'you hava not login'})
+    
+class NewConcact():
+    def POST(self):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user:
+            concactname = post_data.concactname
+            adress = post_data.adress
+            phone = post_data.phone
+            id = model.db.insert('concact',username=user.username,concactname=concactname,adress=adress,phone=phone)
+            return lunch.write_json({'result':True,'message':'success','concact':{'id':id,'username':user.username,'concactname':concactname,'adress':adress,'phone':phone}})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class EditConcact():
+    def POST(self,id):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user:
+            concactname = post_data.concactname
+            adress = post_data.adress
+            phone = post_data.phone
+            model.db.update('concact',where='id=$id',username=user.username,concactname=concactname,adress=adress,phone=phone)
+            return lunch.write_json({'result':True,'message':'success'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class DeleteConcact():
+    def POST(self,id):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user and user.permission>0:
+            model.db.delete('concact',where='id=$id',vars=locals())
+            return lunch.write_json({'result':True,'message':'delete success'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
 class GetMyRest:
     def GET(self):
         user = lunch.get_current_user()
         if user and user.permission>0:
-            uid = user.id
-            rs = model.db.select('restuarant',where='uid=$uid',vars=locals())
+            username=user.username
+            rs = model.db.select('restuarant',where='username=$username',vars=locals())
             result = {'result':True,'message':'success'}
             if len(rs)>0:
                 r = rs[0]
@@ -130,7 +174,7 @@ class NewMenu():
             discount = post_data.discount
             mtype = post_data.mtype
             thumbnail = post_data.thumbnail
-            rid = model.db.query('select id from restuarant where uid='+str(user.id))[0].id
+            rid = model.db.query('select id from restuarant where username='+str(user.username))[0].id
             mid = model.db.insert('menu',name=name,description=description,price=price,discount=discount,mtype=mtype,uid=user.id,rid=rid,thumbnail=thumbnail)
             mns = model.db.select('menu',where='id=$mid',vars=locals())
             m = mns[0]
@@ -153,11 +197,62 @@ class EditMenu():
             m = mns[0]
             return lunch.write_json({'result':True,'message':'success','menu':m})
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
 class DeleteMenu():
     def POST(self,mid):
         user = lunch.get_current_user()
         post_data = web.input()
         if user and user.permission>0:
-            model.db.delete('menu',where='id=$imd',vars=locals())
+            model.db.delete('menu',where='id=$mid',vars=locals())
             return lunch.write_json({'result':True,'message':'delete success'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class NewOrder():
+    def POST(self):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user:
+            concact = int(post_data.concact)
+            rid = post_data.rid
+            message = post_data.message
+            state = 0
+            menus = post_data.menus
+            menus = json.loads(menus)
+            its = {}
+            price = float(post_data.price)
+            sql = 'select * from menu where'
+            for i,menu in enumerate(menus):
+                its[menu['id']] = menu
+                sql += ' id=%s' % menu['id']
+                if i<len(menus)-1:
+                    sql+=' or'
+            menus = model.db.query(sql)
+            if len(menus) == len(menus):
+                p = 0
+                for menu in menus:
+                    if menu.soldout == 0:
+                        return lunch.write_json({'result':False,'message':'some menu soldout'})
+                    p+=menu.price*menu.discount*0.1*int(its[menu.id]['num'])
+                if p == price:
+                    rs = model.db.select('restuarant',where='id=$rid',vars=locals())
+                    if len(rs)>0:
+                        rest = rs[0]
+                        oid = model.db.insert('lunchorder',username=user.username,concact=concact,bossusername=rest.username,message=message,menus=post_data.menus,price=price)
+                        order = model.db.select('lunchorder',where='id=$oid',vars=locals())[0]
+                        order.createdtime = str(order.createdtime)
+                        return lunch.write_json({'result':True,'message':'order success','order':order})
+                    return lunch.write_json({'result':False,'message':'invlid restuarant'})
+                return lunch.write_json({'result':False,'message':'invlid price'})
+            return lunch.write_json({'result':False,'message':'invlid menus'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+            
+        
+class EidtOrder():
+    def POST(self,id):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user and user.permission>0:
+            state = post_data.state
+            model.db.update('lunchorder',where='id=$id',state=state)
+            return lunch.write_json({'result':True,'message':'delete success','state':state})
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})

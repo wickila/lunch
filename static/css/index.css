@@ -14,6 +14,16 @@ body{
 	width: 100%;
 	height: 100%;
 	position: absolute;
+	transition: -webkit-transform 200ms ease-in-out;
+	-webkit-transition: -webkit-transform 200ms ease-in-out;
+	-moz-transition: -moz-transform 200ms ease-in-out;
+	-o-transition: -o-transform 200ms ease-in-out;
+	-ms-transition: -ms-transform 200ms ease-in-out;
+	transform: translate3d(0px, 0px, 0px);
+	-webkit-transform: translate3d(0px, 0px, 0px);
+	-moz-transform: translate3d(0px, 0px, 0px);
+	-o-transform: translate3d(0px, 0px, 0px);
+	-ms-transform: translate3d(0px, 0px, 0px);
 }
 
 section{
@@ -23,7 +33,12 @@ section{
 }
 
 .content{
-	margin-top: 90px;
+	margin-top: 50px;
+	transition: -webkit-transform 200ms ease-in-out;
+	-webkit-transition: -webkit-transform 200ms ease-in-out;
+	-moz-transition: -moz-transform 200ms ease-in-out;
+	-o-transition: -o-transform 200ms ease-in-out;
+	-ms-transition: -ms-transform 200ms ease-in-out;
 }
 
 .msb-avatar-container{
@@ -81,7 +96,17 @@ section{
 
 #shoppingCart-container{
 	position: fixed;
-	min-height: 180px;
+	top: 40px;
+	transition: -webkit-transform 200ms ease-in-out;
+	-webkit-transition: -webkit-transform 200ms ease-in-out;
+	-moz-transition: -moz-transform 200ms ease-in-out;
+	-o-transition: -o-transform 200ms ease-in-out;
+	-ms-transition: -ms-transform 200ms ease-in-out;
+	transform: translate3d(0px, 0px, 0px);
+	-webkit-transform: translate3d(0px, 0px, 0px);
+	-moz-transform: translate3d(0px, 0px, 0px);
+	-o-transform: translate3d(0px, 0px, 0px);
+	-ms-transform: translate3d(0px, 0px, 0px);
 }
 
 #shopping-cart{
@@ -90,13 +115,48 @@ section{
 }
 
 .shopping-cart-menu{
-	float: left;
+	width: 100%;
 	margin-left: 9px;
+	background-color: white;
+	-webkit-border-radius: 4px 4px 0 0;
+	-moz-border-radius: 4px 4px 0 0;
+	border-radius: 4px 4px 0 0;
+	border: 1px solid #DDD;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+}
+
+.shopping-cart-menu-name{
+}
+
+.shopping-cart-menu-num{
+}
+
+.shopping-cart-menu-price{
+}
+
+.shopping-cart-menu-option{
+	cursor:pointer;
+	float:right;
+}
+
+.shopping-cart-menu-option strong{
+	margin-right: 10px;
+}
+
+#shopping-cart-settle{
+	float: right;
+	display: none;
 }
 
 .menu-close-btn{
 	position: relative;
 	float: right;
+}
+
+#order-message{
+	width: 100%;
 }
 
 #contextMenu {

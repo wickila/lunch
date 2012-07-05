@@ -29,12 +29,18 @@ urls = (
 	'/api/resturant/view/(.*)','api.ViewRestuarant',
 	'/api/resturant/menus/(.*)','api.ViewMenus',
 	'/api/checklogin','api.CheckLogin',
+	'/api/getmyconcacts','api.GetMyConcacts',
 	'/api/getmyrest','api.GetMyRest',
 	'/api/menu/view/(.*)','api.ViewMenu',
 	'/api/menu/thumbnail/(.*)','api.MenuThumbail',
 	'/api/menu/new','api.NewMenu',
 	'/api/menu/edit/(.*)','api.EditMenu',
 	'/api/menu/delete/(.*)','api.DeleteMenu',
+	'/api/concact/new','api.NewConcact',
+	'/api/concact/edit/(.*)','api.EditConcact',
+	'/api/concact/delete/(.*)','api.DeleteConcact',
+	'/api/order/new','api.NewOrder',
+	'/api/order/edit/(.*)','api.EditOrder',
 )
 
 app = web.application(urls, globals())

@@ -3,9 +3,9 @@
 	<head>
 	<title>{% block title %}Lunch{% endblock %}</title>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
-	<link rel="stylesheet" href="/static/css/lunch.css" type="text/css" charset="utf-8">
 	<link rel="stylesheet" href="/static/css/bootstrap.css" type="text/css" charset="utf-8">
 	<link rel="stylesheet" href="/static/css/bootstrap-responsive.css" type="text/css" charset="utf-8">
+	<link rel="stylesheet" href="/static/css/lunch.css" type="text/css" charset="utf-8">
 	{% block style%}
 	{% endblock %}
 	<script type="text/javascript" src="/static/js/jquery.js"></script>
@@ -34,8 +34,9 @@
 					  <button type="submit" class="btn">搜索</button>
 					</form>
 					<ul id="nav-right" class="nav pull-right">
+						<li><a onclick="toggleShoppingCart()">购物车(<span class="order-num">0</span>)</a></li>
 						{% if user %}
-							<li><a href="#userview">{{user.username}}</a></li>
+							<li><a onclick='changePage(4)'>{{user.username}}</a></li>
 							<li><a onclick="logout()">登出</a></li>
 						{% else %}
 							<li><a data-toggle="modal" data-target="#login">登录</a></li>

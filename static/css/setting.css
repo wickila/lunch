@@ -1,17 +1,5 @@
 @CHARSET "UTF-8";
 
-.user,.boss{
-	display: none;
-}
-
-.setting-container{
-	display: none;
-}
-
-.active{
-	display: block;
-}
-
 #setting-menus-form-container{
 	display: none;
 }

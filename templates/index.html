@@ -38,36 +38,30 @@
 		</section>
 		 -->
 		<section id="orderview" style="left:200%;">
-			<div>forth div</div>
+			{% include 'order.html' %}
 		</section>
 		<section id="userview" style="left:300%;">
 			{% include 'setting.html' %}
 		</section>
 	</div>
 	<div id="shoppingCart-container" class="container">
-		<table style="height:190px;width:100%;">
-			<strong>已选美味</strong>
-			<tbody>
-				<tr>
-					<td width="4%" id="shopping-cart-pre" style="background-color: whiteSmoke;" align="center">&lt</td>
-					<td><div id="shopping-cart-wrapper" style="width: 100%;overflow-x: hidden;"><div id="shopping-cart"></div></div></td>
-					<td width="4%" id="shopping-cart-next" style="background-color: whiteSmoke;" align="center">&gt</td>
-				</tr>
-			</tbody>
-		</table>
+		<div>购物车(<span class="order-num">0</span>)</div>
+		<ul class="nav nav-tabs nav-stacked">
+	  	</ul>
+	  	<a id="shopping-cart-settle" class="btn" onclick="changePage(3);">结算</a>
 	</div>
 	<div class="navbar navbar-fixed-bottom">
 		<div class="navbar-inner">
 			<div class="container" style="text-align: center;">
 			  <div class="nav-collapse" style="font-size: 12pt;padding-bottom: 10px;padding-top: 10px;">
-				---⊙---<a href="#overview" class="bottom-nav-a">首页</a>---⊙---
-				<a href="#restview" class="bottom-nav-a">餐厅</a>---⊙---
+				---⊙---<a  class="bottom-nav-a" onclick="changePage(1);">首页</a>---⊙---
+				<a  class="bottom-nav-a" onclick="changePage(2);">餐厅</a>---⊙---
 				<!-- <a href="#menuview" class="bottom-nav-a">菜单</a>---⊙--- -->
-				<a href="#orderview" class="bottom-nav-a">订单</a>---⊙---
+				<a  class="bottom-nav-a" onclick="changePage(3);">订单</a>---⊙---
 				{% if user %}
-					<a id="bottom-nav-user" href="#userview" class="bottom-nav-a">{{ user.username }}</a>
+					<a id="bottom-nav-user"  class="bottom-nav-a" onclick="changePage(4);">{{ user.username }}</a>
 				{% else %}
-					<a id="bottom-nav-user" href="#userview" class="bottom-nav-a">游客</a>
+					<a id="bottom-nav-user"  class="bottom-nav-a" onclick="changePage(4);">游客</a>
 				{% endif %}
 				---⊙---
 			  </div>

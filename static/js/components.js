@@ -160,6 +160,11 @@ var RestView = function(jqueryElement,rest){
 	this.rest = rest;
 	this.siderbar = new RestSideBar(jqueryElement.find('#rsb'),this.rest);
 	this.menus = new Menus(jqueryElement.find('#menus-wrapper'),rest.menus);
+	$("#rest-detail").find("#rest-name").html(rest.name);
+	$("#rest-detail").find("#rest-username").html(rest.username);
+	$("#rest-detail").find("#rest-minprice").html(rest.minprice);
+	$("#rest-detail").find("#rest-description").html(rest.description);
+	$('#rest-detail').find('.rest-thumbnail').attr('src',rest.avatarurl);
 };
 
 RestView.prototype.setRest = function(rest){
@@ -172,12 +177,119 @@ RestView.prototype.getRest = function(){
 	return this.rest;
 };
 
+var ShoppingCartRest = function(rest){
+	this.rest = rest;
+	var head = "<li data-rid='"+ rest.id +"'><a style='cursor: pointer;'>"+ rest.name + "(<span class='shopping-cart-rest-order-menus-num'>" + getOrderMenusNum(rest.orderMenus) + "</span>)<strong class='shopping-cart-close' style='float: right;'>&times</strong></a></li>";
+	var body = "<table width='100%' class='shopping-cart-menus' id='shopping-cart-menus-"+ rest.id +"'></table>";
+	this.head = $(head);
+	this.body = $(body);
+	this.body.hide();
+	this.head.find('.shopping-cart-close').bind('click',this.onClose);
+	for(var i in rest.orderMenus){
+		var m = rest.orderMenus[i];
+		this.creatMenuElement(m);
+	}
+}
+
+ShoppingCartRest.prototype.addOrderMenu = function(m){
+	if(m.num>1){
+		var id='#shopping-cart-menu-'+m.id;
+		$(id).find('.shopping-cart-menu-num').html(m.num);
+	}else{
+		this.creatMenuElement(m);
+	}
+	this.head.find('.shopping-cart-rest-order-menus-num').html(getOrderMenusNum(this.rest.orderMenus));
+}
+
+ShoppingCartRest.prototype.creatMenuElement = function(m){
+	var orderMenu = "<tr class='shopping-cart-menu' id='shopping-cart-menu-"+m.id+"' data-mid='"+ m.id +"'>" +
+						"<td width='50%' class='shopping-cart-menu-name'>"+ m.name +"</td>" +
+						"<td width='30%' class='shopping-cart-menu-price'>"+ m.price +"￥</td>" +
+						"<td width='10%' class='shopping-cart-menu-num'>"+ m.num +"</td>" +
+						"<td class='shopping-cart-menu-option'><strong class='shopping-cart-menu-reduce'>-</strong><strong class='shopping-cart-menu-plus'>+</strong><strong class='shopping-cart-menu-close'>&times</strong></td>" +
+					"</tr>";
+	orderMenu = $(orderMenu);
+	orderMenu.find('.shopping-cart-menu-close').bind('click',this.onMenuClose);
+	orderMenu.find('.shopping-cart-menu-plus').bind('click',this.onMenuPlus);
+	orderMenu.find('.shopping-cart-menu-reduce').bind('click',this.onMenuReduce);
+	this.body.append(orderMenu);
+}
+
+ShoppingCartRest.prototype.removeOrderMenu = function(m){
+	var id='#shopping-cart-menu-'+m.id;
+	if(m.num == 0){
+		$(id).remove();
+		$(id).find('.shopping-cart-menu-close').unbind('click',this.onMenuClose);
+		$(id).find('.shopping-cart-menu-plus').unbind('click',this.onMenuPlus);
+		$(id).find('.shopping-cart-menu-reduce').unbind('click',this.onMenuReduce);
+	}else{
+		$(id).find('.shopping-cart-menu-num').html(m.num);
+	}
+	this.head.find('.shopping-cart-rest-order-menus-num').html(this.getOrderMenuNum());
+}
+
+ShoppingCartRest.prototype.onClose = function(){
+	var rest = window.restuarants[$(this).parent().parent().data('rid')].info;
+	var menus = []
+	for(var i in rest.orderMenus){
+		rest.orderMenus[i].num = 1;
+		menus.push(rest.orderMenus[i]);
+	}
+	for(var j in menus){
+		window.removeOrderMenu(menus[j]);
+	}
+}
+
+ShoppingCartRest.prototype.onMenuClose = function(){
+	var a = $(this);
+	var div = a.parent().parent();
+	var mid = parseInt(div.data('mid'));
+	for(var i in window.orderMenus){
+		if(mid == window.orderMenus[i].id){
+			window.orderMenus[i].num = 1;
+			window.removeOrderMenu(window.orderMenus[i]);
+			break;
+		}
+	}
+}
+
+ShoppingCartRest.prototype.onMenuPlus = function(){
+	var a = $(this);
+	var div = a.parent().parent();
+	var mid = parseInt(div.data('mid'));
+	for(var i in window.orderMenus){
+		if(mid == window.orderMenus[i].id){
+			window.addOrderMenu(window.orderMenus[i]);
+			break;
+		}
+	}
+}
+
+ShoppingCartRest.prototype.onMenuReduce = function(){
+	var a = $(this);
+	var div = a.parent().parent();
+	var mid = parseInt(div.data('mid'));
+	for(var i in window.orderMenus){
+		if(mid == window.orderMenus[i].id){
+			window.removeOrderMenu(window.orderMenus[i]);
+			break;
+		}
+	}
+}
+
 var ShoppingCart = function(jqueryElement){
-	this.index = 0;
 	this.jqueryElement = jqueryElement;
-	$('#shopping-cart-wrapper').css('width',$('#shopping-cart-wrapper').width());
-	this.jqueryElement.find('.menu-close-btn').live('click',this.onCloseClick);
-	$('#shoppingCart-container').css('bottom',$('.navbar-fixed-bottom').height());
+	this.rests = [];
+	$('#shoppingCart-container').css('top',$('.navbar-fixed-top').height());
+	$('#shoppingCart-container').css('left',($(window).width()-$('#shoppingCart-container').width())*0.5);
+	
+	$('#shoppingCart-container li').live('click',function(e){
+		var link = $(this);
+		link.addClass('active').siblings().removeClass('active');
+		$('.shopping-cart-menus').hide();
+		$('#shopping-cart-menus-'+link.data('rid')).show();
+	});
+	
 	$('#shoppingCart-container')[0].ondragover = function(ev) {
 		ev.preventDefault();
 		return true;
@@ -205,111 +317,260 @@ var ShoppingCart = function(jqueryElement){
 }
 
 ShoppingCart.prototype.addMenu = function(m){
-	div = this.creatDiv(m);
-	this.jqueryElement.css('width',(div.width()+10)*window.currentRest.info.orderMenus.length);
-	if(window.currentRest.info.orderMenus.length<7){
-		$('#shopping-cart-pre').css('cursor','default');
-		$('#shopping-cart-next').css('cursor','default');
-		$('#shopping-cart-pre').unbind('click',this.preview);
-		$('#shopping-cart-next').unbind('click',this.nextview);
-	}else{
-		if(window.currentRest.info.orderMenus.length==7){
-			$('#shopping-cart-pre').css('cursor','pointer');
-			$('#shopping-cart-next').css('cursor','pointer');
-			$('#shopping-cart-pre').bind('click',this.preview);
-			$('#shopping-cart-next').bind('click',this.nextview);
-		}
-	}
-}
-
-ShoppingCart.prototype.removeMenu = function(m){
-	var menu = this.jqueryElement.find('#shopping-cart-menu-'+m.id);
-	this.jqueryElement.css('width',(menu.width()+10)*window.currentRest.info.orderMenus.length);
-	menu.find('.menu-close-btn').unbind('click',this.onCloseClick);
-	menu.remove();
-	if(window.currentRest.info.orderMenus.length>6){
-		if(window.currentRest.info.orderMenus.length==7){
-			$('#shopping-cart-pre').css('cursor','pointer');
-			$('#shopping-cart-next').css('cursor','pointer');
-			$('#shopping-cart-pre').bind('click',this.preview);
-			$('#shopping-cart-next').bind('click',this.nextview);
-		}
-	}else{
-		$('#shopping-cart-pre').css('cursor','default');
-		$('#shopping-cart-next').css('cursor','default');
-		$('#shopping-cart-pre').unbind('click',this.preview);
-		$('#shopping-cart-next').unbind('click',this.nextview);
-	}
-}
-
-ShoppingCart.prototype.creatDiv = function(m){
-	var div = "<div class='shopping-cart-menu' id='shopping-cart-menu-"+m.id+"'>" +
-			"<div class='menu' data-mid='"+ m.id +"'>"+
-			"<div class='menu-img-container thumbnail'><a class='close menu-close-btn'>&times</a><img class='menu-img' src='"+ m.thumbnail +"'></img></div>" +
-			"<div><span class='rm-name'>"+ m.name +"</span><span class='rm-price'>"+ m.price +"</span></div>" +
-			"</div>" +
-			"</div>";
-	div = $(div);
-	this.jqueryElement.append(div);
-	div.find('.menu-img-container').css('width',$('#shopping-cart-wrapper').width()/6-20)
-	div.find('.menu-close-btn').css('margin-bottom',0-div.find('.menu-close-btn').height());
-	div.find('.menu-close-btn').css('z-index',999);
-	var item = div.find('.menu-img');
-	item.load(function() {  
-		var w = item.width();
-		var h = item.height();
-		var gap = 0;//padding + border
-		var pw = item.parent().width();
-		item.parent().height(pw);
-		if(w>=h){
-			item.width(pw);
-			item.css('margin-top',(pw-item.height()-gap)/2);
-		}else{
-			item.height(pw);
-			item.css('margin-left',(pw-item.width()-gap)/2)
-		}
-    }); 
-	return div;
-}
-
-ShoppingCart.prototype.onCloseClick = function(){
-	var closeBtn = $(this);
-	var mid = parseInt(closeBtn.parent().parent().data('mid'));
-	var m;
-	for(var i in window.currentRest.info.menus){
-		if(window.currentRest.info.menus[i].id == mid){
-			m = window.currentRest.info.menus[i];
+	var rest = null;
+	for(var i in this.rests){
+		if(this.rests[i].rest.id == m.rid){
+			rest = this.rests[i];
 			break;
 		}
 	}
-	window.removeOrderMenu(m);
+	if(rest){
+		rest.addOrderMenu(m);
+	}else{
+		rest = new ShoppingCartRest(window.restuarants[m.rid].info);
+		if(this.rests.length == 0){
+			rest.head.addClass('active');
+			rest.body.show();
+		}
+		this.jqueryElement.append(rest.head);
+		this.jqueryElement.append(rest.body);
+		this.rests.push(rest);
+	}
+	$('#shopping-cart-settle').show();
 }
 
-ShoppingCart.prototype.setMenus = function(menus){
-	this.jqueryElement.empty();
+ShoppingCart.prototype.removeMenu = function(m){
+	var rest = null;
+	for(var i in this.rests){
+		if(this.rests[i].rest.id == m.rid){
+			rest = this.rests[i];
+			break;
+		}
+	}
+	if(rest){
+		rest.removeOrderMenu(m);
+	}
+	if(rest.rest.orderMenus.length == 0){
+		rest.head.remove();
+		rest.body.remove();
+		this.rests.splice(this.rests.indexOf(rest));
+	}
+	if(window.orderMenus.length == 0){
+		$('#shopping-cart-settle').hide();
+	}
+}
+
+var Concacts = function(user){
+	this.element = $("<div class='concacts-container'></div>");
+	this.user = user;
+	this.concacts = $("<div class='concacts-item-container'></div>");
+	this.showFormBtn = $("<a id='add-concact-btn' class='btn'>添加联系方式<a>");
+	this.element.append(this.concacts);
+	this.element.append(this.showFormBtn);
+	this.element.find('#add-concact-btn').bind('click',this.showForm);
+	if(user.concacts){
+		setConcacts(user.concacts);
+	}else{
+		$.ajax({
+		      type: 'GET',
+		      url: '/api/getmyconcacts',
+		      ContentType: "application/json",
+      		  success: function(data){
+							if(data.result){
+								window.user.concacts = data.concacts;
+								setConcacts(data.concacts);
+							}
+						},
+		      error: function(){alert('获取联系地址失败');}
+		    });
+	}
+	
+	function setConcacts(concacts){
+		for(var i in concacts){
+			var concact = concacts[i];
+			var elm = $("<p><input type='radio' name='concact' value='"+concact.id+"'><span>"+concact.adress+"</span><span>"+concact.concactname+"</span><span>"+concact.phone+"</span></p>");
+			if(i==0){
+				elm.find('input').attr('checked',true);
+			}
+			$('.concacts-item-container').append(elm);
+		}
+	}
+}
+
+Concacts.prototype.showForm = function(){
+	var element = $(this).parent();
+	var form = $("<form id='concact-form' method='post' action='/api/concact/new'>" +
+					"<h3>联系方式</h3>" +
+					"<table>" +
+					"<tr><td>联系人:</td><td><input type='text' id='concact-form-concactname' name='concactname' required></input></td></tr>" +
+					"<tr><td>电话:</td><td><input type='text' id='concact-form-phone' name='phone' required></input></td></tr>" +
+					"<tr><td>地址:</td><td><input type='text' id='concact-form-adress' name='adress' required></input></td></tr>" +
+					"</table>" +
+					"<input id='concact-form-btn' type='submit' class='btn' value='保存'></input>" +
+				"</form>");
+	form.find('#concact-form-btn').bind('click',function(event){
+		var element1 = $(this).parent().parent();
+		element1.find('form').ajaxForm({
+			'dataType': 'json',
+			'success':function(data){
+				if(data.result){
+					if(!window.user.concacts)window.user.concacts = [];
+					var concact = data.concact;
+					window.user.concacts.push(concact);
+					var elm = $("<p><input type='radio' name='concact' value='"+concact.id+"'><span>"+concact.adress+"</span><span>"+concact.concactname+"</span><span>"+concact.phone+"</span></p>");
+					element1.find('.concacts-item-container').append(elm);
+					element1.find('form').hide(200,function(){
+							element1.find('form').remove();
+							element1.find('#add-concact-btn').show();
+						});
+				}
+			}
+		});
+//		event.preventDefault();
+	});
+	$(this).hide();
+	element.append(form);
+}
+
+Concacts.prototype.hideForm = function(){
+	
+}
+
+Concacts.prototype.getConcactID = function(){
+	var concactID = 0;
+	this.concacts.find('input').each(function(){
+		var input = $(this);
+		if(input.attr('checked')){
+			concactID = input.val();
+		}
+	})
+	return concactID;
+}
+
+Concacts.prototype.dispose = function(){
+	this.element.find('#add-concact-btn').unbind('click',this.showForm);
+	this.element.find('form a').die('click',this.newConcact);
+}
+
+function getOrderMenusNum(menus){
+	var result = 0;
 	for(var i in menus){
-		this.addMenu(menus[i]);
+		result += menus[i].num;
+	}
+	return result;
+}
+
+function getOrderMenusPrice(menus){
+	var result = 0;
+	for(var i in menus){
+		result += menus[i].num * menus[i].price * (menus[i].discount*0.1);
+	}
+	return result;
+}
+
+var OrderViewItem = function(rest,index){
+	this.rest = rest;
+	this.element = $("<div class='order-item'></div>");
+	var head = "<p>订单"+index+"</p>" +
+			"<p><span>店家:"+ rest.name +"</span><span>数量:"+ getOrderMenusNum(rest.orderMenus) +"</span><span>总价:"+getOrderMenusPrice(rest.orderMenus)+"￥</span></p>";
+	var body = "<table width='100%'>" +
+			"<thead><th width='50%' align='left'>名称</th><th width='30%' align='left'>数量</th><th align='right'>单价</th></thead>" +
+			"</table>";
+	this.head = $(head);
+	this.body = $(body);
+	this.concacts = new Concacts(window.user);
+	this.message = $("<hr></hr><textarea id='order-message' rows='4'></textarea>");
+	this.btn = $("<a class='btn' data-rid='"+this.rest.id+"' style='float:right'>确认订单</a>");
+	this.element.append(this.head);
+	this.element.append(this.body);
+	this.element.append(this.concacts.element);
+	this.element.append(this.message);
+	this.element.append(this.btn);
+	this.btn.bind('click',this.ensureOrder);
+	for(var i in rest.orderMenus){
+		var menu = "<tr><td width='50%'>"+rest.orderMenus[i].name+"</td><td width='30%'>"+rest.orderMenus[i].num+"</td><td align='right'>"+rest.orderMenus[i].price+"￥</td></tr>";
+		this.body.append($(menu));
 	}
 }
 
-ShoppingCart.prototype.preview = function(){
-	window.shoppingCart.index--;
-	var page=Math.ceil(window.currentRest.info.orderMenus.length/6);
-	if(window.shoppingCart.index>0){
-		window.shoppingCart.index = 0;
-	}else if(window.shoppingCart.index<1-page){
-		window.shoppingCart.index = 1-page;
-	}
-	$('#shopping-cart').animate({left:window.shoppingCart.index*$('#shopping-cart-wrapper').width()});
+OrderViewItem.prototype.postOrder = function(){
+	var concact = this.concacts.getConcactID();
+	var rid = this.rest.id;
+	var m = this.element.find('#order-message');
+    var message = this.element.find('#order-message').val();
+    var items = [];
+    for(var i in this.rest.orderMenus){
+    	items.push({
+    		'id':this.rest.orderMenus[i].id,
+    		'num':this.rest.orderMenus[i].num
+    	});
+    }
+    var price = getOrderMenusPrice(this.rest.orderMenus);
+    $.ajax({
+	      type: 'POST',
+	      url: '/api/order/new',
+	      ContentType: "application/json",
+	      data:{
+    				'concact':concact,
+    				'rid':rid,
+    				'message':message,
+    				'menus':JSON.stringify(items),
+    				'price':price
+    			},
+		  success: function(data){
+						if(data.result){
+							window.lunchAlert('提交订单成功')
+						}else{
+							alert(data.message)
+						}
+					},
+	      error: function(){alert('提交订单失败');}
+	    });
 }
 
-ShoppingCart.prototype.nextview = function(){
-	window.shoppingCart.index++;
-	var page=Math.ceil(window.currentRest.info.orderMenus.length/6);
-	if(window.shoppingCart.index>0){
-		window.shoppingCart.index = 0;
-	}else if(window.shoppingCart.index<1-page){
-		window.shoppingCart.index = 1-page;
+OrderViewItem.prototype.ensureOrder = function(){
+	window.orderView.postOrder(parseInt($(this).data('rid')));
+}
+
+OrderViewItem.prototype.dispose = function(){
+	this.btn.unbind('click',this.ensureOrder);
+	this.rest = null;
+	this.element.remove();
+}
+
+var OrderView = function(jqueryElement){
+	this.element = jqueryElement;
+	this.orderItems = [];
+}
+
+OrderView.prototype.setMenus = function(menus){
+	for(var o in this.orderItems){
+		this.orderItems[o].dispose();
 	}
-	$('#shopping-cart').animate({left:window.shoppingCart.index*$('#shopping-cart-wrapper').width()});
+	this.element.empty();
+	if(menus.length>0){
+		var rests = [];
+		for(var i in menus){
+			var rest = window.restuarants[menus[i].rid].info;
+			if(rest && rests.indexOf(rest)==-1){
+				rests.push(rest);
+			}
+		}
+		for(var j in rests){
+			var orderItem = new OrderViewItem(rest,parseInt(j)+1);
+			this.orderItems.push(orderItem);
+			this.element.append(orderItem.element);
+		}
+	}else{
+		this.element.html("您还没有点选任何食物哦");
+	}
+}
+
+OrderView.prototype.postOrder = function(rid){
+	for(var i in this.orderItems){
+		if(this.orderItems[i].rest.id == rid){
+			this.orderItems[i].postOrder();
+			return;
+		}
+	}
 }

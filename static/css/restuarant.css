@@ -6,7 +6,7 @@
 	max-width: 100%;
 }
 
-.item_thumbnail{
+.rest-thumbnail{
 	max-width: 100%;
 	max-height: 100%;
 }
@@ -30,7 +30,7 @@
 	max-width: 100%;
 }
 
-.item-detail-td{
+.rest-detail-td{
 	padding-left: 10px;
 }
 

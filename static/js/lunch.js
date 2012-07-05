@@ -10,6 +10,7 @@ $(function(){
 	
 	window.restuarants = {}
 	window.currentRest = null;
+	window.orderMenus = [];//购物车里面的条目
 	getUser();
 	window.initialize =  function() {
 	    var latlng = new google.maps.LatLng(GEOCHAT_VARS['initial_latitude'], GEOCHAT_VARS['initial_longitude']);
@@ -325,7 +326,6 @@ $(function(){
 		if(window.currentRest == rest)return;
 		window.currentRest = rest;
 	  	$.setSideBarRest(rest);
-	  	window.shoppingCart.setMenus(rest.info.orderMenus)
 	  	if(!window.currentRest.info.menus){
 	  		$.ajax({
 		          type: 'GET',
@@ -333,6 +333,9 @@ $(function(){
 		          ContentType: "application/json",
 		          success: function(data){
 		  					rest.info.menus = data.menus;
+		  					for(var i in rest.info.menus){
+		  						rest.info.menus[i].num = 0;
+		  					}
 		  					$.setSideBarMenus(data.menus);
 		          		},
 		          error: function(){alert('获取菜单失败')}
@@ -349,7 +352,7 @@ $(function(){
 				if(data.result){
 					window.user = data.user
 					$('#login').modal('hide');
-					$('#nav-right').html("<li><a id='nav-username' href='#userview'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li><li><a>首页</a></li>");
+					$('#nav-right').html("<li><a id='nav-username' onclick='changePage'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li><li><a>首页</a></li>");
 					$('#nav-logout').click(logout);
 					$('.user').addClass('user-login');
     				$('.user').removeClass('user');
@@ -373,7 +376,7 @@ $(function(){
 					window.user = data.user
 					$('#signup').modal('hide');
 					user = data.user;
-					$('#nav-right').html("<li><a id='nav-username' href='#userview'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li><li><a>首页</a></li>");
+					$('#nav-right').html("<li><a id='nav-username' onclick='changePage(4)'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li><li><a>首页</a></li>");
 					$('#nav-logout').click(logout);
 					$('#main').append($("<section id='"+ user.username +"' style='left:400%;background-color: #0f0;'>" +
 										"<div>fivth div</div>" +
@@ -436,17 +439,76 @@ $(function(){
 	};
 	
 	window.addOrderMenu = function(m){
-		if(window.currentRest.info.orderMenus.indexOf(m)>-1){
-			window.lunchAlert('你已经选过这道菜啦，如果要再来一份，请在选择数量');
-			return;
+		m.num++;
+		if(window.orderMenus.indexOf(m)<0){
+			var rest = window.restuarants[m.rid];
+			rest.info.orderMenus.push(m);
+			window.orderMenus.push(m);
 		}
-		window.currentRest.info.orderMenus.push(m);
 		window.shoppingCart.addMenu(m);
+		$('.order-num').html(window.getShoppingCartNum());
+		if(window.shoppingCartShow){
+			updateLayout();
+		}
 	}
 	
 	window.removeOrderMenu = function(m){
-		$.updateSideBarMenu(m,false);
-		window.currentRest.info.orderMenus.splice(window.currentRest.info.orderMenus.indexOf(m),1);
+		m.num --;
+		m.num = m.num<0?0:m.num;
+		if(m.num == 0){
+			$.updateSideBarMenu(m,false);
+			var rest = window.restuarants[m.rid];
+			rest.info.orderMenus.splice(rest.info.orderMenus.indexOf(m),1);
+			window.orderMenus.splice(window.orderMenus.indexOf(m),1);
+		}
 		window.shoppingCart.removeMenu(m);
+		$('.order-num').html(window.getShoppingCartNum());
+		if(window.orderMenus.length == 0){
+			hideShoppingCart();
+		}if(window.shoppingCartShow){
+			updateLayout();
+		}
+	}
+	
+	window.getShoppingCartNum = function(){
+		var result = 0;
+		for(var i in window.orderMenus){
+			result += window.orderMenus[i].num;
+		}
+		return result;
+	}
+	
+	window.shoppingCartShow = true;
+	
+	window.showShoppingCart = function (){
+		window.shoppingCartShow = true;
+		setCss($('#shoppingCart-container'),'0px');
+		setCss($('.content'),$('#shoppingCart-container').height()+'px');
+	}
+	
+	window.hideShoppingCart = function (){
+		window.shoppingCartShow = false;
+		setCss($('#shoppingCart-container'),'-100%');
+		setCss($('.content'),'0px');
+	}
+	
+	window.toggleShoppingCart = function(){
+		if(!window.shoppingCartShow){
+			window.showShoppingCart();
+		}else{
+			window.hideShoppingCart();
+		}
+	}
+	
+	function setCss(element,num){
+		element.css('transform','translate3d(0px,'+ num +', 0px)');
+		element.css('-webkit-transform','translate3d(0px,'+ num +', 0px)');
+		element.css('-moz-transform','translate3d(0px,'+ num +', 0px)');
+		element.css('-o-transform','translate3d(0px,'+ num +', 0px)');
+		element.css('-ms-transform','translate3d(0px,'+ num +', 0px)');
+	}
+	
+	function updateLayout(){
+		setCss($('.content'),$('#shoppingCart-container').height()+'px');
 	}
 });

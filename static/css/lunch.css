@@ -3,7 +3,7 @@ html{
 }
 body{
 	margin: 0;
-	background-color: #eeeeff;
+	background-color: #ffffff;
 	background-image: url(/static/img/noise.png), -webkit-linear-gradient(left, #EDE8E4 1px, transparent 1px);
 	background-repeat-x: initial, no-repeat;
 	background-repeat-y: initial, no-repeat;
@@ -18,6 +18,23 @@ body{
 	font-size:14px;
 	height:100%;
 }
+
+a{
+	cursor: pointer;
+}
+.user,.boss{
+	display: none;
+}
+
+.setting-container{
+	display: none;
+}
+
+.active{
+	display: block;	
+}
+
+
 #navigate_bar{
 	background-color: #225;
 	width: 100%;
