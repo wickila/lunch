@@ -4,11 +4,11 @@
 	<div class="row-fluid">
 		<div class="span3">
 			<ul class="nav nav-tabs nav-stacked" id="user-leftbar">
-				<li class="user" data-sidebar="profile"><a href="#userview">个人资料</a></li>
-				<li class="user" data-sidebar="security"><a href="#userview">安全设置</a></li>
-				<li data-sidebar="restuarant" class="boss"><a href="#userview">店铺资料</a></li>
-				<li data-sidebar="menus" class="boss"><a href="#userview">菜单资料</a></li>
-				<li data-sidebar="sell-order" class="boss"><a href="#userview">店家订单</a></li>
+				<li class="user" data-sidebar="profile"><a>个人资料</a></li>
+				<li class="user" data-sidebar="security"><a>安全设置</a></li>
+				<li data-sidebar="restuarant-edit-view" class="boss"><a>店铺资料</a></li>
+				<li data-sidebar="menus-edit-view" class="boss"><a>菜单资料</a></li>
+				<li data-sidebar="sell-order" class="boss"><a>店家订单</a></li>
 			</ul>
 		</div>
 		<div class="span9">
@@ -46,10 +46,10 @@
 					</fieldset>
 				</form>
 			</div>
-			<div class="setting-container boss" id="restuarant">
+			<div class="setting-container boss" id="restuarant-edit-view">
 				{% include 'restuarant_setting.html' %}
 			</div>
-			<div class="setting-container boss" id="menus">
+			<div class="setting-container boss" id="menus-edit-view">
 				<table width="100%"><tr><td><h3>菜单资料</h3></td><td><a class="btn" style="float: right" onclick="newMenu();">新建菜单</a></td></tr></table>
 				<hr></hr>
 				<div id="setting-menus-form-container">
@@ -74,6 +74,10 @@
 										<span>价格:</span><input type="text" name="price" id="setting-menu-price" required></input><br/>
 										<span>折扣:</span><input type="text" name="discount" id="setting-menu-discount" value="10" required></input><br/>
 										<span>类型:</span><input type="text" name="mtype" id="setting-menu-mtype" required></input><br/>
+										<span>状态:</span><select name="state" id="rest-settting-state">
+														    <option value="0">售完
+														    <option value="1">在售
+														</select><br/>
 										<span>图片地址:</span><input type="text" name="thumbnail" id="setting-menu-imgurl" onkeyup="menu_img_change()" placeholder="如果选择了上传图片，此选项将被忽略"></input><br/>
 										<input type="submit" class="btn" onclick="uploadMenu()" value="保存"></input>
 									</fieldset>

@@ -5,19 +5,18 @@
 	<fieldset>
 		<table>
 		<tr><td>名称:</td><td><input type="text" name="name" id="rest-setting-name" placeholder="店铺名称" required></input></td></tr>
-		<tr><td>类型:</td><td><input type="text" name="rtype" id="rest-settting-type" required></input></td></tr>
 		<tr><td>地址:</td><td><input type="text" name="adress" id="rest-setting-addres" required></input></td></tr>
 		<tr><td>电话:</td><td><input type="text" name="phone" id="rest-setting-phone" required></input></td></tr>
 		<tr><td>起送金额:</td><td><input type="text" name="minprice" id="rest-setting-minprice" required></input></td></tr>
 		<tr><td valign="top">描述:</td><td><textarea name="description" id="rest-setting-des" required></textarea></td></tr>
 		</table>
-		<input type="submit" class="btn" onclick="edit_rest()"></input>
+		<input type="submit" class="btn" onclick="edit_rest()" value="保存"></input>
 	</fieldset>
 </form>
 <hr></hr>
 <form id="rest-avatar-form" enctype="multipart/form-data" method="post" action="/restuarant/avatar">
 	<h3>修改头像</h3>
 	<fieldset>
-		<table><tr><td><img id="rest-avatar-img" style="width:35px;height=35px;" src="{{ user and user.avatar_url }}"></img></td><td><input type="file" name="img" required></input></td><td><input type="submit" value="保存" class="btn" onclick="upload_rest_avatar()"></input></td></tr></table>
+		<table><tr><td><img id="rest-avatar-img" style="width:35px;height=35px;" src="{{ user and user.avatar_url }}"></img></td><td><input type="file" name="img" id="rest-avatar-form-imgfile" onchange="onRestAvatarChange();" required></input></td><td><input type="submit" value="保存" class="btn" onclick="upload_rest_avatar()"></input></td></tr></table>
 	</fieldset>
 </form>

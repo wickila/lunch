@@ -6,7 +6,7 @@ $(function(){
 		link.addClass('active').siblings().removeClass('active');
 		$('#'+link.data('sidebar')).addClass('active').siblings().removeClass('active');
 		switch(link.data('sidebar')){
-		case 'menus':
+		case 'menus-edit-view':
 			if(!window.user.restuarant.menus){
 				$.ajax({
 					type: 'GET',
@@ -16,6 +16,8 @@ $(function(){
 						window.user.restuarant.menus = data.menus;
 						if(!menus){
 							createMenus();
+						}else{
+							menus.setMenus(data.menus);
 						}
 					},
 					error:function(){
@@ -25,6 +27,8 @@ $(function(){
 			}else{
 				if(!menus){
 					createMenus();
+				}else{
+					menus.setMenus(window.user.restuarant.menus);
 				}
 			}
 		}
@@ -95,13 +99,17 @@ $(function(){
 						'success':function(data){
 							lunchAlert('操作成功');
 							var m = data.menu;
+							$('#setting-menu-form')[0].reset();
+							var isOld = false;
 							for(var i in window.user.restuarant.menus)
 							{
 								if(window.user.restuarant.menus[i].id==mid){
 									window.user.restuarant.menus[i] = m;
+									isOld = true;
 									break;
 								}
 							}
+							if(!isOld)window.user.restuarant.menus.push(m);
 							updateMenus(window.user.restuarant.menus);
 						}
 					}).submit();
@@ -109,13 +117,17 @@ $(function(){
 					lunchAlert('操作成功');
 					var m = data.menu;
 					$('#setting-menu-img').attr('src',m.thumbnail);
+					$('#setting-menu-form')[0].reset();
+					var isOld = false;
 					for(var i in window.user.restuarant.menus)
 					{
-						if(window.user.restuarant.menus[i].id==mid){
+						if(window.user.restuarant.menus[i].id==m.id){
 							window.user.restuarant.menus[i] = m;
+							isOld = true;
 							break;
 						}
 					}
+					if(!isOld)window.user.restuarant.menus.push(m);
 					updateMenus(window.user.restuarant.menus);
 				}
 			}
@@ -199,17 +211,31 @@ $(function(){
 			'dataType': 'json',
 			'success':function(data){
 				if(data.result){
-					$('#rest-setting-form')[0].reset();
+//					$('#rest-setting-form')[0].reset();
+					window.lunchAlert("店铺资料保存成功");
 				}
 			}
 		});
 	};
+	
+	window.onRestAvatarChange = function(){
+		var viewFiles = document.getElementById("rest-avatar-form-imgfile");
+	    var viewImg = document.getElementById("rest-avatar-img");
+		var file = viewFiles.files[0];
+	    //通过file.size可以取得图片大小
+        var reader = new FileReader();
+        reader.onload = function( evt ){
+            viewImg.src = evt.target.result;
+        }
+        reader.readAsDataURL(file);
+	}
 	
 	window.upload_rest_avatar = function(){
 		$('#rest-avatar-form').ajaxForm({
 				'dataType': 'json',
 				'success':function(data){
 					$("#rest-avatar-img").attr('src',data.imgurl);
+					window.lunchAlert("店铺资料保存成功");
 				}
 		});
 	};

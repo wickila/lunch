@@ -1,22 +1,4 @@
 $(function(){
-	window.page = 1;
-	updateView();
-	initLayout();
-	
-	window.onhashchange = function(){
-//		main = $('#main');
-//		last_section = $(last_hash);
-//		current_section = $(location.hash);
-//		gap = current_section.position().left-last_section.position().left;
-//		main.css('left',gap);
-//		$('#shoppingCart-container').animate({left:last_section.position().left-$('#shoppingCart-container').position().left},500,function(){
-//			$('#shoppingCart-container').animate({left:($(window).width()-$('#shoppingCart-container').width())*0.5});
-//		});
-//		last_hash = location.hash;
-//		main.animate({left:'0px'},500);
-//		drawView();
-	};
-	
 	window.changePage = function(page){
 		if(window.page == page)return;
 		window.page = page;
@@ -26,10 +8,8 @@ $(function(){
 		$('#main').css('-moz-transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
 		$('#main').css('-o-transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
 		$('#main').css('-ms-transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
-		updateView();
+		window.updateView();
 	}
-	
-	window.hideShoppingCart();
 	
 	var overview;
 	window.restView = null;;
@@ -38,7 +18,7 @@ $(function(){
 	var otherview;
 	window.shoppintCart = null;
 	
-	function updateView(){
+	window.updateView = function(){
 		switch(window.page){
 			case 1:
 				creatShoppingCart();
@@ -57,12 +37,29 @@ $(function(){
 				creatShoppingCart();
 				break;
 			case 3:
-				if(!window.orderView){
-					window.orderView = new OrderView($('#order-container'));
+				if(!window.user){
+					$('#order-container').empty();
+					$('#order-container').append($("<p>您还没有登录，请先<a data-toggle='modal' data-target='#signup'>注册</a>或<a data-toggle='modal' data-target='#login'>登录</a></p>"));
+				}else{
+					if(!window.orderView){
+						window.orderView = new OrderView($('#order-container'));
+					}
+					window.orderView.setMenus(window.orderMenus);
 				}
-				window.orderView.setMenus(window.orderMenus);
 				break;
 			case 4:
+				if(!window.user){
+					
+				}else{
+					if(window.user.restuarant){
+						$("rest-setting-name").val(window.user.restuarant.name);
+						$("rest-setting-type").val(window.user.restuarant.rtype);
+						$("rest-setting-adress").val(window.user.restuarant.adress);
+						$("rest-setting-minprice").val(window.user.restuarant.minprice);
+						$("rest-setting-phone").val(window.user.restuarant.phone);
+						$("rest-setting-description").val(window.user.restuarant.description);
+					}
+				}
 				break;
 		}
 		function creatShoppingCart(){
@@ -80,4 +77,8 @@ $(function(){
 		$('#small-menu-container').css('max-height',overviewHeight*0.8);
 		$('#shoppingCart-container').css('left',($(window).width()-$('#shoppingCart-container').width())*0.5);
 	}
+	window.page = 1;
+	initLayout();
+	window.hideShoppingCart();
+	window.updateView();
 });

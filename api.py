@@ -148,7 +148,7 @@ class MenuThumbail():
                     os.mkdir('.'+filedir)
                 if 'imgfile' in post_data: # to check if the file-object is created
                     filepath=post_data.imgfile.filename.replace('\\','/') # replaces the windows-style slashes with linux ones.
-                    filename=str(id)+'.'+filepath.split('/')[-1].split('.')[1] # splits the and chooses the last part (the filename with extension)
+                    filename=str(id)+'.'+filepath.split('/')[-1].split('.')[-1] # splits the and chooses the last part (the filename with extension)
                     fout = open('.'+filedir +'/'+ filename,'wb') # creates the file where the uploaded file should be stored
                     fout.write(post_data.imgfile.file.read()) # writes the uploaded file to the newly created file.
                     fout.close() # closes the file, upload complete.
@@ -174,7 +174,7 @@ class NewMenu():
             discount = post_data.discount
             mtype = post_data.mtype
             thumbnail = post_data.thumbnail
-            rid = model.db.query('select id from restuarant where username='+str(user.username))[0].id
+            rid = model.db.query("select id from restuarant where username='%s'" % user.username)[0].id
             mid = model.db.insert('menu',name=name,description=description,price=price,discount=discount,mtype=mtype,uid=user.id,rid=rid,thumbnail=thumbnail)
             mns = model.db.select('menu',where='id=$mid',vars=locals())
             m = mns[0]
@@ -192,7 +192,8 @@ class EditMenu():
             discount = post_data.discount
             mtype = post_data.mtype
             thumbnail = post_data.thumbnail
-            model.db.update('menu',where='id=$mid',vars=locals(),name=name,description=description,price=price,discount=discount,mtype=mtype,thumbnail=thumbnail)
+            state = int(post_data.state)
+            model.db.update('menu',where='id=$mid',vars=locals(),name=name,description=description,price=price,discount=discount,mtype=mtype,thumbnail=thumbnail,soldout=state)
             mns = model.db.select('menu',where='id=$mid',vars=locals())
             m = mns[0]
             return lunch.write_json({'result':True,'message':'success','menu':m})
@@ -212,7 +213,7 @@ class NewOrder():
         user = lunch.get_current_user()
         post_data = web.input()
         if user:
-            concact = int(post_data.concact)
+            concact = post_data.concact
             rid = post_data.rid
             message = post_data.message
             state = 0
@@ -229,10 +230,14 @@ class NewOrder():
             menus = model.db.query(sql)
             if len(menus) == len(menus):
                 p = 0
+                soldouts = []
                 for menu in menus:
                     if menu.soldout == 0:
-                        return lunch.write_json({'result':False,'message':'some menu soldout'})
+                        soldouts.append(menu)
                     p+=menu.price*menu.discount*0.1*int(its[menu.id]['num'])
+                if len(soldouts)>0:
+                    message = ','.join([menu.name for menu in soldouts])+'卖完啦,换换口味看？'
+                    return lunch.write_json({'result':False,'message':message})
                 if p == price:
                     rs = model.db.select('restuarant',where='id=$rid',vars=locals())
                     if len(rs)>0:
@@ -240,7 +245,7 @@ class NewOrder():
                         oid = model.db.insert('lunchorder',username=user.username,concact=concact,bossusername=rest.username,message=message,menus=post_data.menus,price=price)
                         order = model.db.select('lunchorder',where='id=$oid',vars=locals())[0]
                         order.createdtime = str(order.createdtime)
-                        return lunch.write_json({'result':True,'message':'order success','order':order})
+                        return lunch.write_json({'result':True,'message':'order success','order':order,'rid':rest.id})
                     return lunch.write_json({'result':False,'message':'invlid restuarant'})
                 return lunch.write_json({'result':False,'message':'invlid price'})
             return lunch.write_json({'result':False,'message':'invlid menus'})

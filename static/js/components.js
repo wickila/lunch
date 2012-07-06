@@ -1,7 +1,7 @@
 var RestSideBar = function(jqueryElement,rest){
 	var headDiv = "<div>"+
 				"<table>" +
-				"<tr><td rowspan='3'><img id='rsb-avatar'></img></td><td><span id='rsb-name'></span></td></tr>" +
+				"<tr><td rowspan='3'><img id='rsb-avatar' class='thumbnail small-avatar'></img></td><td><span id='rsb-name'></span></td></tr>" +
 				"<tr><td><span id='rsb-description'></span></td></tr>" +
 				"<tr><td><span id='rsb-thanks'></span></td></tr>" +
 				"</table></div><hr/>";
@@ -64,7 +64,8 @@ Menu.prototype.getDiv = function(){
 	return div;
 };
 
-var Menus = function(jqueryElement,menus){
+var Menus = function(jqueryElement,menus,eventEnable){
+	this.eventEnable = eventEnable;
 	this.jqueryElement = jqueryElement;
 	this.menus = menus;
 	if(menus){
@@ -97,33 +98,35 @@ Menus.prototype.setMenus = function(menus){
 	div += "</div>";
 	var div = $(div);
 	this.jqueryElement.append(div);
-	div.find('.menu').each(function(){
-		var menu = $(this);
-		this.ondragstart = function(event){
-			window.lunchAlert('dragstart');
-			event.dataTransfer.effectAllowed = "move";
-			event.dataTransfer.setData('mid',$(event.target).data('mid'));
-			event.dataTransfer.setDragImage(event.target, 0, 0);
-			return true;
-		}
-		this.ondragend = function(event) {
-			event.dataTransfer.clearData("text");
-			eleDrag = null;
-			return false
-		};
-		this.onclick = function(){
-			var mid = menu.data('mid');
-			var m;
-			for(var i in window.currentRest.info.menus){
-				if(window.currentRest.info.menus[i].id == mid){
-					m = window.currentRest.info.menus[i];
-					break;
-				}
+	if(this.eventEnable){
+		div.find('.menu').each(function(){
+			var menu = $(this);
+			this.ondragstart = function(event){
+				window.lunchAlert('dragstart');
+				event.dataTransfer.effectAllowed = "move";
+				event.dataTransfer.setData('mid',$(event.target).data('mid'));
+				event.dataTransfer.setDragImage(event.target, 0, 0);
+				return true;
 			}
-			window.addOrderMenu(m);
-			$.updateSideBarMenu(m,'checked');
-		}
-	});
+			this.ondragend = function(event) {
+				event.dataTransfer.clearData("text");
+				eleDrag = null;
+				return false
+			};
+			this.onclick = function(){
+				var mid = menu.data('mid');
+				var m;
+				for(var i in window.currentRest.info.menus){
+					if(window.currentRest.info.menus[i].id == mid){
+						m = window.currentRest.info.menus[i];
+						break;
+					}
+				}
+				window.addOrderMenu(m);
+				$.updateSideBarMenu(m,'checked');
+			}
+		});
+	}
 	div.find('.menu-img').each(function(){
 		var item = $(this);
 		item.load(function() {  
@@ -159,7 +162,7 @@ SmallMenu.prototype.getDiv = function(){
 var RestView = function(jqueryElement,rest){
 	this.rest = rest;
 	this.siderbar = new RestSideBar(jqueryElement.find('#rsb'),this.rest);
-	this.menus = new Menus(jqueryElement.find('#menus-wrapper'),rest.menus);
+	this.menus = new Menus(jqueryElement.find('#menus-wrapper'),rest.menus,true);
 	$("#rest-detail").find("#rest-name").html(rest.name);
 	$("#rest-detail").find("#rest-username").html(rest.username);
 	$("#rest-detail").find("#rest-minprice").html(rest.minprice);
@@ -225,7 +228,7 @@ ShoppingCartRest.prototype.removeOrderMenu = function(m){
 	}else{
 		$(id).find('.shopping-cart-menu-num').html(m.num);
 	}
-	this.head.find('.shopping-cart-rest-order-menus-num').html(this.getOrderMenuNum());
+	this.head.find('.shopping-cart-rest-order-menus-num').html(getOrderMenusNum(this.rest.orderMenus));
 }
 
 ShoppingCartRest.prototype.onClose = function(){
@@ -353,21 +356,19 @@ ShoppingCart.prototype.removeMenu = function(m){
 	if(rest.rest.orderMenus.length == 0){
 		rest.head.remove();
 		rest.body.remove();
-		this.rests.splice(this.rests.indexOf(rest));
+		this.rests.splice(this.rests.indexOf(rest),1);
 	}
 	if(window.orderMenus.length == 0){
 		$('#shopping-cart-settle').hide();
 	}
 }
 
-var Concacts = function(user){
+var Concacts = function(user,rid){
 	this.element = $("<div class='concacts-container'></div>");
 	this.user = user;
-	this.concacts = $("<div class='concacts-item-container'></div>");
+	var concactsItemContainer = this.concacts = $("<div class='concacts-item-container' data-rid='"+rid+"'></div>");
 	this.showFormBtn = $("<a id='add-concact-btn' class='btn'>添加联系方式<a>");
 	this.element.append(this.concacts);
-	this.element.append(this.showFormBtn);
-	this.element.find('#add-concact-btn').bind('click',this.showForm);
 	if(user.concacts){
 		setConcacts(user.concacts);
 	}else{
@@ -388,63 +389,164 @@ var Concacts = function(user){
 	function setConcacts(concacts){
 		for(var i in concacts){
 			var concact = concacts[i];
-			var elm = $("<p><input type='radio' name='concact' value='"+concact.id+"'><span>"+concact.adress+"</span><span>"+concact.concactname+"</span><span>"+concact.phone+"</span></p>");
+			var elm = $("<p class='concact-item' style='display:none'><input class='concact-item-input' type='radio' name='concact-"+rid+"' value='"+JSON.stringify(concact)+"'><span>"+concact.adress+"</span><span>"+concact.concactname+"收</span><span>电话:"+concact.phone+"</span></p>");
+			elm.append($("<span style='float:right;display:none' class='icon-remove concact-item-remove'></span>" +
+						"<span style='float:right;display:none;' class='icon-plus concact-item-plus'></span>" +
+						"<span style='float:right;display:none;' class='icon-minus concact-item-minus'></span>" +
+						"<span style='float:right;display:none;' class='icon-list concact-item-list'></span>"));
+			concactsItemContainer.append(elm);
 			if(i==0){
 				elm.find('input').attr('checked',true);
+				elm.find('.icon-plus').show();
+				elm.find('.icon-list').show();
+				elm.show();
 			}
-			$('.concacts-item-container').append(elm);
+		}
+		if(concacts.length == 0){
+			var elm = $("<p class='concact-item' id='blank-concact-item'><a class='concact-item-plus'>您还没有任何联系方式，请点击添加联系方式</a></p>");
+			elm.append($("<span style='float:right' class='icon-plus concact-item-plus'></span>"));
+			concactsItemContainer.append(elm);
 		}
 	}
 }
 
-Concacts.prototype.showForm = function(){
-	var element = $(this).parent();
-	var form = $("<form id='concact-form' method='post' action='/api/concact/new'>" +
-					"<h3>联系方式</h3>" +
-					"<table>" +
-					"<tr><td>联系人:</td><td><input type='text' id='concact-form-concactname' name='concactname' required></input></td></tr>" +
-					"<tr><td>电话:</td><td><input type='text' id='concact-form-phone' name='phone' required></input></td></tr>" +
-					"<tr><td>地址:</td><td><input type='text' id='concact-form-adress' name='adress' required></input></td></tr>" +
-					"</table>" +
-					"<input id='concact-form-btn' type='submit' class='btn' value='保存'></input>" +
-				"</form>");
-	form.find('#concact-form-btn').bind('click',function(event){
-		var element1 = $(this).parent().parent();
-		element1.find('form').ajaxForm({
-			'dataType': 'json',
-			'success':function(data){
-				if(data.result){
-					if(!window.user.concacts)window.user.concacts = [];
-					var concact = data.concact;
-					window.user.concacts.push(concact);
-					var elm = $("<p><input type='radio' name='concact' value='"+concact.id+"'><span>"+concact.adress+"</span><span>"+concact.concactname+"</span><span>"+concact.phone+"</span></p>");
-					element1.find('.concacts-item-container').append(elm);
-					element1.find('form').hide(200,function(){
-							element1.find('form').remove();
-							element1.find('#add-concact-btn').show();
+function initEvents(){
+	$('.concact-item-plus').live('click',function(){
+		var element = $(this).parent().parent();
+		var form = $("<form id='concact-form' method='post' action='/api/concact/new'>" +
+						"<h3>添加联系方式</h3>" +
+						"<table>" +
+						"<tr><td>联系人:</td><td><input type='text' id='concact-form-concactname' name='concactname' required></input></td></tr>" +
+						"<tr><td>电话:</td><td><input type='text' id='concact-form-phone' name='phone' required></input></td></tr>" +
+						"<tr><td>地址:</td><td><input type='text' id='concact-form-adress' name='adress' required></input></td></tr>" +
+						"</table>" +
+						"<input id='concact-form-btn' type='submit' class='btn' value='保存'></input>" +
+					"</form>");
+		form.find('#concact-form-btn').bind('click',function(event){
+			var element1 = $(this).parent().parent();
+			element1.find('form').ajaxForm({
+				'dataType': 'json',
+				'success':function(data){
+					if(data.result){
+						if(!window.user.concacts)window.user.concacts = [];
+						var concact = data.concact;
+						window.user.concacts.push(concact);
+						$('.concacts-item-container').each(function(){
+							var element2 = $(this); 
+							var elm = $("<p class='concact-item' style='display:none'><input type='radio' class='concact-item-input' name='concact-"+element2.data('rid')+"' value='"+JSON.stringify(concact)+"'><span>"+concact.adress+"</span><span>"+concact.concactname+"收</span><span>电话:"+concact.phone+"</span></p>");
+							elm.append($("<span style='float:right;display:none' class='icon-remove concact-item-remove'></span>" +
+										"<span style='float:right;display:none;' class='icon-plus concact-item-plus'></span>" +
+										"<span style='float:right;display:none;' class='icon-minus concact-item-minus'></span>" +
+										"<span style='float:right;display:none;' class='icon-list concact-item-list'></span>"));
+							element2.find('#blank-concact-item').remove();
+							var elements = [];
+							element2.find('.concact-item').each(function(){
+								var item = $(this);
+								elements.push(item);
+								item.find('.icon-plus').hide();
+								item.find('.icon-list').hide();
+								item.find('.icon-remove').hide();
+								item.find('.icon-minus').hide();
+								item.hide();
+								item.attr('checked',false);
+							});
+							element2.append(elm);
+							for(var i in elements){
+								element2.append(elements[i]);
+							}
+							elm.find('input').attr('checked',true);
+							elm.find('.icon-plus').show();
+							elm.find('.icon-list').show();
+							elm.show();
+							element2.find('form').hide(200,function(){
+									element2.find('form').remove();
+							});
 						});
+					}
 				}
+			});
+		});
+		$(this).hide();
+		$(this).parent().find('.icon-minus').hide();
+		$(this).parent().find('.icon-list').show();
+		$(this).parent().find('.icon-remove').show();
+		var ccts = $(this).parent().parent();
+		ccts.find('.concact-item').each(function(){
+			var item = $(this);
+			var checked = item.find('input').attr('checked');
+			if(checked){
+				item.show();
+			}else{
+				item.hide();
 			}
 		});
-//		event.preventDefault();
+		element.append(form);
 	});
-	$(this).hide();
-	element.append(form);
-}
-
-Concacts.prototype.hideForm = function(){
 	
+	$('.concact-item-list').live('click',function(){
+		var ccts = $(this).parent().parent();
+		ccts.find('.concact-item').show();
+		$(this).parent().parent().find('form').remove();
+		$(this).parent().find('.icon-remove').hide();
+		$(this).parent().find('.icon-plus').show();
+		$(this).hide();
+		$(this).parent().find('.icon-minus').show();
+	});
+	
+	$('.concact-item-minus').live('click',function(){
+		var ccts = $(this).parent().parent();
+		ccts.find('.concact-item').each(function(){
+			var item = $(this);
+			var checked = item.find('input').attr('checked');
+			if(checked){
+				item.show();
+			}else{
+				item.hide();
+			}
+		})
+		$(this).hide();
+		$(this).parent().find('.icon-list').show();
+	});
+	$('.concact-item-remove').live('click',function(){
+		$(this).parent().parent().find('form').remove();
+		$(this).hide();
+		$(this).parent().find('.icon-plus').show();
+	});
+	$('.concact-item-input').live('click',function(){
+		var ccts = $(this).parent().parent();
+		var elements = [];
+		ccts.find('.concact-item').each(function(){
+			var item = $(this);
+			var checked = item.find('input').attr('checked');
+			if(checked){
+				elements.unshift(item);
+				item.show();
+				item.find('.icon-plus').show();
+				item.find('.icon-list').show();
+			}else{
+				elements.push(item);
+				item.hide();
+				item.find('.icon-plus').hide();
+				item.find('.icon-list').hide();
+				item.find('.icon-remove').hide();
+				item.find('.icon-minus').hide();
+			}
+		})
+		for(var i in elements){
+			ccts.append(elements[i]);
+		}
+	});
 }
 
-Concacts.prototype.getConcactID = function(){
-	var concactID = 0;
+Concacts.prototype.getConcact = function(){
+	var concact = '';
 	this.concacts.find('input').each(function(){
 		var input = $(this);
 		if(input.attr('checked')){
-			concactID = input.val();
+			concact = input.val();
 		}
 	})
-	return concactID;
+	return concact;
 }
 
 Concacts.prototype.dispose = function(){
@@ -471,15 +573,15 @@ function getOrderMenusPrice(menus){
 var OrderViewItem = function(rest,index){
 	this.rest = rest;
 	this.element = $("<div class='order-item'></div>");
-	var head = "<p>订单"+index+"</p>" +
-			"<p><span>店家:"+ rest.name +"</span><span>数量:"+ getOrderMenusNum(rest.orderMenus) +"</span><span>总价:"+getOrderMenusPrice(rest.orderMenus)+"￥</span></p>";
+	var head = "<h3>订单"+index+"</h3>" +
+			"<p class='order-item-head'><span>店家:"+ rest.name +"</span><span>数量:"+ getOrderMenusNum(rest.orderMenus) +"</span><span>总价:"+getOrderMenusPrice(rest.orderMenus)+"￥</span></p><hr/>";
 	var body = "<table width='100%'>" +
 			"<thead><th width='50%' align='left'>名称</th><th width='30%' align='left'>数量</th><th align='right'>单价</th></thead>" +
 			"</table>";
 	this.head = $(head);
 	this.body = $(body);
-	this.concacts = new Concacts(window.user);
-	this.message = $("<hr></hr><textarea id='order-message' rows='4'></textarea>");
+	this.concacts = new Concacts(window.user,rest.id);
+	this.message = $("<p>附加留言</p><textarea id='order-message' rows='4'></textarea>");
 	this.btn = $("<a class='btn' data-rid='"+this.rest.id+"' style='float:right'>确认订单</a>");
 	this.element.append(this.head);
 	this.element.append(this.body);
@@ -494,7 +596,7 @@ var OrderViewItem = function(rest,index){
 }
 
 OrderViewItem.prototype.postOrder = function(){
-	var concact = this.concacts.getConcactID();
+	var concact = this.concacts.getConcact();
 	var rid = this.rest.id;
 	var m = this.element.find('#order-message');
     var message = this.element.find('#order-message').val();
@@ -511,19 +613,22 @@ OrderViewItem.prototype.postOrder = function(){
 	      url: '/api/order/new',
 	      ContentType: "application/json",
 	      data:{
-    				'concact':concact,
+    				'concact':JSON.stringify(concact),
     				'rid':rid,
     				'message':message,
     				'menus':JSON.stringify(items),
     				'price':price
     			},
 		  success: function(data){
-						if(data.result){
-							window.lunchAlert('提交订单成功')
-						}else{
-							alert(data.message)
-						}
-					},
+	    				if(data.result){
+	    					window.orderView.removeRest(data.rid);
+	    					if(!window.user.orders)window.user.orders = [];
+	    					window.user.orders.push(data.order);
+	    					window.lunchAlert('提交订单成功');
+	    				}else{
+	    					alert(data.message)
+	    				}
+	    		    },
 	      error: function(){alert('提交订单失败');}
 	    });
 }
@@ -541,12 +646,14 @@ OrderViewItem.prototype.dispose = function(){
 var OrderView = function(jqueryElement){
 	this.element = jqueryElement;
 	this.orderItems = [];
+	initEvents();
 }
 
 OrderView.prototype.setMenus = function(menus){
 	for(var o in this.orderItems){
 		this.orderItems[o].dispose();
 	}
+	this.orderItems = [];
 	this.element.empty();
 	if(menus.length>0){
 		var rests = [];
@@ -557,7 +664,7 @@ OrderView.prototype.setMenus = function(menus){
 			}
 		}
 		for(var j in rests){
-			var orderItem = new OrderViewItem(rest,parseInt(j)+1);
+			var orderItem = new OrderViewItem(rests[j],parseInt(j)+1);
 			this.orderItems.push(orderItem);
 			this.element.append(orderItem.element);
 		}
@@ -572,5 +679,28 @@ OrderView.prototype.postOrder = function(rid){
 			this.orderItems[i].postOrder();
 			return;
 		}
+	}
+}
+
+OrderView.prototype.removeRest = function(rid){
+	var orderItem = null;
+	for(var i in this.orderItems){
+		if(this.orderItems[i].rest.id == rid){
+			orderItem = this.orderItems[i];
+			this.orderItems.splice(i,1);
+			break;
+		}
+	}
+	if(orderItem){
+		var mns = orderItem.rest.orderMenus.concat();
+		for(var j in mns){
+			mns[j].num = 1;
+			window.removeOrderMenu(mns[j]);
+		}
+		orderItem.element.animate({'height':30},500,function(){
+			orderItem.element.hide(200,function(){
+				orderItem.dispose();
+			});
+		});
 	}
 }

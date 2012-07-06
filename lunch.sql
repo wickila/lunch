@@ -60,7 +60,7 @@ CHARACTER SET utf8
 CREATE TABLE `lunch`.`lunchorder` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `uername` TEXT  NOT NULL,
-  `concact` INT  NOT NULL,
+  `concact` TEXT  NOT NULL,
   `bossusername` TEXT  NOT NULL,
   `message` TEXT  NOT NULL,
   `createdtime` TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,

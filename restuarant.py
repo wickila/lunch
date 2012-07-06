@@ -18,16 +18,18 @@ class New():
         lat = float(user_data.lat)
         lng = float(user_data.lng)
         rest_name = user_data.rest_name
+        adress = user_data.adress;
         user = lunch.get_current_user()
         dic = {'result':False,'type':0}
         if user:
-            rests = model.db.query('select id from restuarant where username=%d' % user.username)
-            if len(rests>0):
+            rests = model.db.query("select id from restuarant where username='%s'" % user.username)
+            if len(rests)>0:
                 return lunch.write_json({'result':False,'message':'you already have a shop'})
-            rest_id = model.db.insert('restuarant',hash_location=geohash.encode(lat, lng, 12),name=rest_name,username=user.username,lat=lat,lng=lng)
+            rest_id = model.db.insert('restuarant',hash_location=geohash.encode(lat, lng, 12),name=rest_name,username=user.username,lat=lat,lng=lng,adress=adress)
             rest = model.db.query('select * from restuarant where id=$rest_id',vars=locals())[0]
             rest.created_time = str(rest.created_time).split('.')[0]
-            dic = {'result':True,'type':1,'rest':rest}
+            dic = {'result':True,'message':'success','type':1,'rest':rest}
+            return lunch.write_json(dic)
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
     
 class Edit():
@@ -58,7 +60,7 @@ class Avatar:
                 os.mkdir('.'+filedir)
             if 'img' in post_data: # to check if the file-object is created
                 filepath=post_data.img.filename.replace('\\','/') # replaces the windows-style slashes with linux ones.
-                filename=str(user.id)+'.'+filepath.split('/')[-1].split('.')[1] # splits the and chooses the last part (the filename with extension)
+                filename=str(user.id)+'.'+filepath.split('/')[-1].split('.')[-1] # splits the and chooses the last part (the filename with extension)
                 fout = open('.'+filedir +'/'+ filename,'wb') # creates the file where the uploaded file should be stored
                 fout.write(post_data.img.file.read()) # writes the uploaded file to the newly created file.
                 fout.close() # closes the file, upload complete.

@@ -83,6 +83,24 @@ $(function(){
 					}else{
 						$('#lat').val(clickedLatLng.lat());
 						$('#lng').val(clickedLatLng.lng());
+						var latlng = new google.maps.LatLng(clickedLatLng.lat(), clickedLatLng.lng());
+						geocoder.geocode({'latLng': latlng}, function(results, status) {
+						      if (status == google.maps.GeocoderStatus.OK) {
+						        if (results[0]) {
+						        	var adress = results[0].formatted_address;
+									$('#new-rest-form-adress').val(adress);
+//						          map.setZoom(11);
+//						          marker = new google.maps.Marker({
+//						              position: latlng,
+//						              map: map
+//						          });
+//						          infowindow.setContent(results[1].formatted_address);
+//						          infowindow.open(map, marker);
+						        }
+						      } else {
+						        alert("Geocoder failed due to: " + status);
+						      }
+						    });
 						$('#myModal').modal('show');
 					}
 					break;
@@ -229,6 +247,7 @@ $(function(){
 						r = new Restuarant(data.rest);
 						map.setCenter(new google.maps.LatLng(data.rest.lat,data.rest.lng), 13);
 						$('#myModal').modal('hide');
+						window.lunchAlert("您已经成功新开一家店铺啦，点击<a onclick='changePage(4)'>此处</a>可以修改店铺的基本资料哦");
 					}
 				}
 		});
@@ -350,9 +369,9 @@ $(function(){
 			'dataType': 'json',
 			'success':function(data){
 				if(data.result){
-					window.user = data.user
+					window.user = data.user;
 					$('#login').modal('hide');
-					$('#nav-right').html("<li><a id='nav-username' onclick='changePage'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li><li><a>首页</a></li>");
+					$('#nav-right').html("<li><a id='nav-username' onclick='changePage(4);'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li>");
 					$('#nav-logout').click(logout);
 					$('.user').addClass('user-login');
     				$('.user').removeClass('user');
@@ -361,6 +380,7 @@ $(function(){
     					$('.boss').removeClass('boss');
 					}
 					$('#bottom-nav-user').html(user.username);
+					window.updateView();
 				}else{
 					$('#login-message').html(data.message);
 				}
@@ -376,7 +396,7 @@ $(function(){
 					window.user = data.user
 					$('#signup').modal('hide');
 					user = data.user;
-					$('#nav-right').html("<li><a id='nav-username' onclick='changePage(4)'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li><li><a>首页</a></li>");
+					$('#nav-right').html("<li><a id='nav-username' onclick='changePage(4)'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li>");
 					$('#nav-logout').click(logout);
 					$('#main').append($("<section id='"+ user.username +"' style='left:400%;background-color: #0f0;'>" +
 										"<div>fivth div</div>" +
@@ -388,6 +408,7 @@ $(function(){
     					$('.boss').removeClass('boss');
 					}
 					$('#bottom-nav-user').html(user.username);
+					window.updateView();
 				}else{
 					$('#usernameErrorMessage').html(data.usernameErrorMessage);
 					$('#passwordErrorMessage').html(data.passwordErrorMessage);
@@ -405,12 +426,13 @@ $(function(){
     		success: function(data){
 				if(data.result){
 					window.user = null;
-					$('#nav-right').html("<li><a data-toggle='modal' data-target='#login'>登录</a></li><li><a id='nav-signup' data-toggle='modal' data-target='#signup'>注册</a></li><li><a>首页</a></li>");
+					$('#nav-right').html("<li><a data-toggle='modal' data-target='#login'>登录</a></li><li><a id='nav-signup' data-toggle='modal' data-target='#signup'>注册</a>");
 					$('.user-login').addClass('user');
     				$('.user-login').removeClass('user-login');
     				$('.boss-login').addClass('boss');
 					$('.boss-login').removeClass('boss-login');
 					$('#bottom-nav-user').html('游客');
+					window.updateView();
 				}else{
 					alert(data.message);
 				}
