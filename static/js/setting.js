@@ -6,31 +6,35 @@ $(function(){
 		link.addClass('active').siblings().removeClass('active');
 		$('#'+link.data('sidebar')).addClass('active').siblings().removeClass('active');
 		switch(link.data('sidebar')){
-		case 'menus-edit-view':
-			if(!window.user.restuarant.menus){
-				$.ajax({
-					type: 'GET',
-		            url: '/api/resturant/menus/'+window.user.restuarant.id,
-		            ContentType: "application/json",
-					success:function(data){
-						window.user.restuarant.menus = data.menus;
-						if(!menus){
-							createMenus();
-						}else{
-							menus.setMenus(data.menus);
+			case 'menus-edit-view':
+				if(!window.user.restuarant.menus){
+					$.ajax({
+						type: 'GET',
+			            url: '/api/resturant/menus/'+window.user.restuarant.id,
+			            ContentType: "application/json",
+						success:function(data){
+							window.user.restuarant.menus = data.menus;
+							if(!menus){
+								createMenus();
+							}else{
+								menus.setMenus(data.menus);
+							}
+						},
+						error:function(){
+							alert('加载菜单失败');
 						}
-					},
-					error:function(){
-						alert('加载菜单失败');
-					}
-				});
-			}else{
-				if(!menus){
-					createMenus();
+					});
 				}else{
-					menus.setMenus(window.user.restuarant.menus);
+					if(!menus){
+						createMenus();
+					}else{
+						menus.setMenus(window.user.restuarant.menus);
+					}
 				}
-			}
+			case 'boss-order-view':
+				if(!window.bossOrderView){
+					window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
+				}
 		}
 		e.preventDefault();
 	});

@@ -13,6 +13,7 @@ import config
 
 import json
 from geo import geohash
+import datetime
 
 class CheckLogin:
     def GET(self):
@@ -242,7 +243,7 @@ class NewOrder():
                     rs = model.db.select('restuarant',where='id=$rid',vars=locals())
                     if len(rs)>0:
                         rest = rs[0]
-                        oid = model.db.insert('lunchorder',username=user.username,concact=concact,bossusername=rest.username,message=message,menus=post_data.menus,price=price)
+                        oid = model.db.insert('lunchorder',username=user.username,concact=concact,bossusername=rest.username,message=message,menus=post_data.menus,price=price,restname=rest.name)
                         order = model.db.select('lunchorder',where='id=$oid',vars=locals())[0]
                         order.createdtime = str(order.createdtime)
                         return lunch.write_json({'result':True,'message':'order success','order':order,'rid':rest.id})
@@ -252,12 +253,77 @@ class NewOrder():
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
             
         
-class EidtOrder():
+class EditOrder():
     def POST(self,id):
         user = lunch.get_current_user()
         post_data = web.input()
+        state  = int(post_data.state)
+        cancelreason = ''
+        if 'cancelreason' in post_data:
+            cancelreason = post_data.cancelreason
+        if user:
+            order = model.db.select('lunchorder',where='id=$id',vars=locals())
+            if len(order)>0:
+                order = order[0]
+                if (order.bossusername == user.username and (not state == 3)) or (order.username == user.username and state == 3):
+                    model.db.update('lunchorder',where='id=$id',state=state, cancelreason=cancelreason,modifiedtime = datetime.datetime.now(),vars=locals())
+                    order.state = state
+                    order.createdtime = str(order.createdtime).split('.')[0]
+                    order.modifiedtime = str(datetime.datetime.now()).split('.')[0]
+                    return lunch.write_json({'result':True,'message':'delete success','order':order})
+            else:
+                return lunch.write_json({'result':False,'message':'invlid order'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class GetOrder():
+    def GET(self,id):
+        user = lunch.get_current_user()
+        if user:
+            order = model.db.select('lunchorder',where='id=$id',vars=locals())
+            if len(order)>0:
+                order = order[0]
+                order.createdtime = str(order.createdtime).split('.')[0]
+                return lunch.write_json({'result':True,'message':'delete success','order':order})
+            else:
+                return lunch.write_json({'result':False,'message':'invlid order'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class ViewUserOrders():
+    def GET(self):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        try:
+            page = int(post_data.page)
+        except:
+            page = 1
+        page_count = 10
+        if user:
+            sql = "select * from lunchorder where username='%s' LIMIT %d, %d" % (user.username,(page-1)*page_count,page*page_count)
+            orders = model.db.query(sql)
+            total = len(model.db.query("select * from lunchorder where username='%s'" % user.username))
+            ods = []
+            for order in orders:
+                order.createdtime = str(order.createdtime)
+                ods.append(order)
+            return lunch.write_json({'result':True,'message':'seccuss','orders':ods,'total':total})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class ViewBossOrders():
+    def GET(self):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        try:
+            page = int(post_data.page)
+        except:
+            page = 1
+        page_count = 10
         if user and user.permission>0:
-            state = post_data.state
-            model.db.update('lunchorder',where='id=$id',state=state)
-            return lunch.write_json({'result':True,'message':'delete success','state':state})
+            sql = "select * from lunchorder where bossusername='%s' LIMIT %d, %d" % (user.username,(page-1)*page_count,page*page_count)
+            total = len(model.db.query("select id from lunchorder where bossusername='%s'" % user.username))
+            orders = model.db.query(sql)
+            ods = []
+            for order in orders:
+                order.createdtime = str(order.createdtime)
+                ods.append(order)
+            return lunch.write_json({'result':True,'message':'seccuss','orders':ods,'total':total})
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})

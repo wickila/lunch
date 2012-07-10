@@ -117,6 +117,10 @@ section{
 	
 }
 
+.view-order-item span{
+	margin-right: 20px;
+}
+
 .menu-img-container{
 	width: 80%;
 	height: 80%;

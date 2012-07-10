@@ -570,7 +570,7 @@ function getOrderMenusPrice(menus){
 	return result;
 }
 
-var OrderViewItem = function(rest,index){
+var NewOrderItem = function(rest,index){
 	this.rest = rest;
 	this.element = $("<div class='order-item'></div>");
 	var head = "<h3>订单"+index+"</h3>" +
@@ -595,7 +595,7 @@ var OrderViewItem = function(rest,index){
 	}
 }
 
-OrderViewItem.prototype.postOrder = function(){
+NewOrderItem.prototype.postOrder = function(){
 	var concact = this.concacts.getConcact();
 	var rid = this.rest.id;
 	var m = this.element.find('#order-message');
@@ -613,7 +613,7 @@ OrderViewItem.prototype.postOrder = function(){
 	      url: '/api/order/new',
 	      ContentType: "application/json",
 	      data:{
-    				'concact':JSON.stringify(concact),
+    				'concact':concact,
     				'rid':rid,
     				'message':message,
     				'menus':JSON.stringify(items),
@@ -633,11 +633,11 @@ OrderViewItem.prototype.postOrder = function(){
 	    });
 }
 
-OrderViewItem.prototype.ensureOrder = function(){
+NewOrderItem.prototype.ensureOrder = function(){
 	window.orderView.postOrder(parseInt($(this).data('rid')));
 }
 
-OrderViewItem.prototype.dispose = function(){
+NewOrderItem.prototype.dispose = function(){
 	this.btn.unbind('click',this.ensureOrder);
 	this.rest = null;
 	this.element.remove();
@@ -664,7 +664,7 @@ OrderView.prototype.setMenus = function(menus){
 			}
 		}
 		for(var j in rests){
-			var orderItem = new OrderViewItem(rests[j],parseInt(j)+1);
+			var orderItem = new NewOrderItem(rests[j],parseInt(j)+1);
 			this.orderItems.push(orderItem);
 			this.element.append(orderItem.element);
 		}
@@ -703,4 +703,246 @@ OrderView.prototype.removeRest = function(rid){
 			});
 		});
 	}
+}
+
+/**
+ * 查看订单条目
+ */
+var ViewOrderItem = function(type){
+	this.type = type;
+	this.interval = 5000;
+	this.element = $("<div class='view-order-item'>" +
+						"<p><span class='view-order-item-restname'></span><span class='view-order-item-id'></span><span class='view-order-item-createdtime'></span></p>" +
+						"<table width='100%'>" +
+							"<tr><td width='90%' class='view-order-item-username'></td><td colspan='3'><div class='view-order-item-btncontainer'><a class='btn btn-mini btn-primary order-cancel-btn'>取消</a><button class='btn btn-mini order-option-btn'>待确认</button></div></td></tr>" +
+							"<tr><td><span class='view-order-item-num'></span><span class='view-order-item-price'></span></td></tr>" +
+							"<tr><td><span class='view-order-item-concact-adress'></span><span class='view-order-item-concact-name'></span><span class='view-order-item-concact-phone'></span></td></tr>" +
+						"</table>" +
+					"</div>");
+}
+
+ViewOrderItem.prototype.setOrder = function(order){
+	this.order = order;
+	this.element.attr('id','view-order-item-'+order.id);
+	this.element.attr('data-id',order.id);
+	this.element.find('.view-order-item-restname').html(order.restname);
+	this.element.find('.view-order-item-id').html(order.id);
+	this.element.find('.view-order-item-createdtime').html(order.createdtime);
+	this.element.find('.view-order-item-username').html(order.username);
+	this.element.find('.view-order-item-num').html(order.menunum+"份");
+	this.element.find('.view-order-item-price').html(order.price+"￥");
+	this.element.find('.view-order-item-concact-adress').html(order.concact.adress);
+	this.element.find('.view-order-item-concact-name').html(order.concact.concactname+"收");
+	this.element.find('.view-order-item-concact-phone').html("电话:"+order.concact.phone);
+	this.updateView();
+	if(this.type == 'user' && this.order.state != -1 && this.order.state != 3){
+		this.update(this);
+	}
+	this.element.find('.order-option-btn').click($.proxy(this.onButtonClick,this));
+	this.element.find('.order-cancel-btn').click($.proxy(function(){
+		$('#cancelOrderModal').modal('show');
+		window.cancelOrder = $.proxy(function(){
+			var cancelreason = $('#roder-cancel-form-reason').val();
+			if(!cancelreason){
+				alert('不能无理由取消订单');
+				return;
+			}
+			$.ajax({
+			      type: 'POST',
+			      url: '/api/order/edit/'+this.order.id,
+			      ContentType: "application/json",
+			      data:{
+		    				'state':-1,
+		    				'cancelreason':cancelreason
+		    			},
+		    	  scope:this,
+				  success: function(data){
+			    				if(data.result){
+			    					this.scope.order = data.order;
+			    					this.scope.updateView();
+			    				}else{
+			    					window.lunchAlert(data.message)
+			    				}
+			    				$('#cancelOrderModal').modal('hide');
+			    		    },
+			      error: function(){alert('修改取消失败');}
+			    });
+		},this);
+	},this));
+}
+
+ViewOrderItem.prototype.onButtonClick = function(){
+		if(this.element.find('.order-option-btn').hasClass('disabled'))return;
+		var option = 1;
+		switch(this.element.find('.order-option-btn').html()){
+			case '确认':
+				option = 1;
+				break;
+			case '发货':
+				option = 2;
+				break;
+			case '确认收货':
+				option = 3;
+				break;
+		}
+		$.ajax({
+		      type: 'POST',
+		      url: '/api/order/edit/'+this.order.id,
+		      ContentType: "application/json",
+		      data:{
+	    				'state':option
+	    			},
+	    	  scope:this,
+			  success: function(data){
+		    				if(data.result){
+		    					this.scope.order = data.order;
+		    					this.scope.updateView();
+		    				}else{
+		    					window.lunchAlert(data.message)
+		    				}
+		    		    },
+		      error: function(){alert('修改订单失败');}
+		    });
+	}
+
+ViewOrderItem.prototype.updateView = function(){
+	this.element.find('.order-cancel-btn').hide();
+	if(this.type == 'user'){
+		if(this.order.state == -1){
+			this.element.find('.order-option-btn').html('已取消').addClass('disabled').removeClass('btn-primary');
+		}else if(this.order.state == 0){
+			this.element.find('.order-option-btn').html('待确认').addClass('disabled').removeClass('btn-primary');
+		}else if(this.order.state == 1){
+			this.element.find('.order-option-btn').html('已确认').addClass('disabled').removeClass('btn-primary');
+		}else if(this.order.state == 2){
+			this.element.find('.order-option-btn').html('确认收货').removeClass('disabled').addClass('btn-primary');
+		}else{
+			this.element.find('.order-option-btn').html('已结算').addClass('disabled').removeClass('btn-primary');
+		}
+	}else{
+		if(this.order.state == -1){
+			this.element.find('.order-option-btn').html('已取消');
+			this.element.find('.order-option-btn').addClass('disabled').removeClass('btn-primary');
+		}else if(this.order.state == 0){
+			this.element.find('.order-cancel-btn').show();
+			this.element.find('.order-option-btn').html('确认');
+			this.element.find('.order-option-btn').addClass('btn-primary').removeClass('disabled');
+		}else if(this.order.state == 1){
+			this.element.find('.order-option-btn').html('发货');
+			this.element.find('.order-option-btn').addClass('btn-primary').removeClass('disabled');
+		}else if(this.order.state == 2){
+			this.element.find('.order-option-btn').html('已发货');
+			this.element.find('.order-option-btn').addClass('disabled').removeClass('btn-primary');
+		}else{
+			this.element.find('.order-option-btn').html('已结算');
+			this.element.find('.order-option-btn').addClass('disabled').removeClass('btn-primary');
+		}
+	}
+}
+
+ViewOrderItem.prototype.update = function(scope){
+	$.ajax({
+	      type: 'GET',
+	      url: '/api/order/get/'+scope.order.id,
+	      ContentType: "application/json",
+    	  scope:scope,
+		  success: function(data){
+	    				if(data.result){
+	    					this.scope.order = data.order;
+	    					this.scope.updateView();
+	    					if(!this.scope.disposed && this.scope.order.state != -1 && this.scope.order.state != 3){
+	    						setTimeout(this.scope.update,this.scope.interval,this.scope);
+	    					}
+	    				}else{
+	    					window.lunchAlert(data.message)
+	    				}
+	    		    },
+	      error: function(){alert('修改订单失败');}
+	    });
+}
+
+ViewOrderItem.prototype.dispose = function(){
+	this.element.remove();
+	this.disposed = true;
+}
+
+/**
+ * 查看订单视图
+ */
+var ViewOrderView = function(element,type){
+	this.items = [];
+	this.element = element;
+	this.controller = $("<hr/><table width='100%'>" +
+										"<tr><td align='left'><button class='btn pre-page'>上一页</button></td><td><span class='page'>1</span>/<span class='total-page'>1</span></td><td align='right'><button class='btn next-page'>下一页</button></td></tr>" +
+								"</table>");
+	this.element.parent().append(this.controller);
+	this.type = type;
+	this.page = 1;
+	this.totalPage = 1;
+	this.setPage(this.page);
+	this.controller.find('.pre-page').click($.proxy(function(){
+		if(this.page<=1){
+			this.page==1;
+			return;
+		}
+		this.page --;
+		this.setPage(this.page);
+	},this));
+	this.controller.find('.next-page').click($.proxy(function(){
+		if(this.page>=this.totalPage){
+			this.page = this.totalPage;
+			return;
+		}
+		this.page ++;
+		this.setPage(this.page);
+	},this));
+}
+
+ViewOrderView.prototype.setPage = function(page){
+	 $.ajax({
+	      type: 'GET',
+	      url: '/api/order/view/'+this.type,
+	      ContentType: "application/json",
+	      data:{
+    				'page':page
+    			},
+    	  scope:this,
+		  success: function(data){
+	    				if(data.result){
+	    					this.scope.element.empty();
+	    					for(var j in this.scope.items){
+	    						var item = this.scope.items[j];
+	    						item.dispose();
+	    					}
+	    					for(var i in data.orders){
+	    						var order = data.orders[i];
+	    						order.concact = JSON.parse(order.concact);
+	    						order.menus = JSON.parse(order.menus);
+	    						order.menunum = 0;
+	    						for(var j in order.menus){
+	    							order.menunum += order.menus[j].num;
+	    						}
+	    						var orderItem = new ViewOrderItem(this.scope.type);
+	    						this.scope.element.append(orderItem.element);
+	    						orderItem.setOrder(order);
+	    						this.scope.items.push(orderItem);
+	    					}
+    						this.scope.totalPage = Math.ceil(data.total/10);
+    						this.scope.controller.find('.total-page').html(this.scope.totalPage);
+    						this.scope.controller.find('.page').html(this.scope.page);
+	    				}else{
+	    					window.lunchAlert(data.message)
+	    				}
+	    		    },
+	      error: function(){alert('获取订单失败');}
+	    });
+}
+
+ViewOrderView.prototype.dispose = function(){
+	for(var j in this.items){
+		var item = this.items[j];
+		item.dispose();
+	}
+	this.element.empty();
+	this.controller.remove();
 }

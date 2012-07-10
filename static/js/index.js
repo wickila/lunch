@@ -19,6 +19,10 @@ $(function(){
 	window.shoppintCart = null;
 	
 	window.updateView = function(){
+		if(window.viewOrderView)window.viewOrderView.dispose();
+		window.viewOrderView = null;
+		if(window.bossOrderView)window.bossOrderView.dispose();
+		window.bossOrderView = null;
 		switch(window.page){
 			case 1:
 				creatShoppingCart();
@@ -44,6 +48,9 @@ $(function(){
 					if(!window.orderView){
 						window.orderView = new OrderView($('#order-container'));
 					}
+					if(!window.viewOrderView){
+						window.viewOrderView = new ViewOrderView($('#view-order-item-container'),'user');
+					}
 					window.orderView.setMenus(window.orderMenus);
 				}
 				break;
@@ -59,6 +66,9 @@ $(function(){
 						$("rest-setting-phone").val(window.user.restuarant.phone);
 						$("rest-setting-description").val(window.user.restuarant.description);
 					}
+				}
+				if(!window.bossOrderView){
+					window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
 				}
 				break;
 		}

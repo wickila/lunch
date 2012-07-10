@@ -41,6 +41,9 @@ urls = (
 	'/api/concact/delete/(.*)','api.DeleteConcact',
 	'/api/order/new','api.NewOrder',
 	'/api/order/edit/(.*)','api.EditOrder',
+	'/api/order/get/(.*)','api.GetOrder',
+	'/api/order/view/user','api.ViewUserOrders',
+	'/api/order/view/boss','api.ViewBossOrders',
 )
 
 app = web.application(urls, globals())

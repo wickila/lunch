@@ -62,9 +62,12 @@ CREATE TABLE `lunch`.`lunchorder` (
   `uername` TEXT  NOT NULL,
   `concact` TEXT  NOT NULL,
   `bossusername` TEXT  NOT NULL,
+  `restname` TEXT  NOT NULL,
   `message` TEXT  NOT NULL,
+  `cancelreason` TEXT  NOT NULL,
   `createdtime` TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `state` INT NOT NULL,
+  `modifiedtime` TEXT  NOT NULL,
+  `state` INT NOT NULL COMMENT = '-1:canceled, 0:wait for ensure, 1:ensured, 2:delivery, 3:settled',
   `menus` TEXT  NOT NULL,
   `price` FLOAT  NOT NULL,
   PRIMARY KEY (`id`)
