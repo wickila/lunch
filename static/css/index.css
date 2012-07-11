@@ -33,7 +33,6 @@ section{
 }
 
 .content{
-	margin-top: 50px;
 	transition: -webkit-transform 200ms ease-in-out;
 	-webkit-transition: -webkit-transform 200ms ease-in-out;
 	-moz-transition: -moz-transform 200ms ease-in-out;
@@ -198,6 +197,23 @@ section{
 
 #order-message{
 	width: 99%;
+}
+
+#rest-menutype-setting tr{
+	border-bottom: 1px solid #DDD;
+}
+
+#rest-menutype-setting input{
+	margin-top: 5px;
+}
+
+.menus-filter-item span{
+	margin-right: 15px;
+	cursor: pointer;
+}
+
+.menus-filter-item .select{
+	background-color: yellow;
 }
 
 #contextMenu {

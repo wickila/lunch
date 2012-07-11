@@ -57,16 +57,23 @@ Menu.prototype.setMenu = function(menu){
 };
 
 Menu.prototype.getDiv = function(){
-	var div = "<div draggable='true' class='span3 menu' data-mid='"+ this.menu.id +"'>"+
-			"<div class='menu-img-container thumbnail' data-mid='"+ this.menu.id +"'><img class='menu-img' src='"+ this.menu.thumbnail +"' data-mid='"+ this.menu.id +"'></img></div>" +
-			"<div><span class='rm-name'>"+ this.menu.name +"</span><span class='rm-price'>"+ this.menu.price +"</span></div>" +
-			"</div>";
-	return div;
+	if(!this.div){
+		this.div = $("<li class='span2' data-mid='"+ this.menu.id +"'>" +
+							"<div class='thumbnail menu' data-mid='"+ this.menu.id +"'>" +
+							"<img class='menu-img' src='"+this.menu.thumbnail+"' alt='"+this.menu.name+"' data-mid='"+ this.menu.id +"'>" +
+							"</div>" +
+							"<h5 data-mid='"+ this.menu.id +"'>"+this.menu.name+"</h5>" +
+							"<p data-mid='"+ this.menu.id +"'>"+this.menu.price+"</p>" +
+							
+					"</li>");
+	}
+	return this.div;
 };
 
 var Menus = function(jqueryElement,menus,eventEnable){
 	this.eventEnable = eventEnable;
 	this.jqueryElement = jqueryElement;
+	this.jqueryElement.append($("<ul id='menus' class='thumbnails'></ul>"));
 	this.menus = menus;
 	if(menus){
 		this.setMenus(menus);
@@ -75,31 +82,18 @@ var Menus = function(jqueryElement,menus,eventEnable){
 
 Menus.prototype.setMenus = function(menus){
 	this.menus = menus;
-	this.jqueryElement.find('#menus').remove();
+	this.jqueryElement.find('#menus').empty();
 	var m;
-	var mns = [];
+	this.mns = [];
 	for(var i in menus)
 	{
 		m = menus[i];
 		var menu = new Menu(m);
-		mns.push(menu);
+		this.mns.push(menu);
+		this.jqueryElement.find('#menus').append(menu.getDiv());
 	}
-	var div = "<div id='menus'>";
-	for(i=0;i<mns.length;i++)
-	{
-		if(i%4 == 0){
-			div += "<div class='row-fluid'>";
-		}
-		div += mns[i].getDiv();
-		if(i%4 == 3 || i==mns.length-1){
-			div += "</div>";
-		}
-	}
-	div += "</div>";
-	var div = $(div);
-	this.jqueryElement.append(div);
 	if(this.eventEnable){
-		div.find('.menu').each(function(){
+		this.jqueryElement.find('#menus').find('.menu').each(function(){
 			var menu = $(this);
 			this.ondragstart = function(event){
 				window.lunchAlert('dragstart');
@@ -127,7 +121,7 @@ Menus.prototype.setMenus = function(menus){
 			}
 		});
 	}
-	div.find('.menu-img').each(function(){
+	this.jqueryElement.find('#menus').find('.menu-img').each(function(){
 		var item = $(this);
 		item.load(function() {  
 			var w = item.width();
@@ -140,11 +134,64 @@ Menus.prototype.setMenus = function(menus){
 				item.css('margin-top',(pw-item.height()-gap)/2);
 			}else{
 				item.height(pw);
-				item.css('margin-left',(pw-item.width()-gap)/2)
+				item.css('margin-left',(pw-item.width()-gap)/2);
 			}
         }); 
 	})
 };
+
+Menus.prototype.filter = function(filters){
+	for(var i in this.mns){
+		var menu = this.mns[i];
+		menu.getDiv().show();
+		for(var f in filters){
+			var filter = filters[f];
+			if(menu.menu[f] != filter){
+				menu.getDiv().hide();
+				break;
+			}
+		}
+	}
+}
+
+var MenuFilter = function(element,rest){
+	this.rest = rest;
+	this.element = element;
+	this.tastefilter = $("<tr class='menus-filter-item' id='menus-filter-taste'><td>口味:</td><td><span class='select'>全部</span><span data-filter-key='taste' data-filter-value='1'>辣</span><span data-filter-key='taste' data-filter-value='0'>不辣</span></td></tr>");
+	this.typefilter = $("<tr class='menus-filter-item' id='menus-filter-type'><td>类别:</td><td class='menus-filter-select-container'><span class='select'>全部</span></td></tr>");
+	this.element.append(this.tastefilter);
+	this.element.append(this.typefilter);
+	var types = "";
+	for(var i in rest.menutypes){
+		menutype = rest.menutypes[i];
+		types += "<span data-filter-key='mtype' data-filter-value='"+menutype.id+"'>"+menutype.name+"</span>";
+	}
+	this.typefilter.find('.menus-filter-select-container').append($(types));
+	this.element.find('span').each(function(){
+		var span = $(this);
+		span.bind('click',function(){
+			var filter = {};
+			$(this).parent().find('span').removeClass('select');
+			$(this).addClass('select');
+			window.restView.menus.filter(window.restView.menusfilter.getFilter());
+		});
+	});
+}
+
+MenuFilter.prototype.getFilter = function(){
+	this.filter = {};
+	this.element.find('span').each(function(){
+		var span = $(this);
+		if(span.hasClass('select')&&span.html()!='全部'){
+			window.restView.menusfilter.filter[span.data('filter-key')] = span.data('filter-value');
+		}
+	});
+	return this.filter;
+}
+
+MenuFilter.prototype.dispose = function(){
+	this.element.empty();
+}
 
 var SmallMenu = function(menu){
 	this.menu = menu;
@@ -160,9 +207,11 @@ SmallMenu.prototype.getDiv = function(){
 };
 
 var RestView = function(jqueryElement,rest){
+	this.jqueryElement = jqueryElement;
 	this.rest = rest;
 	this.siderbar = new RestSideBar(jqueryElement.find('#rsb'),this.rest);
 	this.menus = new Menus(jqueryElement.find('#menus-wrapper'),rest.menus,true);
+	this.menusfilter = new MenuFilter(jqueryElement.find('#menus-filter'),rest);
 	$("#rest-detail").find("#rest-name").html(rest.name);
 	$("#rest-detail").find("#rest-username").html(rest.username);
 	$("#rest-detail").find("#rest-minprice").html(rest.minprice);
@@ -174,6 +223,8 @@ RestView.prototype.setRest = function(rest){
 	this.rest = rest;
 	this.siderbar.setRest(rest);
 	this.menus.setMenus(rest.menus);
+	this.menusfilter.dispose();
+	this.menusfilter = new MenuFilter(this.jqueryElement.find('#menus-filter'),rest);
 };
 
 RestView.prototype.getRest = function(){
@@ -857,7 +908,7 @@ ViewOrderItem.prototype.update = function(scope){
 	    					window.lunchAlert(data.message)
 	    				}
 	    		    },
-	      error: function(){alert('修改订单失败');}
+	      error: function(){alert('刷新订单失败');}
 	    });
 }
 
@@ -871,6 +922,7 @@ ViewOrderItem.prototype.dispose = function(){
  */
 var ViewOrderView = function(element,type){
 	this.items = [];
+	this.disposed = false;
 	this.element = element;
 	this.controller = $("<hr/><table width='100%'>" +
 										"<tr><td align='left'><button class='btn pre-page'>上一页</button></td><td><span class='page'>1</span>/<span class='total-page'>1</span></td><td align='right'><button class='btn next-page'>下一页</button></td></tr>" +
@@ -879,14 +931,14 @@ var ViewOrderView = function(element,type){
 	this.type = type;
 	this.page = 1;
 	this.totalPage = 1;
-	this.setPage(this.page);
+	this.setPage(this);
 	this.controller.find('.pre-page').click($.proxy(function(){
 		if(this.page<=1){
 			this.page==1;
 			return;
 		}
 		this.page --;
-		this.setPage(this.page);
+		this.setPage(this);
 	},this));
 	this.controller.find('.next-page').click($.proxy(function(){
 		if(this.page>=this.totalPage){
@@ -894,19 +946,19 @@ var ViewOrderView = function(element,type){
 			return;
 		}
 		this.page ++;
-		this.setPage(this.page);
+		this.setPage(this);
 	},this));
 }
 
-ViewOrderView.prototype.setPage = function(page){
+ViewOrderView.prototype.setPage = function(scope){
 	 $.ajax({
 	      type: 'GET',
-	      url: '/api/order/view/'+this.type,
+	      url: '/api/order/view/'+scope.type,
 	      ContentType: "application/json",
 	      data:{
-    				'page':page
+    				'page':scope.page
     			},
-    	  scope:this,
+    	  scope:scope,
 		  success: function(data){
 	    				if(data.result){
 	    					this.scope.element.empty();
@@ -930,6 +982,9 @@ ViewOrderView.prototype.setPage = function(page){
     						this.scope.totalPage = Math.ceil(data.total/10);
     						this.scope.controller.find('.total-page').html(this.scope.totalPage);
     						this.scope.controller.find('.page').html(this.scope.page);
+    						if(!this.scope.disposed){
+    							setTimeout(this.scope.setPage,5000,this.scope);
+    						}
 	    				}else{
 	    					window.lunchAlert(data.message)
 	    				}
@@ -945,4 +1000,116 @@ ViewOrderView.prototype.dispose = function(){
 	}
 	this.element.empty();
 	this.controller.remove();
+	this.disposed = true;
+}
+
+var MenuTypeSetting = function(){
+	this.element = $('#rest-menutype-setting');
+	this.element.append($("<tr><td></td><td></td><td><span id='show-new-menutype-btn' class='icon-plus' style='float:right'></span></td></tr>"));
+	this.newMenuType = $("<tr class='rest-menutype-setting-item'><td>名称:</td><td><input type='text' id='new-menu-name'></input></td><td><span id='new-menutype-btn' class='icon-ok' style='float:right'></span></td></tr>");
+	this.newMenuType.hide();
+	this.element.append(this.newMenuType);
+	this.element.find('#show-new-menutype-btn').click($.proxy(function(){
+		if(this.element.find('#show-new-menutype-btn').hasClass('icon-plus')){
+			this.newMenuType.show();
+			this.element.find('#show-new-menutype-btn').addClass('icon-minus').removeClass('icon-plus');
+		}else{
+			this.newMenuType.hide();
+			this.element.find('#show-new-menutype-btn').addClass('icon-plus').removeClass('icon-minus');
+		}
+	},this));
+	this.element.find('#new-menutype-btn').click($.proxy(function(){
+		$.ajax({
+		      type: 'POST',
+		      url: '/api/menutype/new',
+		      ContentType: "application/json",
+		      data:{
+	    				'name':this.element.find('#new-menu-name').val()
+	    			},
+	    	  scope:this,
+			  success: function(data){
+		    				if(data.result){
+		    					this.scope.addType(data.menutype);
+		    					window.user.restuarant.menutypes.push(data.menutype);
+		    					this.scope.element.find('#new-menu-name').val('');
+		    					this.scope.newMenuType.hide(200);
+		    				}else{
+		    					window.lunchAlert(data.message)
+		    				}
+		    		    },
+		      error: function(){alert('失败');}
+		    });
+	},this));
+	for(var i in window.user.restuarant.menutypes){
+		var menutype = window.user.restuarant.menutypes[i];
+		this.addType(menutype);
+	}
+}
+
+MenuTypeSetting.prototype.addType = function(menutype){
+	var div = $("<tr valign='middle' class='rest-menutype-setting-item' id='rest-menutype-setting-item-"+menutype.id+"' data-id='"+menutype.id+"'><td>名称:</td><td><input type='text' value='"+menutype.name+"' disabled='true'></input></td><td valign='middle'></span><span class='icon-remove'></span><span class='icon-ok'></span><span class='icon-edit'></td><tr>");
+	this.element.append(div);
+	div.find('.icon-ok').hide();
+	div.find('span').css('float','right');
+	div.find('.icon-edit').click($.proxy(function(){
+			this.find('input').attr('disabled',false);
+			this.find('.icon-edit').hide();
+			this.find('.icon-ok').show();
+	},div));
+	div.data('menutype-name',menutype.name);
+	div.find('.icon-ok').click($.proxy(function(){
+		if(this.data('menutype-name') == this.find('input').val()){
+			this.find('input').attr('disabled',true);
+			this.find('.icon-edit').show();
+			this.find('.icon-ok').hide();
+			return;
+		}
+		$.ajax({
+		      type: 'POST',
+		      url: '/api/menutype/edit/'+this.data('id'),
+		      ContentType: "application/json",
+		      data:{
+	    				'name':this.find('input').val()
+	    			},
+	    	  scope:this,
+			  success: function(data){
+		    				if(data.result){
+		    					this.scope.find('input').attr('disabled',true);
+		    					this.scope.find('.icon-edit').show();
+		    					this.scope.find('.icon-ok').hide();
+		    					this.scope.data('menutype-name',this.scope.find('input').val());
+		    					window.lunchAlert('保存成功');
+		    				}else{
+		    					window.lunchAlert(data.message);
+		    				}
+		    		    },
+		      error: function(){alert('失败');}
+		    });
+	},div));
+	div.find('.icon-remove').click($.proxy(function(){
+		$.ajax({
+		      type: 'POST',
+		      url: '/api/menutype/delete/'+this.data('id'),
+		      ContentType: "application/json",
+	    	  scope:this,
+			  success: function(data){
+		    				if(data.result){
+		    					this.scope.hide(200,$.proxy(function(){
+		    						this.remove();
+		    					},this.scope));
+		    					for(var i in window.user.restuarant.menutypes){
+		    						if(window.user.restuarant.menutypes[i] == this.scope.data('id')){
+		    							window.user.restuarant.menutypes.splice(i,1);
+		    							window.lunchAlert('删除成功');
+		    							return;
+		    						}
+		    					}
+		    				}else{
+		    					window.lunchAlert(data.message);
+		    				}
+		    		    },
+		      error: function(){alert('失败');}
+		    });
+	},div));
+	
 }

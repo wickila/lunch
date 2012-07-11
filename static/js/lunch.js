@@ -362,6 +362,17 @@ $(function(){
 	  	}else{
 	  		$.setSideBarMenus(rest.info.menus);
 	  	}
+	  	if(!window.currentRest.info.menutypes){
+	  		$.ajax({
+		          type: 'GET',
+		          url: '/api/menutypes/get/'+rest.id,
+		          ContentType: "application/json",
+		          success: function(data){
+		  					rest.info.menutypes = data.menutypes;
+		          		},
+		          error: function(){alert('获取菜单失败')}
+		    });
+	  	}
 	  }
 	
 	window.login = function(){

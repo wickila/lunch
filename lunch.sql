@@ -50,6 +50,7 @@ CREATE TABLE `lunch`.`menu` (
   `price` FLOAT  NOT NULL,
   `discount` FLOAT  NOT NULL DEFAULT 10,
   `soldout` INT  NOT NULL DEFAULT 1;
+  `taste` INT  NOT NULL;
   `favorites` INT  NOT NULL,
   `comments` INT  NOT NULL,
   PRIMARY KEY (`id`)
@@ -81,6 +82,16 @@ CREATE TABLE `lunch`.`concact` (
   `concactname` TEXT  NOT NULL,
   `adress` TEXT  NOT NULL,
   `phone` TEXT  NOT NULL,
+  PRIMARY KEY (`id`)
+)
+ENGINE = MyISAM
+CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE TABLE `lunch`.`menutype` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` TEXT  NOT NULL,
+  `username` TEXT  NOT NULL,
+  `rid` INT  NOT NULL,
   PRIMARY KEY (`id`)
 )
 ENGINE = MyISAM

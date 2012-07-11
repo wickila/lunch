@@ -74,6 +74,9 @@ class GetMyRest:
             result = {'result':True,'message':'success'}
             if len(rs)>0:
                 r = rs[0]
+                rid = r.id
+                menutypes = [menutype for menutype in model.db.select('menutype',where='rid=$rid',vars=locals())]
+                r['menutypes'] = menutypes
                 r.created_time = str(r.created_time)
                 result['restuarant'] = r
             return lunch.write_json(result)
@@ -120,6 +123,9 @@ class ViewRestuarant():
         q = model.db.select('resetuarant',where='id=$id',vars=locals())
         if len(q)>0:
             restuarant = q[0]
+            rid = restuarant.id
+            menutypes = [menutype for menutype in model.db.select('menutype',where='rid=$rid',vars=locals())]
+            restuarant['menutypes'] = menutypes
         return lunch.write_json({'result':True,'restuarant':restuarant})
     
 class ViewMenus():
@@ -207,6 +213,69 @@ class DeleteMenu():
         if user and user.permission>0:
             model.db.delete('menu',where='id=$mid',vars=locals())
             return lunch.write_json({'result':True,'message':'delete success'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class NewMenuType():
+    def POST(self):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user and user.permission>0:
+            username = user.username
+            rests = model.db.select('restuarant',where='username=$username',vars=locals())
+            if len(rests)>0:
+                name = post_data.name
+                rest = rests[0]
+                mtid = model.db.insert('menutype',name=name,username=username,rid=rest.id)
+                menutype = model.db.select('menutype',where='id=$mtid',vars=locals())[0]
+                return lunch.write_json({'result':True,'message':'success','menutype':menutype})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class EditMenuType():
+    def POST(self,id):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user and user.permission>0:
+            username = user.username
+            rests = model.db.select('restuarant',where='username=$username',vars=locals())
+            if len(rests)>0:
+                name = post_data.name
+                rest = rests[0]
+                model.db.update('menutype',where='id=$id',vars=locals(),name=name)
+                menutypes = model.db.select('menutype',where='id=$id',vars=locals())
+                if len(menutypes)>0:
+                    menutype = menutypes[0]
+                    return lunch.write_json({'result':True,'message':'success','menutype':menutype})
+                return lunch.write_json({'result':False,'message':'menutype is not exist'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class DeleteMenuType():
+    def POST(self,id):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user and user.permission>0:
+            username = user.username
+            rests = model.db.select('restuarant',where='username=$username',vars=locals())
+            if len(rests)>0:
+                rest = rests[0]
+                menutypes = model.db.select('menutype',where='id=$id',vars=locals())
+                if len(menutypes)>0:
+                    menutype = menutypes[0]
+                    if menutype.username == user.username:
+                        model.db.delete('menutype',where='id=$id',vars=locals())
+                        model.db.update('menu',where='mtype=$id',mtype=0)
+                        return lunch.write_json({'result':True,'message':'success'})
+                    return lunch.write_json({'result':False,'message':'you cant delete other persons menutype!'})
+                else:
+                    return lunch.write_json({'result':True,'message':'menutype does not exist'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class GetMenuTypes():
+    def GET(self,id):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        if user:
+            menutypes = [menutype for menutype in model.db.select('menutype',where='rid=$id',vars=locals())]
+            return lunch.write_json({'result':True,'message':'success','menutypes':menutypes})
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
     
 class NewOrder():

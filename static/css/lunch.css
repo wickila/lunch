@@ -17,6 +17,46 @@ body{
 	color:#333333;
 	font-size:14px;
 	height:100%;
+	
+	scrollbar-face-color: #EAEAEA; 
+	scrollbar-shadow-color: #EAEAEA; 
+	scrollbar-highlight-color: #EAEAEA; 
+	scrollbar-3dlight-color: #EAEAEA; 
+	scrollbar-darkshadow-color: #697074; 
+	scrollbar-track-color: #F7F7F7; 
+	scrollbar-arrow-color: #666666; 
+}
+
+.container-fluid,.row-fluid,.row,.span3,.span9{
+	height:100%;
+	overflow-y: auto;
+	::-webkit-scrollbar
+　　::-webkit-scrollbar-button
+　　::-webkit-scrollbar-track
+　　::-webkit-scrollbar-track-piece
+　　::-webkit-scrollbar-thumb
+　　::-webkit-scrollbar-corner
+　　::-webkit-resizer
+}
+
+.span9::-webkit-scrollbar{
+	width: 6px;
+	height: 16px;
+}
+
+.span9::-webkit-scrollbar-thumb{
+	background-color: rgba(42, 2, 255, 0.57);
+	-webkit-box-shadow: inset 1px 1px 0
+}
+
+.span9::-webkit-scrollbar-button{
+	width: 0;
+	height: 0;
+	display: none;
+}
+
+.span9::-webkit-scrollbar-corner{
+	background-color: transparent;
 }
 
 a{
