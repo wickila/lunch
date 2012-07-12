@@ -139,10 +139,10 @@ $(function(){
     this.menus = [];
     
     this.marker.setMap(map);
-    restuarants[this.id] = this;
+    window.restuarants[this.id] = this;
     google.maps.event.addListener(this.marker, 'click', function() {
     	var rest = restuarants[this.id];
-    	setCurrentRest(rest);
+    	setCurrentRest(rest.info);
         map.setCenter(this.getPosition());
     });
   };
@@ -279,8 +279,9 @@ $(function(){
 	              			{
 	              				rest = data.restuarants[i]
 	              				r = new Restuarant(rest);
-	              				if(window.user && window.user.id == r.uid){
-	              					window.user.restuarant = r;
+	              				if(window.user && window.user.username == rest.username){
+	              					window.user.restuarant = rest;
+	              					window.setCurrentRest(rest);
 	              				}
 	              			}
 	              			if(!window.currentRest){
@@ -318,14 +319,25 @@ $(function(){
 	}
 	
 	window.getRestuarant = function(){
-		if(window.user && window.user.permission>0 && !window.user.restuarant){
+		if(window.user && window.user.permission>0 && window.user.restuarant!=undefined){
+			for(id in window.restuarants){
+				var rest = window.restuarants[id].info;
+				if(rest.username == window.user.username){
+					window.user.restuarant = rest;
+					window.setCurrentRest(rest);
+					return;
+				}
+			}
 			$.ajax({
 	            type: 'GET',
 	            url: '/api/getmyrest',
 	            ContentType: "application/json",
 	    		success: function(data){
 	    			if(data.result){
-	    				window.user.restuarant = data.restuarant;
+	    				if(window.user.restuarant == undefined){
+	    					window.user.restuarant = data.restuarant;
+	    					window.setCurrentRest(data.restuarant);
+	    				}
 	    				$('#rest-setting-name').val(window.user.restuarant.name);
 	    				$('#rest-settting-type').val(window.user.restuarant.rtype);
 	    				$('#rest-setting-des').val(window.user.restuarant.description);
@@ -345,30 +357,30 @@ $(function(){
 		if(window.currentRest == rest)return;
 		window.currentRest = rest;
 	  	$.setSideBarRest(rest);
-	  	if(!window.currentRest.info.menus){
+	  	if(!window.currentRest.menus){
 	  		$.ajax({
 		          type: 'GET',
 		          url: '/api/resturant/menus/'+rest.id,
 		          ContentType: "application/json",
 		          success: function(data){
-		  					rest.info.menus = data.menus;
-		  					for(var i in rest.info.menus){
-		  						rest.info.menus[i].num = 0;
+		  					rest.menus = data.menus;
+		  					for(var i in rest.menus){
+		  						rest.menus[i].num = 0;
 		  					}
 		  					$.setSideBarMenus(data.menus);
 		          		},
 		          error: function(){alert('获取菜单失败')}
 		    });
 	  	}else{
-	  		$.setSideBarMenus(rest.info.menus);
+	  		$.setSideBarMenus(rest.menus);
 	  	}
-	  	if(!window.currentRest.info.menutypes){
+	  	if(!window.currentRest.menutypes){
 	  		$.ajax({
 		          type: 'GET',
 		          url: '/api/menutypes/get/'+rest.id,
 		          ContentType: "application/json",
 		          success: function(data){
-		  					rest.info.menutypes = data.menutypes;
+		  					rest.menutypes = data.menutypes;
 		          		},
 		          error: function(){alert('获取菜单失败')}
 		    });
@@ -392,6 +404,7 @@ $(function(){
 					}
 					$('#bottom-nav-user').html(user.username);
 					window.updateView();
+					getRestuarant();
 				}else{
 					$('#login-message').html(data.message);
 				}
@@ -489,7 +502,6 @@ $(function(){
 		m.num --;
 		m.num = m.num<0?0:m.num;
 		if(m.num == 0){
-			$.updateSideBarMenu(m,false);
 			var rest = window.restuarants[m.rid];
 			rest.info.orderMenus.splice(rest.info.orderMenus.indexOf(m),1);
 			window.orderMenus.splice(window.orderMenus.indexOf(m),1);
@@ -516,13 +528,13 @@ $(function(){
 	window.showShoppingCart = function (){
 		window.shoppingCartShow = true;
 		setCss($('#shoppingCart-container'),'0px');
-		setCss($('.content'),$('#shoppingCart-container').height()+'px');
+//		setCss($('.content'),$('#shoppingCart-container').height()+'px');
 	}
 	
 	window.hideShoppingCart = function (){
 		window.shoppingCartShow = false;
 		setCss($('#shoppingCart-container'),'-100%');
-		setCss($('.content'),'0px');
+//		setCss($('.content'),'0px');
 	}
 	
 	window.toggleShoppingCart = function(){
@@ -542,6 +554,6 @@ $(function(){
 	}
 	
 	function updateLayout(){
-		setCss($('.content'),$('#shoppingCart-container').height()+'px');
+//		setCss($('.content'),$('#shoppingCart-container').height()+'px');
 	}
 });

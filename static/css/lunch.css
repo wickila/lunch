@@ -17,45 +17,36 @@ body{
 	color:#333333;
 	font-size:14px;
 	height:100%;
-	
-	scrollbar-face-color: #EAEAEA; 
-	scrollbar-shadow-color: #EAEAEA; 
-	scrollbar-highlight-color: #EAEAEA; 
-	scrollbar-3dlight-color: #EAEAEA; 
-	scrollbar-darkshadow-color: #697074; 
-	scrollbar-track-color: #F7F7F7; 
-	scrollbar-arrow-color: #666666; 
 }
 
-.container-fluid,.row-fluid,.row,.span3,.span9{
+.content{
+	padding-top:20px;
+}
+
+.container-fluid,.row-fluid,.row,.span3,.span9,.scrollable{
 	height:100%;
 	overflow-y: auto;
-	::-webkit-scrollbar
-　　::-webkit-scrollbar-button
-　　::-webkit-scrollbar-track
-　　::-webkit-scrollbar-track-piece
-　　::-webkit-scrollbar-thumb
-　　::-webkit-scrollbar-corner
-　　::-webkit-resizer
+	overflow-x: hidden;
 }
 
-.span9::-webkit-scrollbar{
-	width: 6px;
+.scrollable::-webkit-scrollbar{
+	width: 8px;
 	height: 16px;
 }
 
-.span9::-webkit-scrollbar-thumb{
-	background-color: rgba(42, 2, 255, 0.57);
-	-webkit-box-shadow: inset 1px 1px 0
+.scrollable::-webkit-scrollbar-thumb{
+	background-color: rgba(0, 0, 0, 0.2);
+	-webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.10),inset 0 -1px 0 rgba(0, 0, 0, 0.07);
+	border-radius: 4px;
 }
 
-.span9::-webkit-scrollbar-button{
+.scrollable::-webkit-scrollbar-button{
 	width: 0;
 	height: 0;
 	display: none;
 }
 
-.span9::-webkit-scrollbar-corner{
+.scrollable::-webkit-scrollbar-corner{
 	background-color: transparent;
 }
 
@@ -72,6 +63,21 @@ a{
 
 .active{
 	display: block;	
+}
+
+#loading{
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100000;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(100,100,100,0.5);
+}
+
+#loading img{
+	margin-left: 40%;
+	margin-top: 20%;
 }
 
 
@@ -124,37 +130,5 @@ a{
 	font-weight: 200;
 }
 
-input
-{
-	padding: 4px;
-	background-color: #fff;
-    border: 1px solid #ccc;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    -moz-box-shadow: 1 0px 1px #ccc inset, 0 1px 0 #fff;
-    -webkit-box-shadow: 1 0px 1px #ccc inset, 0 1px 0 #fff;
-    box-shadow: 1 0px 1px #ccc inset, 0 1px 0 #fff;
-}
-
-input:focus
-{
-    background-color: #fff;
-    border-color: #aaa;
-    outline: none;
-    -moz-box-shadow: 0 0 0 1px #e8c291 inset;
-    -webkit-box-shadow: 0 0 0 1px #e8c291 inset;
-    box-shadow: 0 0 0 1px #e8c291 inset;
-}
-
-.shadow-rounded{
-	background: white;
-	border-radius: 5px;
-	box-shadow:1px 0px 3px 1px rgba(0,0,0,.2);
-	padding: 10px;
-}
-
-footer{
-	position: absolute;
-	bottom: 10px;
+.alert{
 }

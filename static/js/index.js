@@ -29,9 +29,9 @@ $(function(){
 				break;
 			case 2:
 				if(!window.restView){
-					window.restView = new RestView($('#restview'),window.currentRest.info);
+					window.restView = new RestView($('#restview'),window.currentRest);
 				}else{
-					window.restView.setRest(window.currentRest.info);
+					window.restView.setRest(window.currentRest);
 				}
 				creatShoppingCart();
 				break;
@@ -57,12 +57,13 @@ $(function(){
 					
 				}else{
 					if(window.user.restuarant){
-						$("rest-setting-name").val(window.user.restuarant.name);
-						$("rest-setting-type").val(window.user.restuarant.rtype);
-						$("rest-setting-adress").val(window.user.restuarant.adress);
-						$("rest-setting-minprice").val(window.user.restuarant.minprice);
-						$("rest-setting-phone").val(window.user.restuarant.phone);
-						$("rest-setting-description").val(window.user.restuarant.description);
+						$("#rest-setting-name").val(window.user.restuarant.name);
+//						$("#rest-setting-type").val(window.user.restuarant.rtype);
+						$("#rest-setting-addres").val(window.user.restuarant.adress);
+						$("#rest-setting-minprice").val(window.user.restuarant.minprice);
+						$("#rest-setting-phone").val(window.user.restuarant.telephone);
+						$("#rest-setting-des").val(window.user.restuarant.description);
+						$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
 					}
 				}
 				if(!window.bossOrderView){
@@ -82,12 +83,13 @@ $(function(){
 	}
 	
 	function initLayout(){
-		overviewHeight = $(window).height()-400;
-		$('.content').css('height',$(window).height()-$('.navbar-fixed-top').height()-$('.navbar-fixed-bottom').height());
+		$('.content').css('height',$(window).height()-$('.navbar-fixed-top').height()-$('.navbar-fixed-bottom').height()-40);
 		$('.content').css('margin-top',$('.navbar-fixed-top').height());
-		$('#map-canvas').css('height',overviewHeight);
-		$('#left-bar').css('height',overviewHeight);
-		$('#small-menu-container').css('max-height',overviewHeight*0.8);
+		overviewHeight = $('.content').height()*0.7;
+		$('#map-canvas').parent().parent().parent().css('height',overviewHeight);
+//		$('#left-bar').css('height',overviewHeight);
+		$('#main-info-container').css('height',$('.content').height()-$('#map-canvas').height()-40)
+		$('.menu').css('height','200px')
 		$('#shoppingCart-container').css('left',($(window).width()-$('#shoppingCart-container').width())*0.5);
 	}
 	window.page = 1;

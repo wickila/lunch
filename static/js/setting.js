@@ -56,10 +56,32 @@ $(function(){
 			$('#setting-menu-description').val(m_info.description);
 			$('#setting-menu-price').val(m_info.price);
 			$('#setting-menu-discount').val(m_info.discount);
-			$('#setting-menu-mtype').val(m_info.mtype);
 			$('#setting-menu-imgurl').val(m_info.thumbnail);
 			$('#setting-menu-form').attr('action','/api/menu/edit/'+m_info.id);
-			$('#setting-menus-form-container').show();
+			$("#setting-menu-mtype").empty();
+			$('#setting-menu-mtype').append("<option value='0'>全部");
+			for(var j in window.user.restuarant.menutypes){
+				var menutype = window.user.restuarant.menutypes[j];
+				if(m_info.mtype == menutype.id){
+					$('#setting-menu-mtype').append("<option value='"+menutype.id+"' selected='selected'>"+menutype.name);
+				}else{
+					$('#setting-menu-mtype').append("<option value='"+menutype.id+"'>"+menutype.name);
+				}
+			}
+			$('#rest-settting-state').find('option').each(function(){
+				var option = $(this);
+				if(parseInt(option.val())==m_info.soldout){
+					option.attr('selected',true);
+				}
+			});
+			$('#rest-settting-taste').find('option').each(function(){
+				var option = $(this);
+				if(parseInt(option.val())==m_info.taste){
+					option.attr('selected',true);
+				}
+			});
+			$('#setting-menus-form-container').slideDown();
+			$('#setting-menus-container').slideUp();
 		});
 	}
 	
@@ -78,11 +100,19 @@ $(function(){
 		$('#setting-menu-form')[0].reset();
 		$('#setting-menu-img-form')[0].reset();
 		$('#setting-menu-img').attr('src','');
-		$('#setting-menus-form-container').show();
+		$('#setting-menu-mtype').empty();
+		$('#setting-menu-mtype').append("<option value='0'>全部");
+		for(var j in window.user.restuarant.menutypes){
+			var menutype = window.user.restuarant.menutypes[j];
+			$('#setting-menu-mtype').append("<option value='"+menutype.id+"'>"+menutype.name);
+		}
+		$('#setting-menus-form-container').slideDown();
+		$('#setting-menus-container').slideUp();
 	}
 	
 	window.close_menu_form = function(){
-		$('#setting-menus-form-container').hide();
+		$('#setting-menus-form-container').slideUp();
+		$('#setting-menus-container').slideDown();
 	}
 	
 	window.menu_img_change = function(){
@@ -102,6 +132,7 @@ $(function(){
 						'dataType': 'json',
 						'success':function(data){
 							lunchAlert('操作成功');
+							close_menu_form();
 							var m = data.menu;
 							$('#setting-menu-form')[0].reset();
 							var isOld = false;
@@ -133,6 +164,7 @@ $(function(){
 					}
 					if(!isOld)window.user.restuarant.menus.push(m);
 					updateMenus(window.user.restuarant.menus);
+					close_menu_form();
 				}
 			}
 		});
@@ -239,6 +271,7 @@ $(function(){
 				'dataType': 'json',
 				'success':function(data){
 					$("#rest-avatar-img").attr('src',data.imgurl);
+					window.user.restuarant.avatarurl = data.imgurl;
 					window.lunchAlert("店铺资料保存成功");
 				}
 		});

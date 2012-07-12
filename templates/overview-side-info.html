@@ -1,13 +1,12 @@
 <script src="/static/js/overview-side-info.js"></script>
-<a onclick="changePage(2);">
-	<table>
+<div id="overview-side-info-head" onclick="changePage(2);">
+	<table width="100%">
 		<thead></thead>
 		<tbody>
-			<tr valign="top"><td rowspan="3"><img id="o-side-bar-rest-avatar" class="thumbnail small-avatar" src=""></img></td><td><span id="o-side-bar-rest-name"></span></td></tr>
-			<tr valign="top"><td><span id="o-side-bar-rest-description"></span></td></tr>
-			<tr valign="top"><td><span id="o-side-bar-rest-thanks"></span></td></tr>
+			<tr valign="top"><td rowspan="2"><img id="o-side-bar-rest-avatar" class="small-avatar" src=""></img></td><td><h4 id="o-side-bar-rest-name"></h4></td><td align="right" style="font-size: 10pt;"><span class="icon-heart"></span>谢谢:<span style="font-size: 11pt" id="o-side-bar-rest-thanks"></span></td></tr>
+			<tr valign="top"><td colspan="3"><span id="o-side-bar-rest-description" style="font-size: 10pt;color: gray;"></span></td></tr>
 		</tbody>
 	</table>
-</a>
-<div id="small-menu-container">
+</div>
+<div id="overview-side-info-menus" class="scrollable">
 </div>

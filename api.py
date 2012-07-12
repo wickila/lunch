@@ -181,8 +181,9 @@ class NewMenu():
             discount = post_data.discount
             mtype = post_data.mtype
             thumbnail = post_data.thumbnail
+            taste = int(post_data.taste)
             rid = model.db.query("select id from restuarant where username='%s'" % user.username)[0].id
-            mid = model.db.insert('menu',name=name,description=description,price=price,discount=discount,mtype=mtype,uid=user.id,rid=rid,thumbnail=thumbnail)
+            mid = model.db.insert('menu',name=name,description=description,price=price,discount=discount,mtype=mtype,uid=user.id,rid=rid,thumbnail=thumbnail,taste=taste)
             mns = model.db.select('menu',where='id=$mid',vars=locals())
             m = mns[0]
             return lunch.write_json({'result':True,'message':'success','menu':m})
@@ -200,7 +201,8 @@ class EditMenu():
             mtype = post_data.mtype
             thumbnail = post_data.thumbnail
             state = int(post_data.state)
-            model.db.update('menu',where='id=$mid',vars=locals(),name=name,description=description,price=price,discount=discount,mtype=mtype,thumbnail=thumbnail,soldout=state)
+            taste = int(post_data.taste)
+            model.db.update('menu',where='id=$mid',vars=locals(),name=name,description=description,price=price,discount=discount,mtype=mtype,thumbnail=thumbnail,soldout=state,taste=taste)
             mns = model.db.select('menu',where='id=$mid',vars=locals())
             m = mns[0]
             return lunch.write_json({'result':True,'message':'success','menu':m})
@@ -308,7 +310,7 @@ class NewOrder():
                 if len(soldouts)>0:
                     message = ','.join([menu.name for menu in soldouts])+'卖完啦,换换口味看？'
                     return lunch.write_json({'result':False,'message':message})
-                if p == price:
+                if price-p<0.1:
                     rs = model.db.select('restuarant',where='id=$rid',vars=locals())
                     if len(rs)>0:
                         rest = rs[0]

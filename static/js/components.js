@@ -7,7 +7,7 @@ var RestSideBar = function(jqueryElement,rest){
 				"</table></div><hr/>";
 	this.head = $(headDiv);
 	var bodyDiv = "<ul class='nav nav-tabs nav-stacked' id='rest-leftbar'>" +
-			"<li data-sidebar='menus-wrapper' class='active'><a href='#restview'>菜单资料</a></li>" +
+			"<li data-sidebar='rest-menus-view' class='active'><a href='#restview'>菜单资料</a></li>" +
 			"<li data-sidebar='rest-wrapper'><a href='#restview'>店铺资料</a></li>" +
 			"</ul>"
 	this.body = $(bodyDiv);
@@ -21,8 +21,8 @@ var RestSideBar = function(jqueryElement,rest){
 		$('#'+link.data('sidebar')).addClass('active').siblings().removeClass('active');
 		switch(link.data('sidebar')){
 			case 'menus-wrapper':
-				if(window.restView.getRest != window.currentRest.info){
-					window.restView.setRest(window.currentRest.info);
+				if(window.restView.getRest != window.currentRest){
+					window.restView.setRest(window.currentRest);
 				}
 				break;
 			case 'rest-wrapper':
@@ -110,34 +110,16 @@ Menus.prototype.setMenus = function(menus){
 			this.onclick = function(){
 				var mid = menu.data('mid');
 				var m;
-				for(var i in window.currentRest.info.menus){
-					if(window.currentRest.info.menus[i].id == mid){
-						m = window.currentRest.info.menus[i];
+				for(var i in window.currentRest.menus){
+					if(window.currentRest.menus[i].id == mid){
+						m = window.currentRest.menus[i];
 						break;
 					}
 				}
 				window.addOrderMenu(m);
-				$.updateSideBarMenu(m,'checked');
 			}
 		});
 	}
-	this.jqueryElement.find('#menus').find('.menu-img').each(function(){
-		var item = $(this);
-		item.load(function() {  
-			var w = item.width();
-			var h = item.height();
-			var gap = 0;//padding + border
-			var pw = item.parent().width();
-			item.parent().height(pw);
-			if(w>=h){
-				item.width(pw);
-				item.css('margin-top',(pw-item.height()-gap)/2);
-			}else{
-				item.height(pw);
-				item.css('margin-left',(pw-item.width()-gap)/2);
-			}
-        }); 
-	})
 };
 
 Menus.prototype.filter = function(filters){
@@ -199,9 +181,9 @@ var SmallMenu = function(menu){
 
 SmallMenu.prototype.getDiv = function(){
 	var div="<div id='small-menu-"+ this.menu.id + "' data-mid='"+this.menu.id+"'>"+
-			"<table width='100%'>" +
-			"<tr><td rowspan='2' width='42'><div class='msb-avatar-container thumbnail'><img class='msb-avatar' src='"+ this.menu.thumbnail +"'></img></div></td><td><span id='msb-name'>"+ this.menu.name +"</span></td></tr>" +
-			"<tr><td><span class='msb-price'>"+ this.menu.price +"￥</span></td><td align='right'><input type='checkbox'"+(this.menu.checked?" checked='checked'":'')+" name='msb-select' data-mid='"+this.menu.id+"'>点选</td></tr>" +
+			"<table class='msb-item' width='100%'>" +
+			"<tr><td valign='middle' rowspan='2' width='42'><img class='msb-avatar' src='"+ this.menu.thumbnail +"'></img></td><td><span id='msb-name'>"+ this.menu.name +"</span></td></tr>" +
+			"<tr><td><span class='msb-price'>"+ this.menu.price +"￥</span></td><td align='right'><button style='margin-right:4px' class='btn btn-mini btn-success' data-mid='"+this.menu.id+"'>点选</td></tr>" +
 			"</table></div>";
 	return div;
 };
@@ -225,6 +207,11 @@ RestView.prototype.setRest = function(rest){
 	this.menus.setMenus(rest.menus);
 	this.menusfilter.dispose();
 	this.menusfilter = new MenuFilter(this.jqueryElement.find('#menus-filter'),rest);
+	$("#rest-detail").find("#rest-name").html(rest.name);
+	$("#rest-detail").find("#rest-username").html(rest.username);
+	$("#rest-detail").find("#rest-minprice").html(rest.minprice);
+	$("#rest-detail").find("#rest-description").html(rest.description);
+	$('#rest-detail').find('.rest-thumbnail').attr('src',rest.avatarurl);
 };
 
 RestView.prototype.getRest = function(){
@@ -357,14 +344,13 @@ var ShoppingCart = function(jqueryElement){
 	$('#shoppingCart-container')[0].ondrop = function(ev) {
 		var mid = ev.dataTransfer.getData('mid');
 		var m;
-		for(var i in window.currentRest.info.menus){
-			if(window.currentRest.info.menus[i].id == mid){
-				m = window.currentRest.info.menus[i];
+		for(var i in window.currentRest.menus){
+			if(window.currentRest.menus[i].id == mid){
+				m = window.currentRest.menus[i];
 				break;
 			}
 		}
 		window.addOrderMenu(m);
-		$.updateSideBarMenu(m,'checked');
 		this.style.color = "#000000";
 		return false;
 	};
@@ -623,7 +609,7 @@ function getOrderMenusPrice(menus){
 
 var NewOrderItem = function(rest,index){
 	this.rest = rest;
-	this.element = $("<div class='order-item'></div>");
+	this.element = $("<div class='order-item radius-border'></div>");
 	var head = "<h3>订单"+index+"</h3>" +
 			"<p class='order-item-head'><span>店家:"+ rest.name +"</span><span>数量:"+ getOrderMenusNum(rest.orderMenus) +"</span><span>总价:"+getOrderMenusPrice(rest.orderMenus)+"￥</span></p><hr/>";
 	var body = "<table width='100%'>" +
@@ -655,6 +641,9 @@ NewOrderItem.prototype.postOrder = function(){
     for(var i in this.rest.orderMenus){
     	items.push({
     		'id':this.rest.orderMenus[i].id,
+    		'name':this.rest.orderMenus[i].name,
+    		'price':this.rest.orderMenus[i].price,
+    		'discount':this.rest.orderMenus[i].discount,
     		'num':this.rest.orderMenus[i].num
     	});
     }
@@ -673,8 +662,9 @@ NewOrderItem.prototype.postOrder = function(){
 		  success: function(data){
 	    				if(data.result){
 	    					window.orderView.removeRest(data.rid);
-	    					if(!window.user.orders)window.user.orders = [];
-	    					window.user.orders.push(data.order);
+//	    					if(!window.user.orders)window.user.orders = [];
+//	    					window.user.orders.push(data.order);
+	    					window.viewOrderView.setPage(window.viewOrderView);
 	    					window.lunchAlert('提交订单成功');
 	    				}else{
 	    					alert(data.message)
@@ -759,24 +749,58 @@ OrderView.prototype.removeRest = function(rid){
 /**
  * 查看订单条目
  */
-var ViewOrderItem = function(type){
+var ViewOrderItem = function(type,expanded){
 	this.type = type;
+	this.expanded  = expanded;
 	this.interval = 5000;
 	this.element = $("<div class='view-order-item'>" +
-						"<p><span class='view-order-item-restname'></span><span class='view-order-item-id'></span><span class='view-order-item-createdtime'></span></p>" +
+						"<p><span class='view-order-item-restname'></span>订单编号:<span class='view-order-item-id'></span>下单时间:<span class='view-order-item-createdtime'></span></p>" +
 						"<table width='100%'>" +
-							"<tr><td width='90%' class='view-order-item-username'></td><td colspan='3'><div class='view-order-item-btncontainer'><a class='btn btn-mini btn-primary order-cancel-btn'>取消</a><button class='btn btn-mini order-option-btn'>待确认</button></div></td></tr>" +
-							"<tr><td><span class='view-order-item-num'></span><span class='view-order-item-price'></span></td></tr>" +
-							"<tr><td><span class='view-order-item-concact-adress'></span><span class='view-order-item-concact-name'></span><span class='view-order-item-concact-phone'></span></td></tr>" +
+							"<tr><td class='view-order-item-username'></td></tr>" +
+							"<tr><td>详细信息:<span class='view-order-item-num'></span><span class='view-order-item-price'></span></td><td align='right'><span id='show-order-detail-btn' class='icon-list'></span></td></tr>" +
+							"<tr id='order-detail-info' style='display:none'><td colspan='3'><table width='100%' class='order-detail-info-table'></table></td></tr>" +
+							"<tr><td>联系方式:<span class='view-order-item-concact-adress'></span><span class='view-order-item-concact-name'></span><span class='view-order-item-concact-phone'></span></td></tr>" +
+							"<tr><td></td><td aligin='right'><a class='btn btn-mini btn-primary order-cancel-btn'>取消</a><button class='btn btn-mini order-option-btn'>待确认</button></td></tr>" +
 						"</table>" +
 					"</div>");
+	this.element.find('#show-order-detail-btn').click($.proxy(function(){
+		if(this.element.find('#show-order-detail-btn').hasClass('icon-list')){
+			this.showDetail();
+		}else{
+			this.hideDetail();
+		}
+	},this));
+}
+
+ViewOrderItem.prototype.showDetail = function(){
+	this.expaned = true;
+	this.element.find('#show-order-detail-btn').removeClass('icon-list').addClass('icon-minus');
+	this.element.find('#order-detail-info').find('table').empty();
+	this.element.find('#order-detail-info').find('table').append("<tr><td>名称</td><td>数量</td><td>单价</td><td>折扣</td><td>实价</td></tr>")
+	for(var i in this.order.menus){
+		var menu = this.order.menus[i];
+		var e = "<tr><td>"+menu.name+"</td><td>"+menu.num+"</td><td>"+menu.price+"￥</td><td>"+menu.discount+"</td><td>"+menu.num*menu.price*menu.discount*0.1+"￥</td></tr>";
+		this.element.find('#order-detail-info').find('table').append($(e));
+	}
+	this.element.find('#order-detail-info').show();
+}
+
+ViewOrderItem.prototype.hideDetail = function(){
+	this.expanded = false;
+	this.element.find('#order-detail-info').hide();
+	this.element.find('#show-order-detail-btn').removeClass('icon-minus').addClass('icon-list');
 }
 
 ViewOrderItem.prototype.setOrder = function(order){
 	this.order = order;
 	this.element.attr('id','view-order-item-'+order.id);
 	this.element.attr('data-id',order.id);
-	this.element.find('.view-order-item-restname').html(order.restname);
+	if(this.type == 'user'){
+		this.element.find('.view-order-item-restname').show();
+		this.element.find('.view-order-item-restname').html(order.restname);
+	}else{
+		this.element.find('.view-order-item-restname').hide();
+	}
 	this.element.find('.view-order-item-id').html(order.id);
 	this.element.find('.view-order-item-createdtime').html(order.createdtime);
 	this.element.find('.view-order-item-username').html(order.username);
@@ -810,6 +834,8 @@ ViewOrderItem.prototype.setOrder = function(order){
 				  success: function(data){
 			    				if(data.result){
 			    					this.scope.order = data.order;
+			    					data.order.concact = JSON.parse(data.order.concact);
+			    					data.order.menus = JSON.parse(data.order.menus);
 			    					this.scope.updateView();
 			    				}else{
 			    					window.lunchAlert(data.message)
@@ -847,6 +873,8 @@ ViewOrderItem.prototype.onButtonClick = function(){
 			  success: function(data){
 		    				if(data.result){
 		    					this.scope.order = data.order;
+		    					data.order.concact = JSON.parse(data.order.concact);
+		    					data.order.menus = JSON.parse(data.order.menus);
 		    					this.scope.updateView();
 		    				}else{
 		    					window.lunchAlert(data.message)
@@ -900,6 +928,8 @@ ViewOrderItem.prototype.update = function(scope){
 		  success: function(data){
 	    				if(data.result){
 	    					this.scope.order = data.order;
+	    					data.order.concact = JSON.parse(data.order.concact);
+	    					data.order.menus = JSON.parse(data.order.menus);
 	    					this.scope.updateView();
 	    					if(!this.scope.disposed && this.scope.order.state != -1 && this.scope.order.state != 3){
 	    						setTimeout(this.scope.update,this.scope.interval,this.scope);
@@ -962,10 +992,17 @@ ViewOrderView.prototype.setPage = function(scope){
 		  success: function(data){
 	    				if(data.result){
 	    					this.scope.element.empty();
-	    					for(var j in this.scope.items){
-	    						var item = this.scope.items[j];
+	    					for(var l in this.scope.items){
+	    						var item = this.scope.items[l];
+	    						for(var m in data.orders){
+	    							var o = data.orders[m];
+	    							if(o.id == item.order.id){
+	    								o['expanded']=item.expanded; 
+	    							}
+	    						}
 	    						item.dispose();
 	    					}
+	    					data.orders.reverse();
 	    					for(var i in data.orders){
 	    						var order = data.orders[i];
 	    						order.concact = JSON.parse(order.concact);
@@ -982,7 +1019,7 @@ ViewOrderView.prototype.setPage = function(scope){
     						this.scope.totalPage = Math.ceil(data.total/10);
     						this.scope.controller.find('.total-page').html(this.scope.totalPage);
     						this.scope.controller.find('.page').html(this.scope.page);
-    						if(!this.scope.disposed){
+    						if(!this.scope.disposed && this.scope.tyoe == 'boss'){
     							setTimeout(this.scope.setPage,5000,this.scope);
     						}
 	    				}else{
@@ -1002,7 +1039,9 @@ ViewOrderView.prototype.dispose = function(){
 	this.controller.remove();
 	this.disposed = true;
 }
-
+/**
+ * 菜单过滤器
+ */
 var MenuTypeSetting = function(){
 	this.element = $('#rest-menutype-setting');
 	this.element.append($("<tr><td></td><td></td><td><span id='show-new-menutype-btn' class='icon-plus' style='float:right'></span></td></tr>"));
@@ -1029,10 +1068,12 @@ var MenuTypeSetting = function(){
 	    	  scope:this,
 			  success: function(data){
 		    				if(data.result){
-		    					this.scope.addType(data.menutype);
 		    					window.user.restuarant.menutypes.push(data.menutype);
 		    					this.scope.element.find('#new-menu-name').val('');
-		    					this.scope.newMenuType.hide(200);
+		    					this.scope.newMenuType.hide(200,$.proxy(function(){
+		    						this.addType(data.menutype);
+		    						this.element.find('#show-new-menutype-btn').addClass('icon-plus').removeClass('icon-minus');
+		    					},this.scope));
 		    				}else{
 		    					window.lunchAlert(data.message)
 		    				}
@@ -1098,7 +1139,7 @@ MenuTypeSetting.prototype.addType = function(menutype){
 		    						this.remove();
 		    					},this.scope));
 		    					for(var i in window.user.restuarant.menutypes){
-		    						if(window.user.restuarant.menutypes[i] == this.scope.data('id')){
+		    						if(window.user.restuarant.menutypes[i].id == this.scope.data('id')){
 		    							window.user.restuarant.menutypes.splice(i,1);
 		    							window.lunchAlert('删除成功');
 		    							return;
