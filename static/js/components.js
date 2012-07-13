@@ -427,21 +427,22 @@ var Concacts = function(user,rid){
 		for(var i in concacts){
 			var concact = concacts[i];
 			var elm = $("<p class='concact-item' style='display:none'><input class='concact-item-input' type='radio' name='concact-"+rid+"' value='"+JSON.stringify(concact)+"'><span>"+concact.adress+"</span><span>"+concact.concactname+"收</span><span>电话:"+concact.phone+"</span></p>");
-			elm.append($("<span style='float:right;display:none' class='icon-remove concact-item-remove'></span>" +
-						"<span style='float:right;display:none;' class='icon-plus concact-item-plus'></span>" +
-						"<span style='float:right;display:none;' class='icon-minus concact-item-minus'></span>" +
-						"<span style='float:right;display:none;' class='icon-list concact-item-list'></span>"));
+			elm.append($("<div class='btn-group' style='float:right;margin-top: -5px;'>" +
+						"<a style='display:none;' class='btn concact-item-list'><i class='icon-list'></i></a>" +
+						"<a style='display:none;' class='btn concact-item-minus'><i class='icon-minus'></i></a>" +
+						"<a style='display:none;' class='btn concact-item-remove'><i class='icon-remove'></i></a>" +
+						"<a style='display:none;' class='btn concact-item-plus'><i class='icon-plus'></i></a></div>"));
 			concactsItemContainer.append(elm);
 			if(i==0){
 				elm.find('input').attr('checked',true);
-				elm.find('.icon-plus').show();
-				elm.find('.icon-list').show();
+				elm.find('.concact-item-plus').show();
+				elm.find('.concact-item-list').show();
 				elm.show();
 			}
 		}
 		if(concacts.length == 0){
 			var elm = $("<p class='concact-item' id='blank-concact-item'><a class='concact-item-plus'>您还没有任何联系方式，请点击添加联系方式</a></p>");
-			elm.append($("<span style='float:right' class='icon-plus concact-item-plus'></span>"));
+			elm.append($("<a style='float:right' class='btn concact-item-plus'><i class='icon-plus'></i></a>"));
 			concactsItemContainer.append(elm);
 		}
 	}
@@ -449,7 +450,7 @@ var Concacts = function(user,rid){
 
 function initEvents(){
 	$('.concact-item-plus').live('click',function(){
-		var element = $(this).parent().parent();
+		var element = $(this).parent().parent().parent();
 		var form = $("<form id='concact-form' method='post' action='/api/concact/new'>" +
 						"<h3>添加联系方式</h3>" +
 						"<table>" +
@@ -462,52 +463,52 @@ function initEvents(){
 		form.find('#concact-form-btn').bind('click',function(event){
 			var element1 = $(this).parent().parent();
 			element1.find('form').ajaxForm({
+				'scope':element1,
 				'dataType': 'json',
 				'success':function(data){
 					if(data.result){
 						if(!window.user.concacts)window.user.concacts = [];
 						var concact = data.concact;
 						window.user.concacts.push(concact);
-						$('.concacts-item-container').each(function(){
-							var element2 = $(this); 
-							var elm = $("<p class='concact-item' style='display:none'><input type='radio' class='concact-item-input' name='concact-"+element2.data('rid')+"' value='"+JSON.stringify(concact)+"'><span>"+concact.adress+"</span><span>"+concact.concactname+"收</span><span>电话:"+concact.phone+"</span></p>");
-							elm.append($("<span style='float:right;display:none' class='icon-remove concact-item-remove'></span>" +
-										"<span style='float:right;display:none;' class='icon-plus concact-item-plus'></span>" +
-										"<span style='float:right;display:none;' class='icon-minus concact-item-minus'></span>" +
-										"<span style='float:right;display:none;' class='icon-list concact-item-list'></span>"));
-							element2.find('#blank-concact-item').remove();
-							var elements = [];
-							element2.find('.concact-item').each(function(){
-								var item = $(this);
-								elements.push(item);
-								item.find('.icon-plus').hide();
-								item.find('.icon-list').hide();
-								item.find('.icon-remove').hide();
-								item.find('.icon-minus').hide();
-								item.hide();
-								item.attr('checked',false);
-							});
-							element2.append(elm);
-							for(var i in elements){
-								element2.append(elements[i]);
-							}
-							elm.find('input').attr('checked',true);
-							elm.find('.icon-plus').show();
-							elm.find('.icon-list').show();
-							elm.show();
-							element2.find('form').hide(200,function(){
-									element2.find('form').remove();
-							});
+						var element2 = this.scope; 
+						var elm = $("<p class='concact-item' style='display:none'><input type='radio' class='concact-item-input' name='concact-"+element2.data('rid')+"' value='"+JSON.stringify(concact)+"'><span>"+concact.adress+"</span><span>"+concact.concactname+"收</span><span>电话:"+concact.phone+"</span></p>");
+						elm.append($("<div class='btn-group' style='float:right;margin-top: -5px;'>" +
+								"<a style='display:none;' class='btn concact-item-list'><i class='icon-list'></i></a>" +
+								"<a style='display:none;' class='btn concact-item-minus'><i class='icon-minus'></i></a>" +
+								"<a style='display:none;' class='btn concact-item-remove'><i class='icon-remove'></i></a>" +
+								"<a style='display:none;' class='btn concact-item-plus'><i class='icon-plus'></i></a></div>"));
+						element2.find('#blank-concact-item').remove();
+						var elements = [];
+						element2.find('.concact-item').each(function(){
+							var item = $(this);
+							elements.push(item);
+							item.find('.concact-item-plus').hide();
+							item.find('.concact-item-list').hide();
+							item.find('.concact-item-remove').hide();
+							item.find('.concact-item-minus').hide();
+							item.hide();
+							item.attr('checked',false);
+						});
+						element2.append(elm);
+						for(var i in elements){
+							element2.append(elements[i]);
+						}
+						elm.find('input').attr('checked',true);
+						elm.find('.concact-item-plus').show();
+						elm.find('.concact-item-list').show();
+						elm.show();
+						element2.find('form').hide(200,function(){
+								element2.find('form').remove();
 						});
 					}
 				}
 			});
 		});
 		$(this).hide();
-		$(this).parent().find('.icon-minus').hide();
-		$(this).parent().find('.icon-list').show();
-		$(this).parent().find('.icon-remove').show();
-		var ccts = $(this).parent().parent();
+		$(this).parent().find('.concact-item-minus').hide();
+		$(this).parent().find('.concact-item-list').show();
+		$(this).parent().find('.concact-item-remove').show();
+		var ccts = $(this).parent().parent().parent();
 		ccts.find('.concact-item').each(function(){
 			var item = $(this);
 			var checked = item.find('input').attr('checked');
@@ -521,17 +522,17 @@ function initEvents(){
 	});
 	
 	$('.concact-item-list').live('click',function(){
-		var ccts = $(this).parent().parent();
+		var ccts = $(this).parent().parent().parent();
 		ccts.find('.concact-item').show();
-		$(this).parent().parent().find('form').remove();
-		$(this).parent().find('.icon-remove').hide();
-		$(this).parent().find('.icon-plus').show();
+		ccts.parent().find('form').remove();
+		$(this).parent().find('.concact-item-remove').hide();
+		$(this).parent().find('.concact-item-plus').show();
 		$(this).hide();
-		$(this).parent().find('.icon-minus').show();
+		$(this).parent().find('.concact-item-minus').show();
 	});
 	
 	$('.concact-item-minus').live('click',function(){
-		var ccts = $(this).parent().parent();
+		var ccts = $(this).parent().parent().parent();
 		ccts.find('.concact-item').each(function(){
 			var item = $(this);
 			var checked = item.find('input').attr('checked');
@@ -542,12 +543,12 @@ function initEvents(){
 			}
 		})
 		$(this).hide();
-		$(this).parent().find('.icon-list').show();
+		$(this).parent().find('.concact-item-list').show();
 	});
 	$('.concact-item-remove').live('click',function(){
-		$(this).parent().parent().find('form').remove();
+		$(this).parent().parent().parent().find('form').remove();
 		$(this).hide();
-		$(this).parent().find('.icon-plus').show();
+		$(this).parent().find('.concact-item-plus').show();
 	});
 	$('.concact-item-input').live('click',function(){
 		var ccts = $(this).parent().parent();
@@ -558,15 +559,15 @@ function initEvents(){
 			if(checked){
 				elements.unshift(item);
 				item.show();
-				item.find('.icon-plus').show();
-				item.find('.icon-list').show();
+				item.find('.concact-item-plus').show();
+				item.find('.concact-item-list').show();
 			}else{
 				elements.push(item);
 				item.hide();
-				item.find('.icon-plus').hide();
-				item.find('.icon-list').hide();
-				item.find('.icon-remove').hide();
-				item.find('.icon-minus').hide();
+				item.find('.concact-item-plus').hide();
+				item.find('.concact-item-list').hide();
+				item.find('.concact-item-remove').hide();
+				item.find('.concact-item-minus').hide();
 			}
 		})
 		for(var i in elements){

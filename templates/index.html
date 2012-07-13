@@ -27,11 +27,6 @@
 		<section id="restview" style="left:100%;">
 			{% include 'restuarant.html' %}
 		</section>
-		<!-- 
-		<section id="menuview" style="left:200%;background-color: #0ff;">
-			<div>third div</div>
-		</section>
-		 -->
 		<section id="orderview" style="left:200%;">
 			{% include 'order.html' %}
 		</section>
@@ -48,18 +43,7 @@
 	<div class="navbar navbar-fixed-bottom">
 		<div class="navbar-inner">
 			<div class="container" style="text-align: center;">
-			  <div class="nav-collapse" style="font-size: 12pt;padding-bottom: 10px;padding-top: 10px;">
-				---⊙---<a  class="bottom-nav-a" onclick="changePage(1);">首页</a>---⊙---
-				<a  class="bottom-nav-a" onclick="changePage(2);">餐厅</a>---⊙---
-				<!-- <a href="#menuview" class="bottom-nav-a">菜单</a>---⊙--- -->
-				<a  class="bottom-nav-a" onclick="changePage(3);">订单</a>---⊙---
-				{% if user %}
-					<a id="bottom-nav-user"  class="bottom-nav-a" onclick="changePage(4);">{{ user.username }}</a>
-				{% else %}
-					<a id="bottom-nav-user"  class="bottom-nav-a" onclick="changePage(4);">游客</a>
-				{% endif %}
-				---⊙---
-			  </div>
+				this is footer
 			</div>
 		  </div>
 	</div>

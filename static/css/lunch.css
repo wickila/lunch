@@ -23,6 +23,10 @@ body{
 	padding-top:20px;
 }
 
+p,span{
+	cursor: default;
+}
+
 .container-fluid,.row-fluid,.row,.span3,.span9,.scrollable{
 	height:100%;
 	overflow-y: auto;
@@ -65,21 +69,80 @@ a{
 	display: block;	
 }
 
-#loading{
-	position: fixed;
-	top: 0;
-	left: 0;
-	z-index: 100000;
-	width: 100%;
+.change-page-btn{
 	height: 100%;
-	background-color: rgba(100,100,100,0.5);
+	position: fixed;
+	font-size: 40px;
+	min-width: 100px;
+	background-color: rgba(245, 245, 245, 0.5);
+	border-color: rgba(167, 167, 167, 0.26);
+	border-width: 1px;
 }
 
-#loading img{
-	margin-left: 40%;
-	margin-top: 20%;
+#left-btn{
+	left: 0;
 }
 
+#right-btn{
+	right: 0;
+}
+
+#site-nav-container{
+	position:fixed;
+	width: 216px;
+	height: 57px;
+	background-image: url(../img/site-nav-bg.png);
+}
+
+.bottom-nav-a{
+	display: inline-block;
+	vertical-align: text-top;
+	margin: 25px -11px 0px 34px;
+	width: 14px;
+	height: 14px;
+	background: gray;
+	border: 1px solid #DDD;
+	border-width: 1px;
+	border-radius: 7px;
+	-webkit-border-radius: 7px;
+	-moz-border-radius: 7px
+}
+
+.bottom-nav-a:HOVER{
+	background-color: rgb(155,155,155);
+}
+
+.bottom-nav-overview-active{
+	background-color: rgb(251,255,35);
+}
+
+.bottom-nav-overview-active:HOVER{
+	background-color: #FDFF98;
+}
+
+.bottom-nav-restview-active{
+	background-color: rgb(94,94,225);
+}
+
+.bottom-nav-restview-active:HOVER{
+	background-color: #8B8BDB;
+}
+
+.bottom-nav-orderview-active{
+	background-color: rgb(255,89,90);
+}
+
+.bottom-nav-orderview-active:HOVER{
+	background-color: #CF9091;
+}
+
+.bottom-nav-user-active{
+	background-color: rgb(251,255,35);
+}
+
+.bottom-nav-user-active:HOVER{
+	background-color: #FDFF98;
+}
 
 #navigate_bar{
 	background-color: #225;

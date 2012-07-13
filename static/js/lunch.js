@@ -131,10 +131,24 @@ $(function(){
     this.info = info;
     this.info.orderMenus = [];
     this.point = new google.maps.LatLng(info.lat, info.lng);
+    var image = new google.maps.MarkerImage('/static/img/marker'+(info.rtype+1)+'.png',
+    	      // This marker is 20 pixels wide by 32 pixels tall.
+    	      new google.maps.Size(40, 40),
+    	      // The origin for this image is 0,0.
+    	      new google.maps.Point(0,0),
+    	      // The anchor for this image is the base of the flagpole at 0,32.
+    	      new google.maps.Point(20, 20));
+//    var shadow = new google.maps.MarkerImage('images/beachflag_shadow.png',
+//  // The shadow image is larger in the horizontal dimension
+//  // while the position and offset are the same as for the main image.
+//    		new google.maps.Size(37, 32),
+//    		new google.maps.Point(0,0),
+//    		new google.maps.Point(0, 32));
     this.marker = new google.maps.Marker({
       id: this.id,
       position: this.point,
-      title:this.info.name
+      title:this.info.name,
+      icon:image
     });
     this.menus = [];
     
@@ -285,7 +299,7 @@ $(function(){
 	              				}
 	              			}
 	              			if(!window.currentRest){
-	              				setCurrentRest(r);
+	              				window.setCurrentRest(rest);
 	              			}
 	              		},
 	              		'error': function(){alert('获取本地餐厅失败')}
@@ -306,7 +320,7 @@ $(function(){
     			if(user){
     				$('.user').addClass('user-login');
     				$('.user').removeClass('user');
-    				$('#bottom-nav-user').html(user.username);
+//    				$('#bottom-nav-user').html(user.username);
     				if(user.permission > 0){
     					$('.boss').addClass('boss-login');
     					$('.boss').removeClass('boss');
@@ -402,7 +416,7 @@ $(function(){
 						$('.boss').addClass('boss-login');
     					$('.boss').removeClass('boss');
 					}
-					$('#bottom-nav-user').html(user.username);
+//					$('#bottom-nav-user').html(user.username);
 					window.updateView();
 					getRestuarant();
 				}else{
@@ -431,7 +445,7 @@ $(function(){
 						$('.boss').addClass('boss-login');
     					$('.boss').removeClass('boss');
 					}
-					$('#bottom-nav-user').html(user.username);
+//					$('#bottom-nav-user').html(user.username);
 					window.updateView();
 				}else{
 					$('#usernameErrorMessage').html(data.usernameErrorMessage);

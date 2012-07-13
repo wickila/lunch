@@ -24,6 +24,7 @@ body{
 	-moz-transform: translate3d(0px, 0px, 0px);
 	-o-transform: translate3d(0px, 0px, 0px);
 	-ms-transform: translate3d(0px, 0px, 0px);
+	cursor: move;
 }
 
 section{
@@ -81,7 +82,7 @@ section{
 }
 
 #overview-side-info-menus{
-	max-height: 100%;
+	max-height: 50%;
 	overflow-y: auto;
 	overflow-x: hiddeon;
 }
@@ -156,11 +157,6 @@ section{
 .menu-img{
 	vertical-align:middle;
 	width:170px;
-}
-
-.bottom-nav-a{
-	color: white;
-	font-size: 12pt;
 }
 
 #shoppingCart-container{
