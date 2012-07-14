@@ -157,7 +157,7 @@ $(function(){
     google.maps.event.addListener(this.marker, 'click', function() {
     	var rest = restuarants[this.id];
     	setCurrentRest(rest.info);
-        map.setCenter(this.getPosition());
+        map.panTo(this.getPosition());
     });
   };
   /**
@@ -498,6 +498,48 @@ $(function(){
 		}
 	};
 	
+	window.showAddOrderAnimation = function(element,menuname,callback){
+//		var mirror = element.clone();
+		var mirror = $('<div id="cart_shadow" style="display: none;background-color:rgb(251,255,35); border:1px solid #000;z-index: 9999;">'+menuname+'</div>');
+		mirror.appendTo($('body'));
+		mirror.css({
+					'width' : element.css('width'),
+					'height': element.css('height') ,
+					'position' : 'absolute',
+					'top' : element.offset().top,
+					'left' : element.offset().left,
+					'opacity' : 0.6				 
+				 }).show();
+		$cart = $('#nav-shopping-cart-btn');
+		mirror.animate({ 
+			  width: $cart.innerWidth(), 
+			  height: $cart.innerHeight()*0.2, 
+			  top: $cart.offset().top, 
+			  left: $cart.offset().left,
+			  opacity: 0
+		 },  {duration: 300 , complete: function(){
+				 mirror.remove();
+				 callback();
+		     } 
+		 })
+	}
+	
+	window.updateShoppingCartNum = function(){
+//		$('.order-num').animate({ 
+//			  color:'white'
+//		 },  {duration: 100 , complete: function(){
+//				 $('.order-num').animate({color:'#999'},{duration: 100});
+//		     } 
+//		 })
+		$('.order-num').css('color','white');
+		$('.order-num').slideUp(200,function(){
+			$('.order-num').html(window.getShoppingCartNum());
+			$('.order-num').slideDown(200,function(){
+				setTimeout(function(){$('.order-num').css('color','#999');},20)
+			});
+		})
+	}
+	
 	window.addOrderMenu = function(m){
 		m.num++;
 		if(window.orderMenus.indexOf(m)<0){
@@ -506,7 +548,7 @@ $(function(){
 			window.orderMenus.push(m);
 		}
 		window.shoppingCart.addMenu(m);
-		$('.order-num').html(window.getShoppingCartNum());
+		window.updateShoppingCartNum();
 		if(window.shoppingCartShow){
 			updateLayout();
 		}
@@ -521,7 +563,7 @@ $(function(){
 			window.orderMenus.splice(window.orderMenus.indexOf(m),1);
 		}
 		window.shoppingCart.removeMenu(m);
-		$('.order-num').html(window.getShoppingCartNum());
+		window.updateShoppingCartNum();
 		if(window.orderMenus.length == 0){
 			hideShoppingCart();
 		}if(window.shoppingCartShow){

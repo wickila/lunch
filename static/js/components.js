@@ -6,10 +6,10 @@ var RestSideBar = function(jqueryElement,rest){
 				"<tr><td><span id='rsb-thanks'></span></td></tr>" +
 				"</table></div><hr/>";
 	this.head = $(headDiv);
-	var bodyDiv = "<ul class='nav nav-tabs nav-stacked' id='rest-leftbar'>" +
-			"<li data-sidebar='rest-menus-view' class='active'><a href='#restview'>菜单资料</a></li>" +
-			"<li data-sidebar='rest-wrapper'><a href='#restview'>店铺资料</a></li>" +
-			"</ul>"
+	var bodyDiv ="<ul class='nav nav-tabs nav-stacked'>" +
+			"<li class='active'><a href='#rest-menus-view' data-toggle='tab'>菜单资料</a></li>" +
+			"<li><a href='#rest-wrapper' data-toggle='tab'>店铺资料</a></li>" +
+			"</ul>";
 	this.body = $(bodyDiv);
 	this.setRest(rest);
 	jqueryElement.append(this.head);
@@ -17,18 +17,17 @@ var RestSideBar = function(jqueryElement,rest){
 	var lis=this.body.find('li');
 	this.body.find('li').bind('click',function(e){
 		var link = $(this);
-		link.addClass('active').siblings().removeClass('active');
-		$('#'+link.data('sidebar')).addClass('active').siblings().removeClass('active');
-		switch(link.data('sidebar')){
-			case 'menus-wrapper':
+//		link.addClass('active').siblings().removeClass('active');
+//		$('#'+link.data('sidebar')).addClass('active').siblings().removeClass('active');
+		switch(link.find('a').attr('href')){
+			case '#rest-menus-view':
 				if(window.restView.getRest != window.currentRest){
 					window.restView.setRest(window.currentRest);
 				}
 				break;
-			case 'rest-wrapper':
+			case '#rest-wrapper':
 				break;
 		}
-		e.preventDefault();
 	});
 };
 
@@ -116,7 +115,7 @@ Menus.prototype.setMenus = function(menus){
 						break;
 					}
 				}
-				window.addOrderMenu(m);
+				window.showAddOrderAnimation($(this),m.name,function(){window.addOrderMenu(m);})
 			}
 		});
 	}
