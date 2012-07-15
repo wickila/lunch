@@ -99,7 +99,7 @@ $(function(){
 			case 3:
 				if(!window.user){
 					$('#order-container').empty();
-					$('#order-container').append($("<p>您还没有登录，请先<a data-toggle='modal' data-target='#signup'>注册</a>或<a data-toggle='modal' data-target='#login'>登录</a></p>"));
+					$('#order-container').append($("<p id='show-login-tip'>您还没有登录，请先<a data-toggle='modal' data-target='#signup'>注册</a>或<a data-toggle='modal' data-target='#login'>登录</a></p>"));
 				}else{
 					if(!window.orderView){
 						window.orderView = new OrderView($('#order-container'));
@@ -112,7 +112,7 @@ $(function(){
 				break;
 			case 4:
 				if(!window.user){
-					
+					$('#show-login-tip').show();
 				}else{
 					if(window.user.restuarant){
 						$("#rest-setting-name").val(window.user.restuarant.name);
@@ -123,6 +123,7 @@ $(function(){
 						$("#rest-setting-des").val(window.user.restuarant.description);
 						$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
 					}
+					$('#show-login-tip').hide();
 					if(!window.bossOrderView){
 						window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
 					}
@@ -154,7 +155,7 @@ $(function(){
 	}
 	window.changePage(1);
 	initLayout();
-	$('#site-nav-container').tooltip({
+	$('#site-nav-container,.tooltip-enable').tooltip({
 	      selector: "a[rel=tooltip]"
 	    });
 	window.hideShoppingCart();

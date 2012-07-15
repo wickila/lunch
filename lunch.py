@@ -14,6 +14,7 @@ web.config.debug = False
 #url mappings
 urls = (
 	'/','Index',
+	'/rest/(.*)','ViewRest',
 	'/signin','Signin',
 	'/signout','Signout',
 	'/signup','Signup',
@@ -90,6 +91,23 @@ class Index:
 		if not session.location:
 			session.location = self.get_location(web.ctx.ip)
 		return env.get_template('index.html').render({"user":session.user,"location":session.location})
+	
+class ViewRest:
+	def get_location(self,ip):
+		try:
+			URL='http://ip.json.dotcloud.com/json/'+ip.strip()
+			tempFile = urllib2.urlopen(URL).read()
+			jsonobj = json.load(tempFile)
+			return (float(jsonobj['latitude']),float(jsonobj['longitude']))
+		except:
+			return (23,114)
+	
+	def GET(self,username):
+		rests = model.db.select('restuarant',where='username=$username',vars=locals())
+		if len(rests)>0:
+			rest = rests[0]
+			return env.get_template('index.html').render({"user":session.user,"location":(rest.lat,rest.lng),"current_rest_id":rest.id})
+			return 'the restaurant is not exist';
 
 class Signin:
 	def GET(self):

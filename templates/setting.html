@@ -1,100 +1,106 @@
 <link rel="stylesheet" href="/static/css/setting.css" type="text/css" charset="utf-8">
-<script type="text/javascript" src="static/js/setting.js"></script>
+<script type="text/javascript" src="/static/js/setting.js"></script>
 <div class="container content">
+	<p id='show-login-tip'>您还没有登录，请先<a data-toggle='modal' data-target='#signup'>注册</a>或<a data-toggle='modal' data-target='#login'>登录</a></p>
 	<div class="row-fluid">
 		<div class="span3">
-			<ul class="nav nav-tabs nav-stacked" id="user-leftbar">
-				<li class="user" data-sidebar="profile"><a>个人资料</a></li>
-				<li class="user" data-sidebar="security"><a>安全设置</a></li>
-				<li data-sidebar="restuarant-edit-view" class="boss"><a>店铺资料</a></li>
-				<li data-sidebar="menus-edit-view" class="boss"><a>菜单资料</a></li>
-				<li data-sidebar="boss-order-view" class="boss"><a>店家订单</a></li>
+			<ul class="nav nav-list radius-border" id="user-leftbar">
+				<li class="nav-header user"><h4>个人设置</h4></li>
+				<li class="user active"><a href="#profile" data-toggle="tab"><i class="icon-user"></i>个人资料</a></li>
+				<li class="user"><a href="#security" data-toggle="tab"><i class="icon-lock"></i>安全设置</a></li>
+				<li class="nav-header boss"><h4>店铺设置</h4></li>
+				<li class="boss"><a href="#restuarant-edit-view" data-toggle="tab"><i class="icon-home"></i>店铺资料</a></li>
+				<li class="boss"><a href="#menus-edit-view" data-toggle="tab"><i class="icon-book"></i>菜单资料</a></li>
+				<li class="boss"><a href="#boss-order-view" data-toggle="tab"><i class="icon-file"></i>店家订单</a></li>
 			</ul>
 		</div>
 		<div class="span9 scrollable">
-			<div class="setting-container active user" id="profile">
-				<h1>个人资料</h1>
-				<hr></hr>
-				<form id="email_form" method="post" action="/user/email">
-					<h3>修改邮箱</h3>
-					<fieldset>
-						<span>邮箱:</span><input type="email" name="email" placeholder="请在此输入您的新邮箱" required></input><br/>
-						<span>密码:</span><input type="password" name="email_pwd" placeholder="请在此输入您的密码" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" maxLength="30" required><span id="email_pwd_err" style="color:#f00;display:none;margin-left:10px">密码錯误</span></input><br/>
-						<input type="submit" class="btn" onclick="post_email()"></input>
-					</fieldset>
-				</form>
-				<hr></hr>
-				<form id="avatar_form" enctype="multipart/form-data" method="post" action="/user/avatar">
-					<h3>修改头像</h3>
-					<fieldset>
-						<table><tr><td><img id="setting-avatar-img" style="width:35px;height=35px;" src="{{ user.avatarurl }}"></img></td><td><input type="file" name="img" required></input></td><td><input type="submit" value="保存" class="btn" onclick="uploadAvatar()"></input></td></tr></table>
-					</fieldset>
-				</form>
-			</div>
-			<div class="setting-container user" id="security">
-				<h1>安全设置</h1>
-				<hr></hr>
-				<form id="pwd_form" method="post" action="/user/security">
-					<h3>修改密码</h3>
-					<fieldset>
-						<table>
-						<tr><td>密码:</td><td><input type="password" name="oldpwd" id="oldpwd" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" maxLength="30" placeholder="原密码" required><span id="pwd_err" style="color:#f00;display:none;margin-left:10px">密码錯误</span></input></td></tr>
-						<tr><td>新密码:</td><td><input type="password" name="newpwd" id="newpwd" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" maxLength="30" placeholder="新密码,数字字母与下划线,4-30字节" required></input></td></tr>
-						<tr><td>确认新密码:</td><td><input type="password" name="repwd" id="repwd" required></input></td></tr>
-						</table>
-						<input type="submit" class="btn" onclick="post_password()"></input>
-					</fieldset>
-				</form>
-			</div>
-			<div class="setting-container boss" id="restuarant-edit-view">
-				{% include 'restuarant_setting.html' %}
-			</div>
-			<div class="setting-container boss" id="menus-edit-view">
-				<table width="100%"><tr><td><h3>菜单资料</h3></td><td><a class="btn" style="float: right" onclick="newMenu();">新建菜单</a></td></tr></table>
-				<hr></hr>
-				<div id="setting-menus-form-container">
-					<a class="close" onclick="close_menu_form()">&times;</a>
-					<table>
-						<tr valign="top">
-							<td width="40%">
-								<form id="setting-menu-img-form" enctype="multipart/form-data" method="post" action="/api/menu/thumbnail">
-									<h3>缩略图</h3>
-									<fieldset>
-										<div class='menu-img-container thumbnail'><img id="setting-menu-img" class="menu-img"></div>
-										图片文件:<input type="file" name="imgfile" id="setting-menu-imgfile" onchange="onMenuImgChoose()"><br/>
-									</fieldset>
-								</form>
-							</td>
-							<td width="60%">
-								<form id="setting-menu-form" method="post" action="/api/menu/new">
-									<h3>菜单资料</h3>
-									<fieldset>
-										<span>名称:</span><input type="text" name="name" id="setting-menu-name" required></input><br/>
-										<span>描述:</span><input type="text" name="description" id="setting-menu-description" required></input><br/>
-										<span>价格:</span><input type="text" name="price" id="setting-menu-price" required></input><span class="add-on">￥</span><br/>
-										<span>折扣:</span><input type="number" min="1" max="10" step="0.1" name="discount" id="setting-menu-discount" value="10" required></input><br/>
-										<span>类型:</span><select type="text" name="mtype" id="setting-menu-mtype"></select><br/>
-										<span>口味:</span><select name="taste" id="rest-settting-taste">
-														    <option value="0" selected="selected">不辣
-														    <option value="1">辣
-														</select><br/>
-										<span>状态:</span><select name="state" id="rest-settting-state">
-														    <option value="0" selected="selected">售完
-														    <option value="1">在售
-														</select><br/>
-										<span>图片地址:</span><input type="text" name="thumbnail" id="setting-menu-imgurl" onkeyup="menu_img_change()" placeholder="如果选择了上传图片，此选项将被忽略"></input><br/>
-										<input type="submit" class="btn" onclick="uploadMenu()" value="保存"></input>
-									</fieldset>
-								</form>
-							</td>
-						</tr>
-					</table>
+			<div class="tab-content radius-border" style="padding: 10px;">
+				<div class="tab-pane fade active in user" id="profile">
+					<h3>个人资料</h3>
+					<hr></hr>
+					<form id="email_form" method="post" action="/user/email">
+						<h4>修改邮箱</h4>
+						<fieldset>
+							<span>邮箱:</span><input type="email" name="email" placeholder="请在此输入您的新邮箱" required></input><br/>
+							<span>密码:</span><input type="password" name="email_pwd" placeholder="请在此输入您的密码" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" maxLength="30" required><span id="email_pwd_err" style="color:#f00;display:none;margin-left:10px">密码錯误</span></input><br/>
+							<input type="submit" class="btn" onclick="post_email()"></input>
+						</fieldset>
+					</form>
+					<hr></hr>
+					<form id="avatar_form" enctype="multipart/form-data" method="post" action="/user/avatar">
+						<h4>修改头像</h4>
+						<fieldset>
+							<table><tr><td><img id="setting-avatar-img" style="width:35px;height=35px;" src="{{ user.avatarurl }}"></img></td><td><input type="file" name="img" required></input></td><td><input type="submit" value="保存" class="btn" onclick="uploadAvatar()"></input></td></tr></table>
+						</fieldset>
+					</form>
 				</div>
-				<div id="setting-menus-container"></div>
-			</div>
-			<div class="setting-container boss" id="boss-order-view">
-				<h4>订单列表</h4>
-				<div id="boss-order-item-container"></div>
+				<div class="tab-pane fade in user" id="security">
+					<h3>安全设置</h3>
+					<hr></hr>
+					<form id="pwd_form" method="post" action="/user/security">
+						<h4>修改密码</h4>
+						<fieldset>
+							<table>
+							<tr><td>密码:</td><td><input type="password" name="oldpwd" id="oldpwd" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" maxLength="30" placeholder="原密码" required><span id="pwd_err" style="color:#f00;display:none;margin-left:10px">密码錯误</span></input></td></tr>
+							<tr><td>新密码:</td><td><input type="password" name="newpwd" id="newpwd" pattern="^[a-zA-Z0-9][a-zA-Z0-9\_]{4,29}" maxLength="30" placeholder="新密码,数字字母与下划线,4-30字节" required></input></td></tr>
+							<tr><td>确认新密码:</td><td><input type="password" name="repwd" id="repwd" required></input></td></tr>
+							</table>
+							<input type="submit" class="btn" onclick="post_password()"></input>
+						</fieldset>
+					</form>
+				</div>
+				<div class="tab-pane fade in boss" id="restuarant-edit-view">
+					{% include 'restuarant_setting.html' %}
+				</div>
+				<div class="tab-pane fade in boss" id="menus-edit-view">
+					<table width="100%"><tr><td><h3>菜单资料</h3></td><td><a class="btn" style="float: right" onclick="newMenu();">新建菜单</a></td></tr></table>
+					<hr></hr>
+					<div id="setting-menus-form-container">
+						<a class="close" onclick="close_menu_form()">&times;</a>
+						<table>
+							<tr valign="top">
+								<td width="40%">
+									<form id="setting-menu-img-form" enctype="multipart/form-data" method="post" action="/api/menu/thumbnail">
+										<h3>缩略图</h3>
+										<fieldset>
+											<div class='menu-img-container thumbnail'><img id="setting-menu-img" class="menu-img"></div>
+											图片文件:<input type="file" name="imgfile" id="setting-menu-imgfile" onchange="onMenuImgChoose()"><br/>
+										</fieldset>
+									</form>
+								</td>
+								<td width="60%">
+									<form id="setting-menu-form" method="post" action="/api/menu/new">
+										<h3>菜单资料</h3>
+										<fieldset>
+											<span>名称:</span><input type="text" name="name" id="setting-menu-name" required></input><br/>
+											<span>描述:</span><input type="text" name="description" id="setting-menu-description" required></input><br/>
+											<span>价格:</span><input type="text" name="price" id="setting-menu-price" required></input><span class="add-on">￥</span><br/>
+											<span>折扣:</span><input type="number" min="1" max="10" step="0.1" name="discount" id="setting-menu-discount" value="10" required></input><br/>
+											<span>类型:</span><select type="text" name="mtype" id="setting-menu-mtype"></select><br/>
+											<span>口味:</span><select name="taste" id="rest-settting-taste">
+															    <option value="0" selected="selected">不辣
+															    <option value="1">辣
+															</select><br/>
+											<span>状态:</span><select name="state" id="rest-settting-state">
+															    <option value="0" selected="selected">售完
+															    <option value="1">在售
+															</select><br/>
+											<span>图片地址:</span><input type="text" name="thumbnail" id="setting-menu-imgurl" onkeyup="menu_img_change()" placeholder="如果选择了上传图片，此选项将被忽略"></input><br/>
+											<input type="submit" class="btn" onclick="uploadMenu()" value="保存"></input>
+										</fieldset>
+									</form>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div id="setting-menus-container"></div>
+				</div>
+				<div class="tab-pane fade in boss" id="boss-order-view">
+					<h3>订单列表</h3>
+					<hr></hr>
+					<div id="boss-order-item-container"></div>
+				</div>
 			</div>
 		</div>
 	</div>

@@ -120,12 +120,13 @@ class LocalRestaurants:
 
 class ViewRestuarant():
     def GET(self,id):
-        q = model.db.select('resetuarant',where='id=$id',vars=locals())
+        q = model.db.select('restuarant',where='id=$id',vars=locals())
         if len(q)>0:
             restuarant = q[0]
             rid = restuarant.id
             menutypes = [menutype for menutype in model.db.select('menutype',where='rid=$rid',vars=locals())]
             restuarant['menutypes'] = menutypes
+            restuarant.created_time = str(restuarant.created_time)
         return lunch.write_json({'result':True,'restuarant':restuarant})
     
 class ViewMenus():

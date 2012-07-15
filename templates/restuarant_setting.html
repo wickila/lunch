@@ -1,7 +1,7 @@
-<h1>店家资料</h1>
+<h3>店家资料</h3>
 <hr></hr>
 <form id="rest-setting-form" method="post" action="/restuarant/edit">
-	<h3>修改资料</h3>
+	<h4>修改资料</h4>
 	<fieldset>
 		<table>
 		<tr><td>名称:</td><td><input type="text" name="name" id="rest-setting-name" placeholder="店铺名称" required></input></td></tr>
@@ -15,11 +15,11 @@
 </form>
 <hr></hr>
 <form id="rest-avatar-form" enctype="multipart/form-data" method="post" action="/restuarant/avatar">
-	<h3>修改头像</h3>
+	<h4>修改头像</h4>
 	<fieldset>
 		<table><tr><td><img id="rest-avatar-img" style="width:35px;height=35px;" src="{{ user and user.avatar_url }}"></img></td><td><input type="file" name="img" id="rest-avatar-form-imgfile" onchange="onRestAvatarChange();" required></input></td><td><input type="submit" value="保存" class="btn" onclick="upload_rest_avatar()"></input></td></tr></table>
 	</fieldset>
 </form>
 <hr/>
-<h3>类别设置</h3>
+<h4>类别设置</h4>
 <table id="rest-menutype-setting"></table>

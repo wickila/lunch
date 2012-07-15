@@ -160,7 +160,9 @@ section{
 }
 
 #shoppingCart-container{
+	background-color: white;
 	position: fixed;
+	padding: 10px;
 	top: 40px;
 	transition: -webkit-transform 200ms ease-in-out;
 	-webkit-transition: -webkit-transform 200ms ease-in-out;
@@ -172,6 +174,10 @@ section{
 	-moz-transform: translate3d(0px, 0px, 0px);
 	-o-transform: translate3d(0px, 0px, 0px);
 	-ms-transform: translate3d(0px, 0px, 0px);
+}
+
+#shoppingCart-container ul{
+	margin: 10px;
 }
 
 #shopping-cart{
@@ -232,13 +238,39 @@ section{
 	margin-top: 5px;
 }
 
-.menus-filter-item span{
-	margin-right: 15px;
-	cursor: pointer;
+#rest-menus-head{
+	font-weight: bold;
+	font-size: 12pt;
+	border-bottom: solid thin #EEE;
+	margin-bottom: 5px;
+	padding-bottom: 5px;
+}
+
+#menus-filter{
+	margin-bottom: 10px;
+}
+
+.menus-filter-item{
+	border-bottom: solid thin #EEE;
+	font-size: 10pt;
+	color: gray;
+	font-weight: bold;
+}
+
+.menus-filter-item td{
+	padding: 5px 0 5px 0;
+}
+
+.menus-filter-item a{
+	margin-right: 10px;
+	padding: 2px 5px 2px 5px;
 }
 
 .menus-filter-item .select{
-	background-color: yellow;
+	background: #FFB27F;
+	border-radius: 3px;
+	text-decoration: none;
+	color: white;
 }
 
 .view-order-item{
@@ -286,6 +318,15 @@ section{
 .order-cancel-btn,.order-option-btn{
 	margin: 0px 10px 0px 10px;
 	float: right;
+}
+
+#user-leftbar{
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+#boss-order-item-container{
+	padding: 0 5px 0 5px;
 }
 
 .add-on{

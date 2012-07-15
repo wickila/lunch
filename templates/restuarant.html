@@ -7,7 +7,8 @@
 	    <div class="span9" id="rsm">
 	    	<div class="tab-content scrollable">
 		    	<div class="tab-pane fade active in" id="rest-menus-view">
-		    		<table id="menus-filter">
+		    		<div id="rest-menus-head"></div>
+		    		<table id="menus-filter" width="100%">
 		    		</table>
 		    		<div id="menus-wrapper"></div>
 		    	</div>
@@ -19,10 +20,10 @@
 							</div>
 						</div>
 						<div class="span5" style="min-height: 265px;">
-							<table cellpadding="1">
+							<table cellpadding="1" class='tooltip-enable'>
 								<tr valign="bottom"><td><span class="icon-home"></span></td><td class="rest-detail-td"><strong id="rest-name">rest.title</strong></td></tr>
 								<tr valign="bottom"><td><span class="icon-user"></span></td><td class="rest-detail-td"><span id="rest-username"></span></td></tr>
-								<tr valign="bottom"><td><span class="icon-tag"></span></td><td class="rest-detail-td"><span id="rest-minprice"></span></td></tr>
+								<tr valign="bottom"><td><span class="icon-tag"></span></td><td class="rest-detail-td"><a rel='tooltip' data-original-title="起送金额" style='text-decoration: none;cursor:default;color: black;'><span id="rest-minprice"></span>￥</a></td></tr>
 								<tr valign="bottom"><td><span class="icon-search"></span></td><td class="rest-detail-td">描述:</td></tr>
 								<tr><td></td><td class="rest-detail-td"><p id="rest-description"></p></td></tr>
 							</table>
@@ -33,26 +34,8 @@
 						<div class="span9">
 							<hr></hr>
 							<h1>comments are here</h1>
-								<div id="comments_container">
-								</div>
-							<hr/>
-							<form class="user" action="/comment" method="post">
-								<fieldset>
-									<textarea name="content" rows="7" cols="" placeholder="comment here" required autofocus style="width:99%"></textarea>
-									<input name="item_id" type="hidden" value="item.id">
-									<input class="btn" type="submit" value="提交" style="float:right;margin-right: 0px" onclick="commentsubmit();">
-								</fieldset>
-							</form>
-							<form id="loginform" style="display: none;" action="/signin" method="post">
-								<h1>Log In</h1>
-								<fieldset>
-									<input id="login-username" name="username" type="text" placeholder="Username" autofocus required>
-									<input id="login-password" name="password" type="password" placeholder="Password" required>
-									<input type="hidden" name="url" value=""></input>
-									<input class="btn" type="submit" value="登录" style="float:right;">
-								</fieldset>
-				    			<div class="alert alert-error" style="display: none"><span class="icon-warning-sign"></span>用戶名或密码错误</div>
-							</form>
+							<div id="comments_container">
+							</div>
 						</div>
 					</div>
 				</div>

@@ -1,12 +1,10 @@
 $(function(){
 	var menus;
 	
-	$('#user-leftbar li').live('click',function(e){
-		var link = $(this);
-		link.addClass('active').siblings().removeClass('active');
-		$('#'+link.data('sidebar')).addClass('active').siblings().removeClass('active');
-		switch(link.data('sidebar')){
-			case 'menus-edit-view':
+	$('#user-leftbar a').live('click',function(e){
+		var a = $(this);
+		switch(a.attr('href')){
+			case '#menus-edit-view':
 				if(!window.user.restuarant.menus){
 					$.ajax({
 						type: 'GET',
@@ -31,12 +29,11 @@ $(function(){
 						menus.setMenus(window.user.restuarant.menus);
 					}
 				}
-			case 'boss-order-view':
+			case '#boss-order-view':
 				if(!window.bossOrderView){
 					window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
 				}
 		}
-		e.preventDefault();
 	});
 	
 	function initEvents(){

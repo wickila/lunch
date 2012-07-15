@@ -11,6 +11,23 @@ $(function(){
 	window.restuarants = {}
 	window.currentRest = null;
 	window.orderMenus = [];//购物车里面的条目
+	if(CURRENT_REST_ID){
+		$.ajax({
+            type: 'GET',
+            url: '/api/resturant/view/'+CURRENT_REST_ID,
+            ContentType: "application/json",
+    		'success': function(data){
+    			if(data.result){
+    				var rest = data.restuarant;
+    				window.setCurrentRest(rest);
+    				window.changePage(2);
+    			}else{
+    				alert(data.message);
+    			}
+    		},
+    		'error': function(){alert('获取本地餐厅失败')}
+        });
+	}
 	getUser();
 	window.initialize =  function() {
 	    var latlng = new google.maps.LatLng(GEOCHAT_VARS['initial_latitude'], GEOCHAT_VARS['initial_longitude']);
@@ -293,7 +310,11 @@ $(function(){
 	              			{
 	              				rest = data.restuarants[i]
 	              				r = new Restuarant(rest);
-	              				if(window.user && window.user.username == rest.username){
+	              				if(CURRENT_REST_ID){
+	              					if(rest.id == CURRENT_REST_ID){
+	              						window.setCurrentRest(rest);
+	              					}
+	              				}else if(window.user && window.user.username == rest.username){
 	              					window.user.restuarant = rest;
 	              					window.setCurrentRest(rest);
 	              				}
@@ -382,11 +403,17 @@ $(function(){
 		  						rest.menus[i].num = 0;
 		  					}
 		  					$.setSideBarMenus(data.menus);
+		  					if(window.page == 2){
+		  						window.restView.setRest(window.currentRest)
+		  					}
 		          		},
 		          error: function(){alert('获取菜单失败')}
 		    });
 	  	}else{
 	  		$.setSideBarMenus(rest.menus);
+	  		if(window.page == 2){
+				window.restView.setRest(window.currentRest)
+			}
 	  	}
 	  	if(!window.currentRest.menutypes){
 	  		$.ajax({
@@ -395,6 +422,9 @@ $(function(){
 		          ContentType: "application/json",
 		          success: function(data){
 		  					rest.menutypes = data.menutypes;
+		  					if(window.page == 2){
+		  						window.restView.setRest(window.currentRest)
+		  					}
 		          		},
 		          error: function(){alert('获取菜单失败')}
 		    });
@@ -525,17 +555,13 @@ $(function(){
 	}
 	
 	window.updateShoppingCartNum = function(){
-//		$('.order-num').animate({ 
-//			  color:'white'
-//		 },  {duration: 100 , complete: function(){
-//				 $('.order-num').animate({color:'#999'},{duration: 100});
-//		     } 
-//		 })
 		$('.order-num').css('color','white');
 		$('.order-num').slideUp(200,function(){
 			$('.order-num').html(window.getShoppingCartNum());
 			$('.order-num').slideDown(200,function(){
-				setTimeout(function(){$('.order-num').css('color','#999');},20)
+				setTimeout(function(){
+					$('.order-num').css('color','');
+				},20)
 			});
 		})
 	}
@@ -584,12 +610,22 @@ $(function(){
 	window.showShoppingCart = function (){
 		window.shoppingCartShow = true;
 		setCss($('#shoppingCart-container'),'0px');
+		var modal = $("<div class='modal-backdrop fade in'></div>");
+		modal.css('opacity',0);
+		modal.css('transform','translate3d('+ (page-1) +'00%, 0px, 0px)');
+		modal.css('-webkit-transform','translate3d('+ (page-1) +'00%, 0px, 0px)');
+		modal.css('-moz-transform','translate3d('+ (page-1) +'00%, 0px, 0px)');
+		modal.css('-o-transform','translate3d('+ (page-1) +'00%, 0px, 0px)');
+		modal.css('-ms-transform','translate3d('+ (page-1) +'00%, 0px, 0px)');
+		$('#main').append(modal);
+		modal.animate({opacity:0.8},{duration:200})
 //		setCss($('.content'),$('#shoppingCart-container').height()+'px');
 	}
 	
 	window.hideShoppingCart = function (){
 		window.shoppingCartShow = false;
 		setCss($('#shoppingCart-container'),'-100%');
+		$('#main').find('.modal-backdrop').animate({opacity:0},{duration:200,complete:function(){$('#main').find('.modal-backdrop').remove()}});
 //		setCss($('.content'),'0px');
 	}
 	

@@ -14,6 +14,10 @@
         'marker': '/static/images/marker.png',
         'marker-restuarant': '/static/images/marker-lime.png'
       };
+      CURRENT_REST_ID = null;
+      {% if current_rest_id %}
+      	CURRENT_REST_ID = {{current_rest_id}}
+      {% endif %}
 </script>
 {% endblock %}
 {% block style %}
@@ -34,11 +38,12 @@
 			{% include 'setting.html' %}
 		</section>
 	</div>
-	<div id="shoppingCart-container" class="container">
+	<div id="shoppingCart-container" class="container radius-border">
 		<div>购物车(<span class="order-num">0</span>)</div>
+		<div id="shoppingCart-container-empty-tip"><hr></hr>您还没有点选任何食物哦</div>
 		<ul class="nav nav-tabs nav-stacked">
 	  	</ul>
-	  	<a id="shopping-cart-settle" class="btn" onclick="changePage(3);">结算</a>
+	  	<a id="shopping-cart-settle" class="btn btn-success" onclick="changePage(3);"><i class="icon-shopping-cart icon-white"></i>结算</a>
 	</div>
 	<div class="navbar navbar-fixed-bottom">
 		<div class="navbar-inner">
@@ -47,5 +52,5 @@
 			</div>
 		  </div>
 	</div>
-	<script type="text/javascript" src="static/js/index.js"></script>
+	<script type="text/javascript" src="/static/js/index.js"></script>
 {% endblock %}

@@ -1,9 +1,8 @@
 var RestSideBar = function(jqueryElement,rest){
 	var headDiv = "<div>"+
 				"<table>" +
-				"<tr><td rowspan='3'><img id='rsb-avatar' class='thumbnail small-avatar'></img></td><td><span id='rsb-name'></span></td></tr>" +
-				"<tr><td><span id='rsb-description'></span></td></tr>" +
-				"<tr><td><span id='rsb-thanks'></span></td></tr>" +
+				"<tr><td rowspan='3'><img id='rsb-avatar' class='small-avatar' style='padding: 0 10px 0 0;'></img></td><td><h4 id='rsb-name'></h4></td><td align='right' style='font-size: 10pt;'><span class='icon-heart'></span>谢谢:<span style='font-size: 11pt' id='rsb-thanks'></span></td></tr>" +
+				"<tr><td><span id='rsb-description' style='font-size: 10pt;color: gray;'></span></td></tr>" +
 				"</table></div><hr/>";
 	this.head = $(headDiv);
 	var bodyDiv ="<ul class='nav nav-tabs nav-stacked'>" +
@@ -61,9 +60,8 @@ Menu.prototype.getDiv = function(){
 							"<div class='thumbnail menu' data-mid='"+ this.menu.id +"'>" +
 							"<img class='menu-img' src='"+this.menu.thumbnail+"' alt='"+this.menu.name+"' data-mid='"+ this.menu.id +"'>" +
 							"</div>" +
+							"<p style='float:right' data-mid='"+ this.menu.id +"'>"+this.menu.price+"￥</p>" +
 							"<h5 data-mid='"+ this.menu.id +"'>"+this.menu.name+"</h5>" +
-							"<p data-mid='"+ this.menu.id +"'>"+this.menu.price+"</p>" +
-							
 					"</li>");
 	}
 	return this.div;
@@ -138,21 +136,21 @@ Menus.prototype.filter = function(filters){
 var MenuFilter = function(element,rest){
 	this.rest = rest;
 	this.element = element;
-	this.tastefilter = $("<tr class='menus-filter-item' id='menus-filter-taste'><td>口味:</td><td><span class='select'>全部</span><span data-filter-key='taste' data-filter-value='1'>辣</span><span data-filter-key='taste' data-filter-value='0'>不辣</span></td></tr>");
-	this.typefilter = $("<tr class='menus-filter-item' id='menus-filter-type'><td>类别:</td><td class='menus-filter-select-container'><span class='select'>全部</span></td></tr>");
+	this.tastefilter = $("<tr class='menus-filter-item' id='menus-filter-taste'><td width='7%'>口味:</td><td><a class='select'>全部</a><a data-filter-key='taste' data-filter-value='1'>辣</a><a data-filter-key='taste' data-filter-value='0'>不辣</a></td></tr>");
+	this.typefilter = $("<tr class='menus-filter-item' id='menus-filter-type'><td width='7%'>类别:</td><td class='menus-filter-select-container'><a class='select'>全部</a></td></tr>");
 	this.element.append(this.tastefilter);
 	this.element.append(this.typefilter);
 	var types = "";
 	for(var i in rest.menutypes){
 		menutype = rest.menutypes[i];
-		types += "<span data-filter-key='mtype' data-filter-value='"+menutype.id+"'>"+menutype.name+"</span>";
+		types += "<a data-filter-key='mtype' data-filter-value='"+menutype.id+"'>"+menutype.name+"</a>";
 	}
 	this.typefilter.find('.menus-filter-select-container').append($(types));
-	this.element.find('span').each(function(){
-		var span = $(this);
-		span.bind('click',function(){
+	this.element.find('a').each(function(){
+		var a = $(this);
+		a.bind('click',function(){
 			var filter = {};
-			$(this).parent().find('span').removeClass('select');
+			$(this).parent().find('a').removeClass('select');
 			$(this).addClass('select');
 			window.restView.menus.filter(window.restView.menusfilter.getFilter());
 		});
@@ -161,10 +159,10 @@ var MenuFilter = function(element,rest){
 
 MenuFilter.prototype.getFilter = function(){
 	this.filter = {};
-	this.element.find('span').each(function(){
-		var span = $(this);
-		if(span.hasClass('select')&&span.html()!='全部'){
-			window.restView.menusfilter.filter[span.data('filter-key')] = span.data('filter-value');
+	this.element.find('a').each(function(){
+		var a = $(this);
+		if(a.hasClass('select')&&a.html()!='全部'){
+			window.restView.menusfilter.filter[a.data('filter-key')] = a.data('filter-value');
 		}
 	});
 	return this.filter;
@@ -190,12 +188,14 @@ SmallMenu.prototype.getDiv = function(){
 var RestView = function(jqueryElement,rest){
 	this.jqueryElement = jqueryElement;
 	this.rest = rest;
+	$('#rest-menus-head').html(rest.name+'家的所有美味');
 	this.siderbar = new RestSideBar(jqueryElement.find('#rsb'),this.rest);
 	this.menus = new Menus(jqueryElement.find('#menus-wrapper'),rest.menus,true);
 	this.menusfilter = new MenuFilter(jqueryElement.find('#menus-filter'),rest);
 	$("#rest-detail").find("#rest-name").html(rest.name);
 	$("#rest-detail").find("#rest-username").html(rest.username);
 	$("#rest-detail").find("#rest-minprice").html(rest.minprice);
+	$("#rest-minprice").parent().attr('data-original-title','起送金额:'+rest.minprice+'￥');
 	$("#rest-detail").find("#rest-description").html(rest.description);
 	$('#rest-detail').find('.rest-thumbnail').attr('src',rest.avatarurl);
 };
@@ -205,10 +205,12 @@ RestView.prototype.setRest = function(rest){
 	this.siderbar.setRest(rest);
 	this.menus.setMenus(rest.menus);
 	this.menusfilter.dispose();
+	$('#rest-menus-head').html(rest.name+'家的所有美味');
 	this.menusfilter = new MenuFilter(this.jqueryElement.find('#menus-filter'),rest);
 	$("#rest-detail").find("#rest-name").html(rest.name);
 	$("#rest-detail").find("#rest-username").html(rest.username);
 	$("#rest-detail").find("#rest-minprice").html(rest.minprice);
+	$("#rest-minprice").parent().attr('data-original-title','起送金额:'+rest.minprice+'￥');
 	$("#rest-detail").find("#rest-description").html(rest.description);
 	$('#rest-detail').find('.rest-thumbnail').attr('src',rest.avatarurl);
 };
@@ -219,7 +221,7 @@ RestView.prototype.getRest = function(){
 
 var ShoppingCartRest = function(rest){
 	this.rest = rest;
-	var head = "<li data-rid='"+ rest.id +"'><a style='cursor: pointer;'>"+ rest.name + "(<span class='shopping-cart-rest-order-menus-num'>" + getOrderMenusNum(rest.orderMenus) + "</span>)<strong class='shopping-cart-close' style='float: right;'>&times</strong></a></li>";
+	var head = "<li data-rid='"+ rest.id +"'><a style='cursor: pointer;'>"+ rest.name + "(<span class='shopping-cart-rest-order-menus-num'>" + getOrderMenusNum(rest.orderMenus) + "</span>)<i class='shopping-cart-close icon-remove-sign' style='float: right;'></i></a></li>";
 	var body = "<table width='100%' class='shopping-cart-menus' id='shopping-cart-menus-"+ rest.id +"'></table>";
 	this.head = $(head);
 	this.body = $(body);
@@ -246,7 +248,7 @@ ShoppingCartRest.prototype.creatMenuElement = function(m){
 						"<td width='50%' class='shopping-cart-menu-name'>"+ m.name +"</td>" +
 						"<td width='30%' class='shopping-cart-menu-price'>"+ m.price +"￥</td>" +
 						"<td width='10%' class='shopping-cart-menu-num'>"+ m.num +"</td>" +
-						"<td class='shopping-cart-menu-option'><strong class='shopping-cart-menu-reduce'>-</strong><strong class='shopping-cart-menu-plus'>+</strong><strong class='shopping-cart-menu-close'>&times</strong></td>" +
+						"<td class='shopping-cart-menu-option'><i class='shopping-cart-menu-reduce icon-minus'>-</i><i class='shopping-cart-menu-plus icon-plus'></i><i class='shopping-cart-menu-close icon-remove'></i></td>" +
 					"</tr>";
 	orderMenu = $(orderMenu);
 	orderMenu.find('.shopping-cart-menu-close').bind('click',this.onMenuClose);
@@ -376,6 +378,7 @@ ShoppingCart.prototype.addMenu = function(m){
 		this.rests.push(rest);
 	}
 	$('#shopping-cart-settle').show();
+	$('#shoppingCart-container-empty-tip').hide();
 }
 
 ShoppingCart.prototype.removeMenu = function(m){
@@ -396,6 +399,7 @@ ShoppingCart.prototype.removeMenu = function(m){
 	}
 	if(window.orderMenus.length == 0){
 		$('#shopping-cart-settle').hide();
+		$('#shoppingCart-container-empty-tip').show();
 	}
 }
 
