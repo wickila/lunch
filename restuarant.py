@@ -71,3 +71,25 @@ class Avatar:
                 web.header('Content-Type', 'application/json')
                 return lunch.write_json(pydic)
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class Comments:
+    def GET(self,id):
+        data = web.input()
+        page_count=10
+        try:
+            page = int(data.page)
+        except:
+            page = 1
+        sql = "select * from comment where rid=%d order by id desc LIMIT %d, %d" % (int(id),(page-1)*page_count,page_count)
+        comments = model.db.query(sql)
+        cmts = []
+        for comment in comments:
+            u = model.db.query("select avatarurl from user where username='%s'" % comment.username)
+            avatarurl = ''
+            if len(u) > 0:
+                u = u[0]
+                avatarurl = u.avatarurl
+            comment.createdtime = str(comment.createdtime)
+            comment['avatarurl'] = avatarurl
+            cmts.append(comment)
+        return lunch.write_json({'result':True,'message':'success','comments':cmts})

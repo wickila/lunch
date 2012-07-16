@@ -1,8 +1,8 @@
-var RestSideBar = function(jqueryElement,rest){
+var RestSideBar = function(jqueryElement){
 	var headDiv = "<div>"+
-				"<table>" +
+				"<table width='100%'>" +
 				"<tr><td rowspan='3'><img id='rsb-avatar' class='small-avatar' style='padding: 0 10px 0 0;'></img></td><td><h4 id='rsb-name'></h4></td><td align='right' style='font-size: 10pt;'><span class='icon-heart'></span>谢谢:<span style='font-size: 11pt' id='rsb-thanks'></span></td></tr>" +
-				"<tr><td><span id='rsb-description' style='font-size: 10pt;color: gray;'></span></td></tr>" +
+				"<tr><td colspan='2'><span id='rsb-description' style='font-size: 10pt;color: gray;'></span></td></tr>" +
 				"</table></div><hr/>";
 	this.head = $(headDiv);
 	var bodyDiv ="<ul class='nav nav-tabs nav-stacked'>" +
@@ -10,14 +10,11 @@ var RestSideBar = function(jqueryElement,rest){
 			"<li><a href='#rest-wrapper' data-toggle='tab'>店铺资料</a></li>" +
 			"</ul>";
 	this.body = $(bodyDiv);
-	this.setRest(rest);
 	jqueryElement.append(this.head);
 	jqueryElement.append(this.body);
 	var lis=this.body.find('li');
 	this.body.find('li').bind('click',function(e){
 		var link = $(this);
-//		link.addClass('active').siblings().removeClass('active');
-//		$('#'+link.data('sidebar')).addClass('active').siblings().removeClass('active');
 		switch(link.find('a').attr('href')){
 			case '#rest-menus-view':
 				if(window.restView.getRest != window.currentRest){
@@ -36,14 +33,6 @@ RestSideBar.prototype.setRest = function(rest){
 	this.head.find('#rsb-name').html(rest.name);
 	this.head.find('#rsb-description').html(rest.description);
 	this.head.find('#rsb-thanks').html(rest.thanks);
-};
-
-RestSideBar.prototype.edit = function(){
-	
-};
-
-RestSideBar.prototype.save = function(){
-	
 };
 
 var Menu = function(menu){
@@ -187,33 +176,55 @@ SmallMenu.prototype.getDiv = function(){
 
 var RestView = function(jqueryElement,rest){
 	this.jqueryElement = jqueryElement;
-	this.rest = rest;
-	$('#rest-menus-head').html(rest.name+'家的所有美味');
-	this.siderbar = new RestSideBar(jqueryElement.find('#rsb'),this.rest);
-	this.menus = new Menus(jqueryElement.find('#menus-wrapper'),rest.menus,true);
-	this.menusfilter = new MenuFilter(jqueryElement.find('#menus-filter'),rest);
-	$("#rest-detail").find("#rest-name").html(rest.name);
-	$("#rest-detail").find("#rest-username").html(rest.username);
-	$("#rest-detail").find("#rest-minprice").html(rest.minprice);
-	$("#rest-minprice").parent().attr('data-original-title','起送金额:'+rest.minprice+'￥');
-	$("#rest-detail").find("#rest-description").html(rest.description);
-	$('#rest-detail').find('.rest-thumbnail').attr('src',rest.avatarurl);
+	this.siderbar = new RestSideBar(jqueryElement.find('#rsb'));
+	this.menus = new Menus(jqueryElement.find('#menus-wrapper'),null,true);
+	this.setRest(rest);
 };
 
 RestView.prototype.setRest = function(rest){
+	if(this.rest == rest)return;
 	this.rest = rest;
 	this.siderbar.setRest(rest);
 	this.menus.setMenus(rest.menus);
-	this.menusfilter.dispose();
-	$('#rest-menus-head').html(rest.name+'家的所有美味');
+	if(this.menusfilter)this.menusfilter.dispose();
 	this.menusfilter = new MenuFilter(this.jqueryElement.find('#menus-filter'),rest);
+	$('#rest-menus-head').html(rest.name+'家的所有美味');
+	$('.rest-comment-title').html(rest.name+'家的所有评论')
 	$("#rest-detail").find("#rest-name").html(rest.name);
 	$("#rest-detail").find("#rest-username").html(rest.username);
 	$("#rest-detail").find("#rest-minprice").html(rest.minprice);
 	$("#rest-minprice").parent().attr('data-original-title','起送金额:'+rest.minprice+'￥');
 	$("#rest-detail").find("#rest-description").html(rest.description);
 	$('#rest-detail').find('.rest-thumbnail').attr('src',rest.avatarurl);
+	this.getComments(1);
 };
+
+RestView.prototype.getComments = function(page){
+	if(page==1)$('#comments_container').empty();
+	$.ajax({
+	      type: 'GET',
+	      url: '/api/restuarant/comments/'+this.rest.id,
+	      scope:this,
+	      ContentType: "application/json",
+	      data:{
+				page:1
+			},
+		  success: function(data){
+						if(data.result){
+							for(var i in data.comments){
+								comment = $(this.scope.createComment(data.comments[i]));
+								$('#comments_container').append(comment);
+								comment.show(500);
+							}
+						}
+					},
+	      error: function(){alert('获取评论失败');}
+	    });
+}
+
+RestView.prototype.createComment = function(data){
+	return "<div class='comment'><table style='width:100%'><tr><td rowspan='2' valign='top' style='width:35px'><img class='avatar' src='"+data.avatarurl+"'></img></td><td align='left'><p class='comment_content'>"+data.content+"</p></td></tr><tr><td align='right'><div style='float:right;margin:-10px 0px 0 0'>by <strong>"+data.username+"</strong><span class='comment-time'>@"+data.createdtime+"</span></div></td></tr></table></div>";
+}
 
 RestView.prototype.getRest = function(){
 	return this.rest;
@@ -221,12 +232,20 @@ RestView.prototype.getRest = function(){
 
 var ShoppingCartRest = function(rest){
 	this.rest = rest;
-	var head = "<li data-rid='"+ rest.id +"'><a style='cursor: pointer;'>"+ rest.name + "(<span class='shopping-cart-rest-order-menus-num'>" + getOrderMenusNum(rest.orderMenus) + "</span>)<i class='shopping-cart-close icon-remove-sign' style='float: right;'></i></a></li>";
-	var body = "<table width='100%' class='shopping-cart-menus' id='shopping-cart-menus-"+ rest.id +"'></table>";
+	var head = "<li data-rid='"+ rest.id +"'><a style='cursor: pointer;'>"+ rest.name + "(<span class='shopping-cart-rest-order-menus-num'>" + getOrderMenusNum(rest.orderMenus) + "</span>份)<i class='shopping-cart-close icon-remove-sign' style='float: right;'></i><button class='btn btn-primary btn-mini'>取消</button><button class='btn btn-danger btn-mini'>删除"+rest.name+"家的所有订餐</button></a></li>";
+	var body = "<table width='99%' class='shopping-cart-menus' id='shopping-cart-menus-"+ rest.id +"'></table>";
 	this.head = $(head);
 	this.body = $(body);
 	this.body.hide();
-	this.head.find('.shopping-cart-close').bind('click',this.onClose);
+	this.head.find('.shopping-cart-close').bind('click',$.proxy(function(){
+		this.head.find('.shopping-cart-close').hide(100);
+		this.head.find('.btn').show(100);
+	},this));
+	this.head.find('.btn-danger').bind('click',this.onClose);
+	this.head.find('.btn-primary').bind('click',$.proxy(function(){
+		this.head.find('.shopping-cart-close').show(100);
+		this.head.find('.btn').hide(100);
+	},this));
 	for(var i in rest.orderMenus){
 		var m = rest.orderMenus[i];
 		this.creatMenuElement(m);
@@ -247,8 +266,8 @@ ShoppingCartRest.prototype.creatMenuElement = function(m){
 	var orderMenu = "<tr class='shopping-cart-menu' id='shopping-cart-menu-"+m.id+"' data-mid='"+ m.id +"'>" +
 						"<td width='50%' class='shopping-cart-menu-name'>"+ m.name +"</td>" +
 						"<td width='30%' class='shopping-cart-menu-price'>"+ m.price +"￥</td>" +
-						"<td width='10%' class='shopping-cart-menu-num'>"+ m.num +"</td>" +
-						"<td class='shopping-cart-menu-option'><i class='shopping-cart-menu-reduce icon-minus'>-</i><i class='shopping-cart-menu-plus icon-plus'></i><i class='shopping-cart-menu-close icon-remove'></i></td>" +
+						"<td width='10%'><span class='shopping-cart-menu-num'>"+ m.num +"</span>份</td>" +
+						"<td class='shopping-cart-menu-option'><strong class='close shopping-cart-menu-close'>&times</strong><strong class='close shopping-cart-menu-plus'>+</strong><strong class='close shopping-cart-menu-reduce'>-</strong></td>" +
 					"</tr>";
 	orderMenu = $(orderMenu);
 	orderMenu.find('.shopping-cart-menu-close').bind('click',this.onMenuClose);
@@ -322,7 +341,7 @@ ShoppingCartRest.prototype.onMenuReduce = function(){
 var ShoppingCart = function(jqueryElement){
 	this.jqueryElement = jqueryElement;
 	this.rests = [];
-	$('#shoppingCart-container').css('top',$('.navbar-fixed-top').height());
+	$('#shoppingCart-container').css('top',$('.navbar-fixed-top').height()+10);
 	$('#shoppingCart-container').css('left',($(window).width()-$('#shoppingCart-container').width())*0.5);
 	
 	$('#shoppingCart-container li').live('click',function(e){
@@ -338,7 +357,6 @@ var ShoppingCart = function(jqueryElement){
 	};
 
 	$('#shoppingCart-container')[0].ondragenter = function(ev) {
-		window.lunchAlert('dragenter');
 		this.style.color = "#ff0000";
 		return true;
 	};
@@ -407,7 +425,6 @@ var Concacts = function(user,rid){
 	this.element = $("<div class='concacts-container'></div>");
 	this.user = user;
 	var concactsItemContainer = this.concacts = $("<div class='concacts-item-container' data-rid='"+rid+"'></div>");
-	this.showFormBtn = $("<a id='add-concact-btn' class='btn'>添加联系方式<a>");
 	this.element.append(this.concacts);
 	if(user.concacts){
 		setConcacts(user.concacts);
@@ -444,8 +461,8 @@ var Concacts = function(user,rid){
 			}
 		}
 		if(concacts.length == 0){
-			var elm = $("<p class='concact-item' id='blank-concact-item'><a class='concact-item-plus'>您还没有任何联系方式，请点击添加联系方式</a></p>");
-			elm.append($("<a style='float:right' class='btn concact-item-plus'><i class='icon-plus'></i></a>"));
+			var elm = $("<p class='concact-item' id='blank-concact-item'><span><a class='concact-item-plus'>您还没有任何联系方式，请点击添加联系方式</a></span></p>");
+			elm.append($("<div class='btn-group' style='float:right;margin-top: -5px;'><a class='btn concact-item-plus'><i class='icon-plus'></i></a><div>"));
 			concactsItemContainer.append(elm);
 		}
 	}
@@ -455,7 +472,7 @@ function initEvents(){
 	$('.concact-item-plus').live('click',function(){
 		var element = $(this).parent().parent().parent();
 		var form = $("<form id='concact-form' method='post' action='/api/concact/new'>" +
-						"<h3>添加联系方式</h3>" +
+						"<h4>添加联系方式</h4>" +
 						"<table>" +
 						"<tr><td>联系人:</td><td><input type='text' id='concact-form-concactname' name='concactname' required></input></td></tr>" +
 						"<tr><td>电话:</td><td><input type='text' id='concact-form-phone' name='phone' required></input></td></tr>" +
@@ -638,6 +655,10 @@ var NewOrderItem = function(rest,index){
 
 NewOrderItem.prototype.postOrder = function(){
 	var concact = this.concacts.getConcact();
+	if(!concact){
+		alert('请填写联系方式!');
+		return;
+	}
 	var rid = this.rest.id;
 	var m = this.element.find('#order-message');
     var message = this.element.find('#order-message').val();
@@ -865,6 +886,28 @@ ViewOrderItem.prototype.onButtonClick = function(){
 			case '确认收货':
 				option = 3;
 				break;
+			case '评论':
+				option = 4;
+				$('#commentOrderModal').modal('show');
+				$('#order-commment-orderid').val(this.order.id);
+				$('#order-comment-thanks').attr('max',Math.ceil(this.order.price/10));
+				$('#order-comment-thanks').val(Math.ceil(this.order.price/10));
+				window.onOrderComment = function(){
+					$('#order-comment-form').ajaxForm({
+						'scope':this,
+						'dataType': 'json',
+						'success':function(data){
+							if(data.result){
+								$('#commentOrderModal').modal('hide');
+								lunchAlert('评论成功');
+							}else{
+								lunchAlert(data.message);
+							}
+						}
+					});
+				}
+				return;
+				break;
 		}
 		$.ajax({
 		      type: 'POST',
@@ -899,8 +942,10 @@ ViewOrderItem.prototype.updateView = function(){
 			this.element.find('.order-option-btn').html('已确认').addClass('disabled').removeClass('btn-primary');
 		}else if(this.order.state == 2){
 			this.element.find('.order-option-btn').html('确认收货').removeClass('disabled').addClass('btn-primary');
+		}else if(this.order.state == 3){
+			this.element.find('.order-option-btn').html('评论').addClass('btn-primary').removeClass('disabled');
 		}else{
-			this.element.find('.order-option-btn').html('已结算').addClass('disabled').removeClass('btn-primary');
+			this.element.find('.order-option-btn').html('已评论').addClass('disabled').removeClass('btn-primary');
 		}
 	}else{
 		if(this.order.state == -1){
@@ -916,8 +961,11 @@ ViewOrderItem.prototype.updateView = function(){
 		}else if(this.order.state == 2){
 			this.element.find('.order-option-btn').html('已发货');
 			this.element.find('.order-option-btn').addClass('disabled').removeClass('btn-primary');
-		}else{
+		}else if(this.order.state == 3){
 			this.element.find('.order-option-btn').html('已结算');
+			this.element.find('.order-option-btn').addClass('disabled').removeClass('btn-primary');
+		}else{
+			this.element.find('.order-option-btn').html('已评论');
 			this.element.find('.order-option-btn').addClass('disabled').removeClass('btn-primary');
 		}
 	}
@@ -1006,7 +1054,6 @@ ViewOrderView.prototype.setPage = function(scope){
 	    						}
 	    						item.dispose();
 	    					}
-	    					data.orders.reverse();
 	    					for(var i in data.orders){
 	    						var order = data.orders[i];
 	    						order.concact = JSON.parse(order.concact);
@@ -1020,10 +1067,17 @@ ViewOrderView.prototype.setPage = function(scope){
 	    						orderItem.setOrder(order);
 	    						this.scope.items.push(orderItem);
 	    					}
-    						this.scope.totalPage = Math.ceil(data.total/10);
+    						this.scope.totalPage = Math.ceil(data.total/5);
     						this.scope.controller.find('.total-page').html(this.scope.totalPage);
     						this.scope.controller.find('.page').html(this.scope.page);
-    						if(!this.scope.disposed && this.scope.tyoe == 'boss'){
+    						if(!this.scope.disposed && this.scope.type == 'boss'){
+    							if(data.hasNew){
+    	    						playSound();
+    	    						lunchAlert('<a>恭喜你收到新订单！<a>',function(){
+    	    							changePage(4);
+    	    							$('#settting-left-bar-bossorder').find('a').click();
+    	    						});
+    	    					}
     							setTimeout(this.scope.setPage,5000,this.scope);
     						}
 	    				}else{

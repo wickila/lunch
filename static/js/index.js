@@ -23,12 +23,11 @@ $(function(){
 		}
 		window.page = page;
 		window.hideShoppingCart();
-		$('#main').css('-webkit-transition','-webkit-transform 200ms ease-in-out')
-		$('#main').css('transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
-		$('#main').css('-webkit-transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
-		$('#main').css('-moz-transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
-		$('#main').css('-o-transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
-		$('#main').css('-ms-transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
+		$('#main').css('transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-webkit-transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-moz-transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-o-transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-ms-transform','translate('+ (1-page) +'00%, 0px)');
 		window.updateView();
 	}
 	window.date = new Date();
@@ -48,11 +47,11 @@ $(function(){
 			window.speed = Math.abs(evt.clientX - window.orignClientX)/((new Date()).getTime()-window.dragStartTime);
 			window.maxSpeed = window.maxSpeed<window.speed?window.speed:window.maxSpeed;
 			var x = ((1-page)+(evt.clientX - window.orignClientX)/$(window).width())*100;
-			$('#main').css('transform','translate3d('+ x +'%, 0px, 0px)');
-			$('#main').css('-webkit-transform','translate3d('+ x +'%, 0px, 0px)');
-			$('#main').css('-moz-transform','translate3d('+ x +'%, 0px, 0px)');
-			$('#main').css('-o-transform','translate3d('+ x +'%, 0px, 0px)');
-			$('#main').css('-ms-transform','translate3d('+ x +'%, 0px, 0px)');
+			$('#main').css('transform','translate('+ x +'%, 0px)');
+			$('#main').css('-webkit-transform','translate('+ x +'%, 0px)');
+			$('#main').css('-moz-transform','translate('+ x +'%, 0px)');
+			$('#main').css('-o-transform','translate('+ x +'%, 0px)');
+			$('#main').css('-ms-transform','translate('+ x +'%, 0px)');
 			x = (evt.clientX - window.orignClientX)/$(window).width()*100;
 			if(Math.abs(x)>60||window.maxSpeed>1){
 				window.changePage(window.page-(x/Math.abs(x)));
@@ -63,11 +62,11 @@ $(function(){
 	});
 	$('#main').bind('mouseup',function(evt){
 		window.isDragging = false;
-		$('#main').css('transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
-		$('#main').css('-webkit-transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
-		$('#main').css('-moz-transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
-		$('#main').css('-o-transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
-		$('#main').css('-ms-transform','translate3d('+ (1-page) +'00%, 0px, 0px)');
+		$('#main').css('transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-webkit-transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-moz-transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-o-transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-ms-transform','translate('+ (1-page) +'00%, 0px)');
 		evt.preventDefault();
 	})
 	
@@ -82,8 +81,13 @@ $(function(){
 	window.updateView = function(){
 		if(window.viewOrderView)window.viewOrderView.dispose();
 		window.viewOrderView = null;
-		if(window.bossOrderView)window.bossOrderView.dispose();
-		window.bossOrderView = null;
+//		if(window.bossOrderView)window.bossOrderView.dispose();
+//		window.bossOrderView = null;
+		if(!window.bossOrderView){
+			if(window.user && window.user.restuarant){
+				window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
+			}
+		}
 		switch(window.page){
 			case 1:
 				creatShoppingCart();
@@ -124,9 +128,6 @@ $(function(){
 						$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
 					}
 					$('#show-login-tip').hide();
-					if(!window.bossOrderView){
-						window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
-					}
 					if(!window.menutypeSetting){
 						window.menutypeSetting = new MenuTypeSetting();
 					}
@@ -159,4 +160,8 @@ $(function(){
 	      selector: "a[rel=tooltip]"
 	    });
 	window.hideShoppingCart();
+	
+	$('.modal').on('shown',function(){
+		$(this).find('input:first').focus();
+	});
 });

@@ -2,7 +2,8 @@
 <div class="content container" id="restview">
 	<div class="container-fluid">
 	  <div class="row-fluid">
-	    <div class="span3" id="rsb">
+	    <div class="span3">
+	    	<div id="rsb"></div>
 	    </div>
 	    <div class="span9" id="rsm">
 	    	<div class="tab-content scrollable">
@@ -12,14 +13,14 @@
 		    		</table>
 		    		<div id="menus-wrapper"></div>
 		    	</div>
-		    	<div class="tab-pane fade" id="rest-wrapper">
-		    		<div id="rest-detail" class="row">
+		    	<div class="tab-pane fade radius-border" id="rest-wrapper" style="padding: 10px">
+		    		<div id="rest-detail" class="row-fluid">
 			    		<div class="span3">
 							<div class="thumbnail-container">
 								<img class="rest-thumbnail" src="http://www.dennisandmcgregor.co.uk/product_images/78-1-l.png"></img>
 							</div>
 						</div>
-						<div class="span5" style="min-height: 265px;">
+						<div class="span9">
 							<table cellpadding="1" class='tooltip-enable'>
 								<tr valign="bottom"><td><span class="icon-home"></span></td><td class="rest-detail-td"><strong id="rest-name">rest.title</strong></td></tr>
 								<tr valign="bottom"><td><span class="icon-user"></span></td><td class="rest-detail-td"><span id="rest-username"></span></td></tr>
@@ -30,10 +31,9 @@
 						</div>
 					</div>
 					
-					<div class="row">
-						<div class="span9">
-							<hr></hr>
-							<h1>comments are here</h1>
+					<div class="row-fluid">
+						<div class="span12">
+							<h3 class="rest-comment-title">comments are here</h3>
 							<div id="comments_container">
 							</div>
 						</div>

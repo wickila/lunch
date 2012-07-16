@@ -316,6 +316,11 @@ $(function(){
 	              					}
 	              				}else if(window.user && window.user.username == rest.username){
 	              					window.user.restuarant = rest;
+	              					if(!window.bossOrderView){
+	              						if(window.user && window.user.restuarant){
+	              							window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
+	              						}
+	              					}
 	              					window.setCurrentRest(rest);
 	              				}
 	              			}
@@ -372,6 +377,11 @@ $(function(){
 	    				if(window.user.restuarant == undefined){
 	    					window.user.restuarant = data.restuarant;
 	    					window.setCurrentRest(data.restuarant);
+	    					if(!window.bossOrderView){
+	    						if(window.user && window.user.restuarant){
+	    							window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
+	    						}
+	    					}
 	    				}
 	    				$('#rest-setting-name').val(window.user.restuarant.name);
 	    				$('#rest-settting-type').val(window.user.restuarant.rtype);
@@ -608,24 +618,18 @@ $(function(){
 	window.shoppingCartShow = true;
 	
 	window.showShoppingCart = function (){
+		if(window.page==3){
+			lunchAlert('此界面不允许操作购物车');
+			return;
+		}
 		window.shoppingCartShow = true;
 		setCss($('#shoppingCart-container'),'0px');
-		var modal = $("<div class='modal-backdrop fade in'></div>");
-		modal.css('opacity',0);
-		modal.css('transform','translate3d('+ (page-1) +'00%, 0px, 0px)');
-		modal.css('-webkit-transform','translate3d('+ (page-1) +'00%, 0px, 0px)');
-		modal.css('-moz-transform','translate3d('+ (page-1) +'00%, 0px, 0px)');
-		modal.css('-o-transform','translate3d('+ (page-1) +'00%, 0px, 0px)');
-		modal.css('-ms-transform','translate3d('+ (page-1) +'00%, 0px, 0px)');
-		$('#main').append(modal);
-		modal.animate({opacity:0.8},{duration:200})
 //		setCss($('.content'),$('#shoppingCart-container').height()+'px');
 	}
 	
 	window.hideShoppingCart = function (){
 		window.shoppingCartShow = false;
-		setCss($('#shoppingCart-container'),'-100%');
-		$('#main').find('.modal-backdrop').animate({opacity:0},{duration:200,complete:function(){$('#main').find('.modal-backdrop').remove()}});
+		setCss($('#shoppingCart-container'),'-110%');
 //		setCss($('.content'),'0px');
 	}
 	
@@ -638,11 +642,11 @@ $(function(){
 	}
 	
 	function setCss(element,num){
-		element.css('transform','translate3d(0px,'+ num +', 0px)');
-		element.css('-webkit-transform','translate3d(0px,'+ num +', 0px)');
-		element.css('-moz-transform','translate3d(0px,'+ num +', 0px)');
-		element.css('-o-transform','translate3d(0px,'+ num +', 0px)');
-		element.css('-ms-transform','translate3d(0px,'+ num +', 0px)');
+		element.css('transform','translate(0px,'+ num +')');
+		element.css('-webkit-transform','translate(0px,'+ num +')');
+		element.css('-moz-transform','translate(0px,'+ num +')');
+		element.css('-o-transform','translate(0px,'+ num +')');
+		element.css('-ms-transform','translate(0px,'+ num +')');
 	}
 	
 	function updateLayout(){

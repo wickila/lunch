@@ -60,7 +60,7 @@ CHARACTER SET utf8
 
 CREATE TABLE `lunch`.`lunchorder` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `uername` TEXT  NOT NULL,
+  `uesrname` TEXT  NOT NULL,
   `concact` TEXT  NOT NULL,
   `bossusername` TEXT  NOT NULL,
   `restname` TEXT  NOT NULL,
@@ -68,9 +68,10 @@ CREATE TABLE `lunch`.`lunchorder` (
   `cancelreason` TEXT  NOT NULL,
   `createdtime` TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modifiedtime` TEXT  NOT NULL,
-  `state` INT NOT NULL COMMENT = '-1:canceled, 0:wait for ensure, 1:ensured, 2:delivery, 3:settled',
+  `state` INT NOT NULL COMMENT = '-1:canceled, 0:wait for ensure, 1:ensured, 2:delivery, 3:settled, 4:commented',
   `menus` TEXT  NOT NULL,
   `price` FLOAT  NOT NULL,
+  `isnew` BOOL  NOT NULL,
   PRIMARY KEY (`id`)
 )
 ENGINE = MyISAM
@@ -92,6 +93,19 @@ CREATE TABLE `lunch`.`menutype` (
   `name` TEXT  NOT NULL,
   `username` TEXT  NOT NULL,
   `rid` INT  NOT NULL,
+  PRIMARY KEY (`id`)
+)
+ENGINE = MyISAM
+CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE TABLE `lunch`.`comment` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `username` TEXT  NOT NULL,
+  `orderid` INT UNSIGNED NOT NULL,
+  `rid` INT UNSIGNED NOT NULL,
+  `content` TEXT  NOT NULL,
+  `thanks` INT  NOT NULL,
+  `createdtime` TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 )
 ENGINE = MyISAM

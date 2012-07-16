@@ -19,13 +19,20 @@
 	<script type="text/javascript">
 		window.initialize =  function() {
 	  	}
-		window.lunchAlert = function(message){
+		window.lunchAlert = function(message,callback){
 			$('#alert-message').html(message);
+			if(callback){
+				$('#alert-message').find('a').bind('click',callback);
+			}
 			$('.alert').slideDown(200);
 			setTimeout(function(){$('.alert').slideUp(200);},2500);
 		}
 		window.closeTip = function(){
 			$('.alert').hide();
+		}
+		function playSound(){
+			var sound=$('#new-order-sound');
+			$('#new-order-sound').get(0).play();
 		}
 	</script>
 	</head>
@@ -40,7 +47,7 @@
 					</form>
 					<ul class="nav pull-right">
 						<li><a id="nav-shopping-cart-btn" onclick="toggleShoppingCart()"><i class="icon-shopping-cart icon-white" style="margin-right: 5px"></i>购物车(<span class="order-num">0</span>)</a></li>
-						<li><a onclick="lunchAlert('asdf')"  rel="tooltip" data-original-title="首页">首页</a></li>
+						<li><a onclick="playSound()"  rel="tooltip" data-original-title="首页">首页</a></li>
 					</ul>
 					<ul id="nav-right" class="nav pull-right">
 						{% if user %}
@@ -81,5 +88,6 @@
 		  </div>
 		<button class="change-page-btn" id="left-btn" onclick="changePage(window.page-1)"><</button>
 		<button class="change-page-btn" id="right-btn" onclick="changePage(window.page+1)">></button>
+		<audio id="new-order-sound" src="/static/sound/neworder.mp3"></audio>
 	</body>
 </html>

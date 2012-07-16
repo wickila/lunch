@@ -26,6 +26,7 @@ urls = (
 	'/restuarant/new','restuarant.New',
 	'/restuarant/edit','restuarant.Edit',
 	'/restuarant/avatar','restuarant.Avatar',
+	'/api/restuarant/comments/(.*)','restuarant.Comments',
 	'/api/localrestuarants','api.LocalRestaurants',
 	'/api/resturant/view/(.*)','api.ViewRestuarant',
 	'/api/resturant/menus/(.*)','api.ViewMenus',
@@ -49,6 +50,7 @@ urls = (
 	'/api/order/get/(.*)','api.GetOrder',
 	'/api/order/view/user','api.ViewUserOrders',
 	'/api/order/view/boss','api.ViewBossOrders',
+	'/api/order/comment','api.OrderComment'
 )
 
 app = web.application(urls, globals())

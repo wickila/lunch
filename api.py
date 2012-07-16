@@ -14,6 +14,7 @@ import config
 import json
 from geo import geohash
 import datetime
+import math
 
 class CheckLogin:
     def GET(self):
@@ -287,6 +288,8 @@ class NewOrder():
         post_data = web.input()
         if user:
             concact = post_data.concact
+            if not concact:
+                return lunch.write_json({'result':False,'message':'invlid concact'})
             rid = post_data.rid
             message = post_data.message
             state = 0
@@ -368,9 +371,9 @@ class ViewUserOrders():
             page = int(post_data.page)
         except:
             page = 1
-        page_count = 10
+        page_count = 5
         if user:
-            sql = "select * from lunchorder where username='%s' LIMIT %d, %d" % (user.username,(page-1)*page_count,page*page_count)
+            sql = "select * from lunchorder where username='%s' order by id desc LIMIT %d, %d" % (user.username,(page-1)*page_count,page_count)
             orders = model.db.query(sql)
             total = len(model.db.query("select * from lunchorder where username='%s'" % user.username))
             ods = []
@@ -388,14 +391,41 @@ class ViewBossOrders():
             page = int(post_data.page)
         except:
             page = 1
-        page_count = 10
+        page_count = 5
         if user and user.permission>0:
-            sql = "select * from lunchorder where bossusername='%s' LIMIT %d, %d" % (user.username,(page-1)*page_count,page*page_count)
+            sql = "select * from lunchorder where bossusername='%s' order by id desc LIMIT %d, %d" % (user.username,(page-1)*page_count,page_count)
             total = len(model.db.query("select id from lunchorder where bossusername='%s'" % user.username))
             orders = model.db.query(sql)
             ods = []
+            hasNew = False
             for order in orders:
                 order.createdtime = str(order.createdtime)
+                if (not hasNew) and (not order.isnew):
+                    hasNew = True
+                    model.db.update('lunchorder',where='bossusername=$user.username',isnew=1,vars=locals())
                 ods.append(order)
-            return lunch.write_json({'result':True,'message':'seccuss','orders':ods,'total':total})
+            return lunch.write_json({'result':True,'message':'seccuss','orders':ods,'total':total,'hasNew':hasNew})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class OrderComment():
+    def POST(self):
+        user = lunch.get_current_user()
+        post_data = web.input()
+        oid = int(post_data.orderid)
+        content = post_data.content
+        thanks = int(post_data.thanks)
+        if user:
+            orders = model.db.select('lunchorder',where='id=$oid',vars=locals())
+            if len(orders)>0:
+                order = orders[0]
+                if order.username == user.username:
+                    rest = model.db.query("select * from restuarant where name='%s' and username='%s'"%(order.restname,order.bossusername))[0]
+                    if order.state == 3 or thanks>math.ceil(order.price/10):
+                        model.db.update('lunchorder',where='id=$oid',state=4,vars=locals())
+                        model.db.insert('comment',username=user.username,orderid=oid,content=content,thanks=thanks,rid=rest.id)
+                        model.db.update('restuarant',where='id=$rest.id',thanks=rest.thanks+thanks,vars=locals())
+                        return lunch.write_json({'result':True,'message':'success'})
+                    return lunch.write_json({'result':False,'message':'invalid option'})
+                return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+            return lunch.write_json({'result':False,'message':'invalid order'})
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
