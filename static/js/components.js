@@ -192,8 +192,15 @@ RestView.prototype.setRest = function(rest){
 	$('.rest-comment-title').html(rest.name+'家的所有评论')
 	$("#rest-detail").find("#rest-name").html(rest.name);
 	$("#rest-detail").find("#rest-username").html(rest.username);
+	$("#rest-detail").find("#rest-createdtime").html(rest.created_time.split(' ')[0]);
+	$("#rest-detail").find("#rest-telephone").html(rest.telephone);
 	$("#rest-detail").find("#rest-minprice").html(rest.minprice);
+	$("#rest-detail").find("#rest-maxdistance").html(rest.maxdistance);
+	$("#rest-detail").find("#rest-starttime").html(rest.starttime);
+	$("#rest-detail").find("#rest-endtime").html(rest.endtime);
 	$("#rest-minprice").parent().attr('data-original-title','起送金额:'+rest.minprice+'￥');
+	$("#rest-maxdistance").parent().attr('data-original-title','配送范围:'+rest.maxdistance+'米');
+	$("#rest-starttime").parent().attr('data-original-title','送餐时间:'+rest.starttime+'至'+rest.endtime);
 	$("#rest-detail").find("#rest-description").html(rest.description);
 	$('#rest-detail').find('.rest-thumbnail').attr('src',rest.avatarurl);
 	this.getComments(1);
@@ -396,6 +403,7 @@ ShoppingCart.prototype.addMenu = function(m){
 		this.rests.push(rest);
 	}
 	$('#shopping-cart-settle').show();
+	$('#shopping-cart-ride').show();
 	$('#shoppingCart-container-empty-tip').hide();
 }
 
@@ -417,6 +425,7 @@ ShoppingCart.prototype.removeMenu = function(m){
 	}
 	if(window.orderMenus.length == 0){
 		$('#shopping-cart-settle').hide();
+		$('#shopping-cart-ride').hide();
 		$('#shoppingCart-container-empty-tip').show();
 	}
 }
@@ -641,11 +650,16 @@ var NewOrderItem = function(rest,index){
 	this.concacts = new Concacts(window.user,rest.id);
 	this.message = $("<p>附加留言</p><textarea id='order-message' rows='4'></textarea>");
 	this.btn = $("<a class='btn' data-rid='"+this.rest.id+"' style='float:right'>确认订单</a>");
+	this.rideBtn = $("<p style='float:right;margin-top: 8px;'><a class='btn' data-rid='"+this.rest.id+"' style='margin: -8px 30px 0 0;'>搭顺风车</a><span class='add-on'>@</span><input type='text' name='name'></input><p>");
 	this.element.append(this.head);
 	this.element.append(this.body);
 	this.element.append(this.concacts.element);
 	this.element.append(this.message);
-	this.element.append(this.btn);
+	if(window.rideOrder){
+		this.element.append(this.rideBtn);
+	}else{
+		this.element.append(this.btn);
+	}
 	this.btn.bind('click',this.ensureOrder);
 	for(var i in rest.orderMenus){
 		var menu = "<tr><td width='50%'>"+rest.orderMenus[i].name+"</td><td width='30%'>"+rest.orderMenus[i].num+"</td><td align='right'>"+rest.orderMenus[i].price+"￥</td></tr>";

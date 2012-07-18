@@ -112,10 +112,8 @@ $(function(){
 		$('#setting-menus-container').slideDown();
 	}
 	
-	window.menu_img_change = function(){
-		var s = $('#setting-menu-imgurl').val();
-		var l = s.length;
-		$('#setting-menu-imgfile')[0].disabled = l > 0;
+	window.menu_img_change = function(event){
+		$('#setting-menu-img-modal-internet').attr('src',$("#setting-menu-img-modal-input-internet").val());
 	}
 	
 	window.uploadMenu = function(){
@@ -124,7 +122,7 @@ $(function(){
 			'success':function(data){
 				menu = data.menu
 				$('#setting-menu-img-form').attr('action','/api/menu/thumbnail/'+menu.id);
-				if($('#setting-menu-imgfile').val()){
+				if($('#setting-menu-img-file-modal').val()){
 					$('#setting-menu-img-form').ajaxForm({
 						'dataType': 'json',
 						'success':function(data){
@@ -168,8 +166,8 @@ $(function(){
 	}
 	
 	window.onMenuImgChoose = function(){
-		var viewFiles = document.getElementById("setting-menu-imgfile");
-	    var viewImg = document.getElementById("setting-menu-img");
+		var viewFiles = document.getElementById("setting-menu-img-file-modal");
+	    var viewImg = document.getElementById("setting-menu-img-modal");
 		var file = viewFiles.files[0];
 	    //通过file.size可以取得图片大小
         var reader = new FileReader();

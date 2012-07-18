@@ -41,10 +41,13 @@ class Edit():
         adress = user_data.adress
         phone = user_data.phone
         minprice = int(user_data.minprice)
+        maxdistance = int(user_data.maxdistance)
+        starttime = user_data.starttime
+        endtime = user_data.endtime
         user = lunch.get_current_user()
         if user and user.permission > 0:
             username = user.username
-            rid = model.db.update('restuarant',where='username=$username',name=name,rtype=rtype,description=description,adress=adress,telephone=phone,minprice=minprice,vars=locals())
+            rid = model.db.update('restuarant',where='username=$username',name=name,rtype=rtype,description=description,adress=adress,telephone=phone,minprice=minprice,maxdistance=maxdistance,starttime=starttime,endtime=endtime,vars=locals())
             r = model.db.select('restuarant',where='username=$username',vars=locals())[0]
             r.created_time = str(r.created_time)
             return lunch.write_json({'result':True,'message':'modified success!','restuarant':r})

@@ -30,6 +30,12 @@ $(function(){
 		$('#main').css('-ms-transform','translate('+ (1-page) +'00%, 0px)');
 		window.updateView();
 	}
+	
+	window.gotoCharge = function(rideOrder){
+		window.rideOrder=rideOrder;
+		$('#orderview-left-ensure-order').click();
+		changePage(3);
+	}
 	window.date = new Date();
 	$('#main').bind('mousedown',function(evt){
 		if(evt.which == 1&&$(evt.target).children().length>0){
@@ -126,6 +132,9 @@ $(function(){
 						$("#rest-setting-phone").val(window.user.restuarant.telephone);
 						$("#rest-setting-des").val(window.user.restuarant.description);
 						$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
+						$('#rest-maxdistance').val(window.user.restuarant.maxdistance);
+						$('#rest-starttime').val(window.user.restuarant.starttime);
+						$('#rest-endtime').val(window.user.restuarant.endtime);
 					}
 					$('#show-login-tip').hide();
 					if(!window.menutypeSetting){
@@ -164,4 +173,48 @@ $(function(){
 	$('.modal').on('shown',function(){
 		$(this).find('input:first').focus();
 	});
+	$('#select-thumbnail-modal').on('shown',function(){
+		if(!window.thumbnails){
+			$.ajax({
+		          type: 'GET',
+		          url: '/api/thumbnaillib',
+		          ContentType: "application/json",
+		          success: function(data){
+		  					if(data.result){
+		  						window.thumbnails = data.thumbnails;
+		  						for(var i in window.thumbnails){
+		  							$('#thumb-lib').find('.thumbnails').append($("<li class='span2'>"+
+		  																		"<a href='#' class='thumbnail'><img src='"+window.thumbnails[i].src+"' alt='"+window.thumbnails[i].name+"'></a>"+
+		  																		"<h5>"+window.thumbnails[i].name+"</h5>"+
+		  																		"</li>"));
+		  						}
+		  						$('#select-thumbnail-modal').css('width',($('#select-thumbnail-modal').find('.span2').width()+parseInt($('#select-thumbnail-modal').find('.span2').css('margin-left').split('px')[0]))*3+10)
+		  						$('#thumb-lib .thumbnail').bind('click',function(){
+		  							$('#thumb-lib .thumbnail').removeClass('select')
+		  							$(this).addClass('select');
+//		  							$('#setting-menu-imgurl').val($(this).attr('src'));
+		  							$('#setting-menu-img').attr('src',$(this).find('img').attr('src'));
+		  							$('#thumb-lib').data('selected-src',$(this).find('img').attr('src'))
+		  						});
+		  					}
+		          		},
+		          error: function(){alert('获取菜单失败')}
+		    });
+		}
+	});
+	$('#select-thumbnail-btn').bind('click',function(){
+		if($('#thumb-lib').hasClass('active')){
+			$('#setting-menu-imgurl').val($('#thumb-lib').data('selected-src'));
+			$('#setting-menu-img-form').get(0).reset();
+			$('#setting-menu-img').attr('src',$('#thumb-lib').data('selected-src'));
+		}else if($('#thumb-upload').hasClass('active')){
+			$('#setting-menu-img').attr('src',$('#setting-menu-img-modal').attr('src'));
+			$('#setting-menu-imgurl').val('');
+		}else{
+			$('#setting-menu-imgurl').val($('#setting-menu-img-modal-internet').attr('src'));
+			$('#setting-menu-img').attr('src',$('#setting-menu-img-modal-internet').attr('src'));
+			$('#setting-menu-img-form').get(0).reset();
+		}
+		$('#select-thumbnail-modal').modal('hide');
+	})
 });

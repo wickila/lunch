@@ -33,6 +33,9 @@ CREATE TABLE `lunch`.`restuarant` (
   `adress` TEXT  NOT NULL,
   `telephone` TEXT  NOT NULL,
   `thanks` INT  NOT NULL,
+  `maxdistance` INT,
+  `starttime` TEXT,
+  `endtime` TEXT,
   `created_time` TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 )
@@ -68,7 +71,7 @@ CREATE TABLE `lunch`.`lunchorder` (
   `cancelreason` TEXT  NOT NULL,
   `createdtime` TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modifiedtime` TEXT  NOT NULL,
-  `state` INT NOT NULL COMMENT = '-1:canceled, 0:wait for ensure, 1:ensured, 2:delivery, 3:settled, 4:commented',
+  `state` INT NOT NULL COMMENT '-1:canceled, 0:wait for ensure, 1:ensured, 2:delivery, 3:settled, 4:commented',
   `menus` TEXT  NOT NULL,
   `price` FLOAT  NOT NULL,
   `isnew` BOOL  NOT NULL,
@@ -105,6 +108,19 @@ CREATE TABLE `lunch`.`comment` (
   `rid` INT UNSIGNED NOT NULL,
   `content` TEXT  NOT NULL,
   `thanks` INT  NOT NULL,
+  `createdtime` TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+)
+ENGINE = MyISAM
+CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE TABLE `lunch`.`message` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `sender` TEXT  NOT NULL,
+  `receiver` TEXT  NOT NULL,
+  `messagetype` INT UNSIGNED NOT NULL COMMENT '0:system message, 1:ride message, 2:normal user message',
+  `content` TEXT  NOT NULL,
+  `state` INT NOT NULL COMMENT '0:unread, 1:read',
   `createdtime` TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 )

@@ -10,6 +10,7 @@ $(function(){
 	
 	window.restuarants = {}
 	window.currentRest = null;
+	var PERSISSION = 15;
 	window.orderMenus = [];//购物车里面的条目
 	if(CURRENT_REST_ID){
 		$.ajax({
@@ -32,7 +33,7 @@ $(function(){
 	window.initialize =  function() {
 	    var latlng = new google.maps.LatLng(GEOCHAT_VARS['initial_latitude'], GEOCHAT_VARS['initial_longitude']);
 	    var myOptions = {
-	      zoom: 12,
+	      zoom: PERSISSION,
 	      center: latlng,
 	      mapTypeId: google.maps.MapTypeId.ROADMAP
 	    };
@@ -167,14 +168,23 @@ $(function(){
       title:this.info.name,
       icon:image
     });
+    this.circle = new google.maps.Circle({
+    	  map: map,
+    	  strokeColor: '#999999',
+    	  strokeWeight: '1',
+    	  radius: this.info.maxdistance,
+    	  fillColor: '#aaaaaa'
+    	});
+    this.circle.bindTo('center', this.marker, 'position');
+    this.circle.setVisible(false);
     this.menus = [];
     
     this.marker.setMap(map);
     window.restuarants[this.id] = this;
     google.maps.event.addListener(this.marker, 'click', function() {
     	var rest = restuarants[this.id];
-    	setCurrentRest(rest.info);
         map.panTo(this.getPosition());
+        setCurrentRest(rest.info);
     });
   };
   /**
@@ -276,7 +286,7 @@ $(function(){
 					data = eval(data);
 					if(data.result){
 						r = new Restuarant(data.rest);
-						map.setCenter(new google.maps.LatLng(data.rest.lat,data.rest.lng), 13);
+						map.setCenter(new google.maps.LatLng(data.rest.lat,data.rest.lng), PERSISSION);
 						$('#myModal').modal('hide');
 						window.lunchAlert("您已经成功新开一家店铺啦，点击<a onclick='changePage(4)'>此处</a>可以修改店铺的基本资料哦");
 					}
@@ -295,7 +305,7 @@ $(function(){
 //	            latitude = latlng.lat();
 //	            longitude = latlng.lng();
 //	          }
-	          map.setCenter(new google.maps.LatLng(latitude, longitude), 13);
+	          map.setCenter(new google.maps.LatLng(latitude, longitude), PERSISSION);
 	          $.ajax({
 	              type: 'GET',
 	              url: '/api/localrestuarants',
@@ -359,12 +369,13 @@ $(function(){
 	}
 	
 	window.getRestuarant = function(){
-		if(window.user && window.user.permission>0 && window.user.restuarant!=undefined){
+		if(window.user && window.user.permission>0 && window.user.restuarant==undefined){
 			for(id in window.restuarants){
 				var rest = window.restuarants[id].info;
 				if(rest.username == window.user.username){
 					window.user.restuarant = rest;
 					window.setCurrentRest(rest);
+					updateUserInfoView();
 					return;
 				}
 			}
@@ -377,20 +388,8 @@ $(function(){
 	    				if(window.user.restuarant == undefined){
 	    					window.user.restuarant = data.restuarant;
 	    					window.setCurrentRest(data.restuarant);
-	    					if(!window.bossOrderView){
-	    						if(window.user && window.user.restuarant){
-	    							window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
-	    						}
-	    					}
 	    				}
-	    				$('#rest-setting-name').val(window.user.restuarant.name);
-	    				$('#rest-settting-type').val(window.user.restuarant.rtype);
-	    				$('#rest-setting-des').val(window.user.restuarant.description);
-	    				$('#rest-setting-addres').val(window.user.restuarant.adress);
-	    				$('#rest-setting-phone').val(window.user.restuarant.telephone);
-	    				$('#rest-setting-minprice').val(window.user.restuarant.minprice);
-	    				$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
-	    				$('#setting-avatar-img').attr('src',window.user.avatarurl);
+	    				updateUserInfoView();
 	    			}
 	    		},
 	    		error: function(){alert('获取餐厅信息失败')}
@@ -398,9 +397,47 @@ $(function(){
 		}
 	}
 	
+	window.updateUserInfoView = function(){
+		if(window.user){
+			if(window.user.restuarant){
+				$('#rest-setting-name').val(window.user.restuarant.name);
+				$('#rest-settting-type').val(window.user.restuarant.rtype);
+				$('#rest-setting-des').val(window.user.restuarant.description);
+				$('#rest-setting-addres').val(window.user.restuarant.adress);
+				$('#rest-setting-phone').val(window.user.restuarant.telephone);
+				$('#rest-setting-minprice').val(window.user.restuarant.minprice);
+				$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
+				$('#setting-avatar-img').attr('src',window.user.avatarurl);
+			}
+			if(!window.bossOrderView){
+				if(window.user && window.user.restuarant){
+					window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
+				}
+			}
+		}else{
+			$('#rest-setting-name').val("");
+			$('#rest-settting-type').val('');
+			$('#rest-setting-des').val('');
+			$('#rest-setting-addres').val('');
+			$('#rest-setting-phone').val('');
+			$('#rest-setting-minprice').val('');
+			$('#rest-avatar-img').attr('src','');
+			$('#setting-avatar-img').attr('src','');
+			if(window.bossOrderView){
+				window.bossOrderView.dispose();
+				window.bossOrderView = null;
+			}
+		}
+	}
+	
 	  window.setCurrentRest = function(rest){
 		if(window.currentRest == rest)return;
+		for(var i in window.restuarants){
+	        	window.restuarants[i].circle.setVisible(false);
+	        }
+		window.restuarants[rest.id].circle.setVisible(true);
 		window.currentRest = rest;
+		map.panTo(new google.maps.LatLng(rest.lat,rest.lng), PERSISSION);
 	  	$.setSideBarRest(rest);
 	  	if(!window.currentRest.menus){
 	  		$.ajax({
@@ -509,8 +546,9 @@ $(function(){
     				$('.user-login').removeClass('user-login');
     				$('.boss-login').addClass('boss');
 					$('.boss-login').removeClass('boss-login');
-					$('#bottom-nav-user').html('游客');
+//					$('#bottom-nav-user').html('游客');
 					window.updateView();
+					window.updateUserInfoView();
 				}else{
 					alert(data.message);
 				}

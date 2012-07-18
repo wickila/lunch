@@ -3,10 +3,11 @@
 <div class="container content">
 	<p id='show-login-tip'>您还没有登录，请先<a data-toggle='modal' data-target='#signup'>注册</a>或<a data-toggle='modal' data-target='#login'>登录</a></p>
 	<div class="row-fluid">
-		<div class="span3">
+		<div class="span3 user">
 			<ul class="nav nav-list radius-border" id="user-leftbar">
 				<li class="nav-header user"><h4>个人设置</h4></li>
-				<li class="user active"><a href="#profile" data-toggle="tab"><i class="icon-user"></i>个人资料</a></li>
+				<li class="user active"><a href="#message" data-toggle="tab"><i class="icon-envelope"></i>消息中心</a></li>
+				<li class="user"><a href="#profile" data-toggle="tab"><i class="icon-user"></i>个人资料</a></li>
 				<li class="user"><a href="#security" data-toggle="tab"><i class="icon-lock"></i>安全设置</a></li>
 				<li class="nav-header boss"><h4>店铺设置</h4></li>
 				<li class="boss"><a href="#restuarant-edit-view" data-toggle="tab"><i class="icon-home"></i>店铺资料</a></li>
@@ -14,9 +15,14 @@
 				<li class="boss" id="settting-left-bar-bossorder"><a href="#boss-order-view" data-toggle="tab"><i class="icon-file"></i>店家订单</a></li>
 			</ul>
 		</div>
-		<div class="span9 scrollable">
+		<div class="span9 scrollable user">
 			<div class="tab-content radius-border" style="padding: 10px;">
-				<div class="tab-pane fade active in user" id="profile">
+				<div class="tab-pane fade active in user" id="message">
+					<h3>消息中心</h3>
+					<hr></hr>
+					<div id="setting-message-item-container"></div>
+				</div>
+				<div class="tab-pane fade in user" id="profile">
 					<h3>个人资料</h3>
 					<hr></hr>
 					<form id="email_form" method="post" action="/user/email">
@@ -61,13 +67,11 @@
 						<table>
 							<tr valign="top">
 								<td width="40%">
-									<form id="setting-menu-img-form" enctype="multipart/form-data" method="post" action="/api/menu/thumbnail">
 										<h3>缩略图</h3>
 										<fieldset>
 											<div class='menu-img-container thumbnail'><img id="setting-menu-img" class="menu-img"></div>
-											图片文件:<input type="file" name="imgfile" id="setting-menu-imgfile" onchange="onMenuImgChoose()"><br/>
 										</fieldset>
-									</form>
+										<a class="btn" data-toggle="modal" data-target="#select-thumbnail-modal">选择图片</a>
 								</td>
 								<td width="60%">
 									<form id="setting-menu-form" method="post" action="/api/menu/new">
@@ -86,7 +90,7 @@
 															    <option value="0" selected="selected">售完
 															    <option value="1">在售
 															</select><br/>
-											<span>图片地址:</span><input type="text" name="thumbnail" id="setting-menu-imgurl" onkeyup="menu_img_change()" placeholder="如果选择了上传图片，此选项将被忽略"></input><br/>
+											<input type="hidden" name="thumbnail" id="setting-menu-imgurl"></input><br/>
 											<input type="submit" class="btn" onclick="uploadMenu()" value="保存"></input>
 										</fieldset>
 									</form>

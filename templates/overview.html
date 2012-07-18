@@ -11,10 +11,43 @@
 	    </div>
 	  </div>
 	</div>
-	
 	<div class="container-fluid">
-	  <div class="row-fluid">
-	    <div id="main-info-container" class="radius-border">赞助点把</div>
+	  <div id="main-info-container" class="row-fluid radius-border">
+	    <div class="span2" id="main-info-view-left">
+	    	<ul class="nav nav-list">
+			  <li class="active">
+			    <a href="#about-us-view" data-toggle="tab">关于我们</a>
+			  </li>
+			  <li>
+			    <a href="#concact-us-view" data-toggle="tab">联系我们</a>
+			  </li>
+			  <li>
+			    <a href="#apply-open-shop-view" data-toggle="tab">申请开店</a>
+			  </li>
+			  <li>
+			    <a href="#donate-view" data-toggle="tab">赞助我们</a>
+			  </li>
+			</ul>
+		</div>
+		<div class="span10">
+			<div class="tab-content scrollable">
+		    	<div class="tab-pane fade active in" id="about-us-view">
+		    		我们只做小事儿
+		    	</div>
+		    	<div class="tab-pane fade in" id="concact-us-view">
+		    		gzswicki@gmail.com
+		    	</div>
+		    	<div class="tab-pane fade in" id="apply-open-shop-view">
+		    		<form id="apply-open-shop-form" method="POST" action="/api/restuarant/apply">
+		    			店名:<input type="text" name="restname"><br>
+		    			地址:<input type="text" name="adress"></input><br>
+		    			电话:<input type="" name="phone"></input><br>
+		    		</form>
+		    	</div>
+		    	<div class="tab-pane fade in" id="donate-view">
+		    	</div>
+		    </div>
+		</div>
 	  </div>
 	</div>
 </div>

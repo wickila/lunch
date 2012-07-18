@@ -429,3 +429,15 @@ class OrderComment():
                 return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
             return lunch.write_json({'result':False,'message':'invalid order'})
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class ThumbnailLib:
+    def GET(self):
+        user = lunch.get_current_user()
+        if user and user.permission>0:
+            thumbnails = []
+            rootdir = "./static/img/thumbnails"
+            for parent, dirnames, filenames in os.walk(rootdir):
+                for filename in filenames:
+                    thumbnails.append({'src':'/static/img/thumbnails/'+filename,'name':filename})
+            return lunch.write_json({'result':True,'thumbnails':thumbnails})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})

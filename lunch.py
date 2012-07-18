@@ -50,7 +50,8 @@ urls = (
 	'/api/order/get/(.*)','api.GetOrder',
 	'/api/order/view/user','api.ViewUserOrders',
 	'/api/order/view/boss','api.ViewBossOrders',
-	'/api/order/comment','api.OrderComment'
+	'/api/order/comment','api.OrderComment',
+	'/api/thumbnaillib','api.ThumbnailLib'
 )
 
 app = web.application(urls, globals())

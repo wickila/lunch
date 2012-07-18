@@ -58,7 +58,7 @@ a{
 	cursor: pointer;
 }
 .user,.boss{
-	display: none;
+	display: none!important;
 }
 
 .setting-container{

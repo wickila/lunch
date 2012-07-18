@@ -106,6 +106,20 @@ section{
 	margin: 10px 0px 10px 0px;
 }
 
+#main-info-view-left{
+	height: 100%;
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 100%;
+	border-right: solid 1px #AAA;
+}
+
+#main-info-view-left ul{
+	padding: 10px;
+	margin: 10px;
+}
+
 .order-item{
 	color: #555;
 	padding: 10px 10px 50px 10px;
@@ -265,6 +279,12 @@ section{
 	margin: 0 10px 10px 0;
 }
 
+#shopping-cart-ride{
+	float: right;
+	display: none;
+	margin: 0 10px 10px 0;
+}
+
 .menu-close-btn{
 	position: relative;
 	float: right;
@@ -377,6 +397,10 @@ section{
 
 #boss-order-item-container{
 	padding: 0 5px 0 5px;
+}
+
+.thumbnails .select{
+	border: 1px solid #88f;
 }
 
 .add-on{
