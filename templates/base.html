@@ -8,12 +8,12 @@
 	<link rel="stylesheet" href="/static/css/lunch.css" type="text/css" charset="utf-8">
 	{% block style%}
 	{% endblock %}
-	<script type="text/javascript" src="/static/js/components.js"></script>
 	<script type="text/javascript" src="/static/js/jquery.js"></script>
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript" src="/static/js/jquery.form.js"></script>
-	<script type="text/javascript" src="/static/js/bootstrap.js"></script>
+	<script type="text/javascript" src="/static/js/components.js"></script>
+	<script type="text/javascript" src="https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=false"></script>
 	<script type="text/javascript" src="/static/js/lunch.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.js"></script>
 	{% block script %}
 	{% endblock %}
 	<script type="text/javascript">
@@ -42,9 +42,17 @@
 				<div class="container">
 					<a class="brand" href="/">Lunch</a>
 					<form class="navbar-search pull-left">
-					  <input type="text" class="search-query" placeholder="Search">
-					  <button type="submit" class="btn">搜索</button>
-					</form>
+			            <input type="text" class="search-query span2" placeholder="Search"  onkeypress="return event.keyCode != 13">
+			        </form>
+                	<ul class="nav">
+			            <li class="dropdown">
+			              <a href="#" class="dropdown-toggle" data-toggle="dropdown">搜索<b class="caret"></b></a>
+			              <ul class="dropdown-menu">
+			              	<li onclick="search('adress');"><a>搜索地址</a></li>
+			                <li onclick="search('shop');"><a href="#">搜索店铺</a></li>
+			              </ul>
+			            </li>
+			        </ul>
 					<ul class="nav pull-right">
 						<li><a id="nav-shopping-cart-btn" onclick="toggleShoppingCart()"><i class="icon-shopping-cart icon-white" style="margin-right: 5px"></i>购物车(<span class="order-num">0</span>)</a></li>
 						<li><a onclick="playSound()"  rel="tooltip" data-original-title="首页">首页</a></li>
@@ -70,21 +78,16 @@
 		{% include 'modal.html' %}
 		<div id="content">
 			{% block content %}this is the defualt content{% endblock %}
-			<footer class="footer">
-				{% block footer %}
-				{% endblock %}
-			</footer>
+			<div id="site-nav-container" class="nav-collapse">
+				<a href="#" id="bottom-nav-overview" class="bottom-nav-a" onclick="changePage(1);" rel="tooltip" data-original-title="首页"></a>
+				<a id="bottom-nav-restview" class="bottom-nav-a" onclick="changePage(2);" rel="tooltip" data-original-title="店铺"></a>
+				<a id="bottom-nav-orderview" class="bottom-nav-a" onclick="changePage(3);" rel="tooltip" data-original-title="订单"></a>
+				<a id="bottom-nav-user"  class="bottom-nav-a" onclick="changePage(4);" rel="tooltip" data-original-title="管理"></a>
+			</div>
 		</div>
-		<div id="site-nav-container" class="nav-collapse" style="">
-			<a href="#" id="bottom-nav-overview" class="bottom-nav-a" onclick="changePage(1);" rel="tooltip" data-original-title="首页"></a>
-			<a id="bottom-nav-restview" class="bottom-nav-a" onclick="changePage(2);" rel="tooltip" data-original-title="店铺"></a>
-			<a id="bottom-nav-orderview" class="bottom-nav-a" onclick="changePage(3);" rel="tooltip" data-original-title="订单"></a>
-			{% if user %}
-				<a id="bottom-nav-user"  class="bottom-nav-a" onclick="changePage(4);" rel="tooltip" data-original-title="管理"></a>
-			{% else %}
-				<a id="bottom-nav-user"  class="bottom-nav-a" onclick="changePage(4);" rel="tooltip" data-original-title="管理"></a>
-			{% endif %}
-		  </div>
+		<div id="loading" class="progress progress-striped active">
+		  <div class="bar" style="width: 1%;"></div>
+		</div>
 		<!-- <button class="change-page-btn" id="left-btn" onclick="changePage(window.page-1)"><</button>
 		<button class="change-page-btn" id="right-btn" onclick="changePage(window.page+1)">></button>
 		<audio id="new-order-sound" src="/static/sound/neworder.mp3"></audio> -->

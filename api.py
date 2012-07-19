@@ -441,3 +441,27 @@ class ThumbnailLib:
                     thumbnails.append({'src':'/static/img/thumbnails/'+filename,'name':filename})
             return lunch.write_json({'result':True,'thumbnails':thumbnails})
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class SearchRestuarant:
+    def GET(self):
+        data = web.input()
+        restname = data.restname
+        rests = model.db.select('restuarant',where='name=restname',vars=locals())
+        restuarants = []
+        for restuarant in rests:
+            restuarant.created_time = str(restuarant.created_time).split('.')[0]
+            restuarants.append(restuarant)
+        return lunch.write_json({'result':True,'restuarants':restuarants})
+    
+class ApplyOpenRest:
+    def POST(self):
+        user = lunch.get_current_user()
+        if user:
+            data = web.input()
+            restname = data.restname
+            adress = data.adress
+            phone = data.phone
+            message = data.message
+            model.db.insert('restapply',restname=restname,adress=adress,phone=phone,message=message,username=user.username)
+            return lunch.write_json({'result':True,'message':'success'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})

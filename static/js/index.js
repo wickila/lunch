@@ -109,7 +109,7 @@ $(function(){
 			case 3:
 				if(!window.user){
 					$('#order-container').empty();
-					$('#order-container').append($("<p id='show-login-tip'>您还没有登录，请先<a data-toggle='modal' data-target='#signup'>注册</a>或<a data-toggle='modal' data-target='#login'>登录</a></p>"));
+					$('#order-container').append($("<p class='show-login-tip'>您还没有登录，请先<a data-toggle='modal' data-target='#signup'>注册</a>或<a data-toggle='modal' data-target='#login'>登录</a></p>"));
 				}else{
 					if(!window.orderView){
 						window.orderView = new OrderView($('#order-container'));
@@ -122,7 +122,7 @@ $(function(){
 				break;
 			case 4:
 				if(!window.user){
-					$('#show-login-tip').show();
+					$('.show-login-tip').show();
 				}else{
 					if(window.user.restuarant){
 						$("#rest-setting-name").val(window.user.restuarant.name);
@@ -136,7 +136,7 @@ $(function(){
 						$('#rest-starttime').val(window.user.restuarant.starttime);
 						$('#rest-endtime').val(window.user.restuarant.endtime);
 					}
-					$('#show-login-tip').hide();
+					$('.show-login-tip').hide();
 					if(!window.menutypeSetting){
 						window.menutypeSetting = new MenuTypeSetting();
 					}
@@ -163,7 +163,7 @@ $(function(){
 		$('#site-nav-container').css('bottom',$('.navbar-fixed-bottom').height());
 		$('#site-nav-container').css('left',($(window).width()-$('#site-nav-container').width())*0.5);
 	}
-	window.changePage(1);
+//	window.changePage(1);
 	initLayout();
 	$('#site-nav-container,.tooltip-enable').tooltip({
 	      selector: "a[rel=tooltip]"
@@ -183,17 +183,16 @@ $(function(){
 		  					if(data.result){
 		  						window.thumbnails = data.thumbnails;
 		  						for(var i in window.thumbnails){
-		  							$('#thumb-lib').find('.thumbnails').append($("<li class='span2'>"+
+		  							$('#thumb-lib').find('.thumbnails').append($("<li>"+
 		  																		"<a href='#' class='thumbnail'><img src='"+window.thumbnails[i].src+"' alt='"+window.thumbnails[i].name+"'></a>"+
 		  																		"<h5>"+window.thumbnails[i].name+"</h5>"+
 		  																		"</li>"));
 		  						}
-		  						$('#select-thumbnail-modal').css('width',($('#select-thumbnail-modal').find('.span2').width()+parseInt($('#select-thumbnail-modal').find('.span2').css('margin-left').split('px')[0]))*3+10)
+		  						$('#select-thumbnail-modal').css('width',190*3+30+10)
 		  						$('#thumb-lib .thumbnail').bind('click',function(){
 		  							$('#thumb-lib .thumbnail').removeClass('select')
 		  							$(this).addClass('select');
 //		  							$('#setting-menu-imgurl').val($(this).attr('src'));
-		  							$('#setting-menu-img').attr('src',$(this).find('img').attr('src'));
 		  							$('#thumb-lib').data('selected-src',$(this).find('img').attr('src'))
 		  						});
 		  					}

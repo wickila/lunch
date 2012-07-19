@@ -126,3 +126,15 @@ CREATE TABLE `lunch`.`message` (
 )
 ENGINE = MyISAM
 CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE TABLE `lunch`.`restapply` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `username` TEXT  NOT NULL,
+  `restname` TEXT  NOT NULL,
+  `adress` TEXT  NOT NULL,
+  `phone` TEXT  NOT NULL,
+  `message` TEXT  NOT NULL,
+  PRIMARY KEY (`id`)
+)
+ENGINE = MyISAM
+CHARACTER SET utf8 COLLATE utf8_general_ci;

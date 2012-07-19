@@ -1,9 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'admin.html' %}
 {% block style %}
 	<link rel="stylesheet" href="/static/css/signin.css" type="text/css" charset="utf-8">
 {% endblock %}
 {% block content%}
-<form class="form" id="login" action="/signin" method="post">
+<form class="form" id="login" action="/admin/signin" method="post">
     <h1>Log In</h1>
     <fieldset id="inputs">
         <input id="username" name="username" type="text" placeholder="Username" autofocus required>

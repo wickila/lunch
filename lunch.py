@@ -51,7 +51,11 @@ urls = (
 	'/api/order/view/user','api.ViewUserOrders',
 	'/api/order/view/boss','api.ViewBossOrders',
 	'/api/order/comment','api.OrderComment',
-	'/api/thumbnaillib','api.ThumbnailLib'
+	'/api/thumbnaillib','api.ThumbnailLib',
+	'/api/search/rest','api.SearchRestuarant',
+	'/api/restuarant/apply','api.ApplyOpenRest',
+	'/admin','Admin',
+	'/admin/signin','AdminSignIn'
 )
 
 app = web.application(urls, globals())
@@ -110,7 +114,7 @@ class ViewRest:
 		if len(rests)>0:
 			rest = rests[0]
 			return env.get_template('index.html').render({"user":session.user,"location":(rest.lat,rest.lng),"current_rest_id":rest.id})
-			return 'the restaurant is not exist';
+		return 'the restaurant is not exist';
 
 class Signin:
 	def GET(self):
@@ -209,6 +213,41 @@ class Signup:
 			session.user.registertime = str(session.user.registertime)
 			session.user.modifytime = str(session.user.modifytime)
 			return write_json({'result':True,'message':'signup success','user':session.user})
+		
+class Admin:
+	def GET(self):
+		user = get_current_user()
+		if user:
+			if user.permission>10:
+				return render('admin.html',{})
+			else:
+				session.user = None
+		return web.seeother('/admin/signin')
+		
+class AdminSignIn:
+	def GET(self):
+		return render('signin.html',{})
+	
+	def POST(self):
+		user_data = web.input()
+		u = user_data.username
+		p = user_data.password
+		user = model.valid_user(u, p)
+		if user and user.permission>10:
+			session.user = user
+			user.registertime = str(user.registertime)
+			user.modifytime = str(user.modifytime)
+			return web.seeother('/admin')
+		return web.seeother('/admin/signin')
+	
+class AdminSignOut:
+	def GET(self):
+		session.user = None
+		raise web.seeother('/admin/signin')
+	
+	def POST(self):
+		session.user = None
+		raise web.seeother('/admin/signin')
 
 def getSession():
 	if '_session' not in web.config:
