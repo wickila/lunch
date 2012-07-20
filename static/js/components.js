@@ -82,7 +82,6 @@ Menus.prototype.setMenus = function(menus){
 		this.jqueryElement.find('#menus').find('.menu').each(function(){
 			var menu = $(this);
 			this.ondragstart = function(event){
-				window.lunchAlert('dragstart');
 				event.dataTransfer.effectAllowed = "move";
 				event.dataTransfer.setData('mid',$(event.target).data('mid'));
 				event.dataTransfer.setDragImage(event.target, 0, 0);
@@ -812,7 +811,7 @@ var ViewOrderItem = function(type,expanded){
 }
 
 ViewOrderItem.prototype.showDetail = function(){
-	this.expaned = true;
+	this.expanded = true;
 	this.element.find('#show-order-detail-btn').removeClass('icon-list').addClass('icon-minus');
 	this.element.find('#order-detail-info').find('table').empty();
 	this.element.find('#order-detail-info').find('table').append("<tr><td>名称</td><td>数量</td><td>单价</td><td>折扣</td><td>实价</td></tr>")
@@ -849,8 +848,13 @@ ViewOrderItem.prototype.setOrder = function(order){
 	this.element.find('.view-order-item-concact-name').html(order.concact.concactname+"收");
 	this.element.find('.view-order-item-concact-phone').html("电话:"+order.concact.phone);
 	this.updateView();
-	if(this.type == 'user' && this.order.state != -1 && this.order.state != 3){
+	if(this.type == 'user' && this.order.state != -1 && this.order.state != 3 && this.order.state != 4){
 		this.update(this);
+	}
+	if(this.expanded){
+		this.showDetail();
+	}else{
+		this.hideDetail();
 	}
 	this.element.find('.order-option-btn').click($.proxy(this.onButtonClick,this));
 	this.element.find('.order-cancel-btn').click($.proxy(function(){
@@ -1027,6 +1031,7 @@ var ViewOrderView = function(element,type){
 	this.type = type;
 	this.page = 1;
 	this.totalPage = 1;
+	this.currentOffset = 0;
 	this.setPage(this);
 	this.controller.find('.pre-page').click($.proxy(function(){
 		if(this.page<=1){
@@ -1057,17 +1062,20 @@ ViewOrderView.prototype.setPage = function(scope){
     	  scope:scope,
 		  success: function(data){
 	    				if(data.result){
-	    					this.scope.element.empty();
+	    					this.scope.currentOffset = this.scope.element[0].offsetTop;
+//	    					this.scope.element.empty();
 	    					for(var l in this.scope.items){
 	    						var item = this.scope.items[l];
-	    						for(var m in data.orders){
-	    							var o = data.orders[m];
-	    							if(o.id == item.order.id){
-	    								o['expanded']=item.expanded; 
-	    							}
-	    						}
-	    						item.dispose();
+//	    						for(var m in data.orders){
+//	    							var o = data.orders[m];
+//	    							if(o.id == item.order.id){
+//	    								o['expanded']=item.expanded; 
+//	    							}
+//	    						}
+//	    						item.dispose();
+//	    						item.element.hide();
 	    					}
+	    					this.scope.items = [];
 	    					for(var i in data.orders){
 	    						var order = data.orders[i];
 	    						order.concact = JSON.parse(order.concact);
@@ -1076,10 +1084,14 @@ ViewOrderView.prototype.setPage = function(scope){
 	    						for(var j in order.menus){
 	    							order.menunum += order.menus[j].num;
 	    						}
-	    						var orderItem = new ViewOrderItem(this.scope.type);
-	    						this.scope.element.append(orderItem.element);
+	    						var orderItem = this.scope.items[i];
+	    						if(!orderItem){
+	    							var orderItem = new ViewOrderItem(this.scope.type,order.expanded);
+	    							this.scope.element.append(orderItem.element);
+	    							this.scope.items.push(orderItem);
+	    						}
 	    						orderItem.setOrder(order);
-	    						this.scope.items.push(orderItem);
+	    						orderItem.element.show();
 	    					}
     						this.scope.totalPage = Math.ceil(data.total/5);
     						this.scope.controller.find('.total-page').html(this.scope.totalPage);
@@ -1224,5 +1236,74 @@ MenuTypeSetting.prototype.addType = function(menutype){
 		      error: function(){alert('失败');}
 		    });
 	},div));
-	
+}
+
+var Message = function(){
+	this.element = $("<tr class='message-item'><td class='message-item-id'></td><td class='message-item-sender'></td><td class='message-item-content'></td><td class='message-item-time'></td></tr>")
+}
+
+Message.prototype = {
+	    constructor: Message
+	  , setMessage: function(message){
+			this.element.find('.message-item-id').html(message.id);
+			this.element.find('.message-item-sender').html(message.sender?message.sender:'系统');
+			this.element.find('.message-item-content').html(message.content);
+			this.element.find('.message-item-time').html(message.createdtime);
+		}
+	  ,
+}
+
+var Messages = function(){
+	this.page = 1;
+	this.total = 1;
+	this.pagecount = 10;
+	this.element = $("<table width='100%'><tr>" +
+			"<th>ID</th>" +
+			"<th>发送者</th>" +
+			"<th>内容</th>" +
+			"<th>时间</th>" +
+			"</tr></table>");
+	this.update();
+}
+
+Messages.prototype = {
+		constructor: Message
+	,	update: function(){
+			$.ajax({
+			      type: 'GET',
+			      url: '/api/messages/'+this.page,
+			      ContentType: "application/json",
+			      scope:this,
+				  success: function(data){
+								this.scope.element.find('message-item').remove();
+								if(data.total>0){
+									this.scope.element.parent().find('.blank-place').hide();
+									this.scope.element.show();
+								}else{
+									this.scope.element.parent().find('.blank-place').show();
+									this.scope.element.hide();
+								}
+								total = Math.ceil(data.total / this.scope.pagecount);
+								total = total == 0?1:total;
+								for(var i in data.messages){
+									message = new Message();
+									message.setMessage(data.messages[i]);
+									this.scope.element.append(message.element);
+								}
+			    		    },
+			      error: function(){alert('失败');}
+			    });
+	},	nextPage: function(){
+			this.page++;
+			if(this.page>this.total){
+				this.page = this.total;
+			}
+			this.update();
+	},	prePage: function(){
+			this.page --;
+			if(this.page<1){
+				this.page = 1;
+			}
+			this.update();
+	}
 }

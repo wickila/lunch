@@ -118,7 +118,7 @@ CREATE TABLE `lunch`.`message` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `sender` TEXT  NOT NULL,
   `receiver` TEXT  NOT NULL,
-  `messagetype` INT UNSIGNED NOT NULL COMMENT '0:system message, 1:ride message, 2:normal user message',
+  `messagetype` INT UNSIGNED NOT NULL COMMENT '0-99:system message, 100:normal user message',
   `content` TEXT  NOT NULL,
   `state` INT NOT NULL COMMENT '0:unread, 1:read',
   `createdtime` TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -134,6 +134,10 @@ CREATE TABLE `lunch`.`restapply` (
   `adress` TEXT  NOT NULL,
   `phone` TEXT  NOT NULL,
   `message` TEXT  NOT NULL,
+  `activation` TEXT NOT NULL,
+  `state` INT NOT NULL COMMENT '-1:reject, 0:unread, 1:accept',
+  `reason` TEXT NOT NULL,
+  `createdtime` TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 )
 ENGINE = MyISAM

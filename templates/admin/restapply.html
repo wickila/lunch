@@ -1,0 +1,35 @@
+{% extends 'admin.html' %}
+{% block content %}
+	<table width="100%">
+	  <tr>
+	    <th>ID</th>
+	    <th>申请者</th>
+	    <th>店铺名</th>
+	    <th>店铺地址</th>
+	    <th>电话</th>
+	    <th>申请时间</th>
+	    <th>留言</th>
+	    <th>激活码</th>
+	    <th>操作</th>
+	  </tr>
+	  {% for apply in applys %}
+		<tr align="center">
+			<td>{{apply.id}}</td>
+			<td>{{apply.username}}</td>
+			<td>{{apply.restname}}</td>
+			<td>{{apply.adress}}</td>
+			<td>{{apply.phone}}</td>
+			<td>{{apply.createdtime}}</td>
+			<td>{{apply.message}}</td>
+			<td>{{apply.activation}}</td>
+			{% if apply.state == 0 %}
+				<td><button class="btn" onclick="opApply(event,{{apply.id}},1);">接受</button><button class="btn" onclick="opApply(event,{{apply.id}},-1);">拒绝</button></td>
+			{% elif apply.state == 1 %}
+				<td><span class='label label-success'>已接受</span></td>
+			{% else %}
+				<td><span class='label label-warning'>已拒绝</span></td>
+			{% endif %}
+		</tr>
+	{% endfor %}
+	</table>
+{% endblock %}

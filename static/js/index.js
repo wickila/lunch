@@ -38,7 +38,16 @@ $(function(){
 	}
 	window.date = new Date();
 	$('#main').bind('mousedown',function(evt){
-		if(evt.which == 1&&$(evt.target).children().length>0){
+		var canmove = false;
+		if($(evt.target).parent().attr('id')=='main' ||
+				$(evt.target).hasClass('container') ||
+				$(evt.target).hasClass('content') ||
+				$(evt.target).hasClass('radius-border') ||
+				$(evt.target).hasClass('span3') ||
+				$(evt.target).hasClass('span9')){
+			canmove = true;
+		}
+		if(evt.which == 1&&canmove){
 			window.isDragging = true;
 			window.orignClientX = evt.clientX;
 			window.speed = 0;
@@ -73,7 +82,7 @@ $(function(){
 		$('#main').css('-moz-transform','translate('+ (1-page) +'00%, 0px)');
 		$('#main').css('-o-transform','translate('+ (1-page) +'00%, 0px)');
 		$('#main').css('-ms-transform','translate('+ (1-page) +'00%, 0px)');
-		evt.preventDefault();
+//		evt.preventDefault();
 	})
 	
 	
@@ -87,8 +96,6 @@ $(function(){
 	window.updateView = function(){
 		if(window.viewOrderView)window.viewOrderView.dispose();
 		window.viewOrderView = null;
-//		if(window.bossOrderView)window.bossOrderView.dispose();
-//		window.bossOrderView = null;
 		if(!window.bossOrderView){
 			if(window.user && window.user.restuarant){
 				window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
@@ -121,9 +128,7 @@ $(function(){
 				}
 				break;
 			case 4:
-				if(!window.user){
-					$('.show-login-tip').show();
-				}else{
+				if(window.user){
 					if(window.user.restuarant){
 						$("#rest-setting-name").val(window.user.restuarant.name);
 //						$("#rest-setting-type").val(window.user.restuarant.rtype);
@@ -136,9 +141,12 @@ $(function(){
 						$('#rest-starttime').val(window.user.restuarant.starttime);
 						$('#rest-endtime').val(window.user.restuarant.endtime);
 					}
-					$('.show-login-tip').hide();
 					if(!window.menutypeSetting){
 						window.menutypeSetting = new MenuTypeSetting();
+					}
+					if(!window.messages){
+						window.messages = new Messages();
+						$('#setting-message-item-container').append(window.messages.element);
 					}
 				}
 				break;

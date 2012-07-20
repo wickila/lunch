@@ -54,8 +54,11 @@ urls = (
 	'/api/thumbnaillib','api.ThumbnailLib',
 	'/api/search/rest','api.SearchRestuarant',
 	'/api/restuarant/apply','api.ApplyOpenRest',
+	'/api/messages/(.*)','api.Messages',
 	'/admin','Admin',
-	'/admin/signin','AdminSignIn'
+	'/admin/signin','AdminSignIn',
+	'/admin/restapply','admin.RestApply',
+	'/admin/applyoption','admin.RestApplyOption'
 )
 
 app = web.application(urls, globals())

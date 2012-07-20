@@ -20,8 +20,8 @@ class CheckLogin:
     def GET(self):
         user = lunch.get_current_user()
         if user:
-            return lunch.write_json({'result':True,'message':'','user':user})
-        return lunch.write_json({'result':False,'message':'you hava not login'})
+            return lunch.write_json({'result':True,'message':'success','user':user})
+        return lunch.write_json({'result':True,'message':'you hava not login'})
     
 class GetMyConcacts:
     def GET(self):
@@ -90,14 +90,14 @@ class LocalRestaurants:
         lng = float(data.lng)
         percision = 6
         if 'percision' in data:
-            percision = data.percision
+            percision = int(data.percision)
         if percision>11:
             percision = 11
         elif percision<3:
             percision = 3
         hash_location = geohash.encode(lat, lng, 12)
         hash_location = hash_location[0:percision]
-        neighbors = self.get_neighbors(hash_location[0:config.LOCATION_PRECISION],percision)
+        neighbors = self.get_neighbors(hash_location,config.LOCATION_PRECISION)
         neighbors.sort()
         rs = model.db.query("SELECT * FROM restuarant WHERE hash_location >= '%s' AND hash_location <= '%s'" % (neighbors[0],neighbors[-1]))
         restuarants = []
@@ -464,4 +464,20 @@ class ApplyOpenRest:
             message = data.message
             model.db.insert('restapply',restname=restname,adress=adress,phone=phone,message=message,username=user.username)
             return lunch.write_json({'result':True,'message':'success'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class Messages:
+    def GET(self,page):
+        page = int(page)
+        user = lunch.get_current_user()
+        page_count = 10
+        if user:
+            sql = "select * from message where receiver='%s' order by id desc LIMIT %d, %d" % (user.username,(page-1)*page_count,page_count)
+            total = len(model.db.query("select id from message where receiver='%s'" % user.username))
+            messages = model.db.query(sql)
+            msgs = []
+            for message in messages:
+                message.createdtime = str(message.createdtime)
+                msgs.append(message)
+            return lunch.write_json({'result':True,'message':'success','total':total,'messages':msgs})
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})

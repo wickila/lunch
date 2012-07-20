@@ -449,6 +449,11 @@ section{
 	margin-left: -28px;
 }
 
+.message-item td{
+	text-align: center;
+	color: gray;
+}
+
 #contextMenu {
 position: absolute;
 min-width: 100px;

@@ -96,7 +96,7 @@ $(function(){
 		$('#setting-menu-form').attr('action','/api/menu/new');
 		$('#setting-menu-form')[0].reset();
 		$('#setting-menu-img-form')[0].reset();
-		$('#setting-menu-img').attr('src','');
+		$('#setting-menu-img').attr('src','http://placehold.it/160x160');
 		$('#setting-menu-mtype').empty();
 		$('#setting-menu-mtype').append("<option value='0'>全部");
 		for(var j in window.user.restuarant.menutypes){
