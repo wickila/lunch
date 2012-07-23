@@ -7,18 +7,33 @@ $(function(){
 		$('.bottom-nav-a').each(function(){
 			$(this).removeClass($(this).attr('id')+'-active');
 		});
+		$('.navbar-fixed-top').find('.nav:first').find('li').removeClass('active')
 		switch(page){
 			case 1:
 				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
+				$('#navbar-fixed-top-index').addClass('active');
+				$('title').html('Lunch-首页');
 				break;
 			case 2:
+				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
 				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
+				$('#navbar-fixed-top-rest').addClass('active');
+				$('title').html('Lunch-'+window.currentRest.name);
 				break;
 			case 3:
+				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
+				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
 				$('#bottom-nav-orderview').addClass('bottom-nav-orderview-active');
+				$('#navbar-fixed-top-order').addClass('active');
+				$('title').html('Lunch-订单页面');
 				break;
 			case 4:
+				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
+				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
+				$('#bottom-nav-orderview').addClass('bottom-nav-orderview-active');
 				$('#bottom-nav-user').addClass('bottom-nav-user-active');
+				$('#navbar-fixed-top-user').addClass('active');
+				$('title').html('Lunch-管理页面');
 				break;
 		}
 		window.page = page;
@@ -53,7 +68,6 @@ $(function(){
 			window.speed = 0;
 			window.maxSpeed = 0;
 			window.dragStartTime = (new Date()).getTime();
-			$('#main').css('-webkit-transition','-webkit-transform 2ms ease-in-out');
 			evt.preventDefault();
 		}
 	});
@@ -131,7 +145,15 @@ $(function(){
 				if(window.user){
 					if(window.user.restuarant){
 						$("#rest-setting-name").val(window.user.restuarant.name);
-//						$("#rest-setting-type").val(window.user.restuarant.rtype);
+						$('#rest-setting-rtype').empty();
+						for(var i in window.REST_TYPES){
+							var rtype = window.REST_TYPES[i];
+							if(window.user.restuarant.rtype == parseInt(i)){
+								$('#rest-setting-rtype').append("<option value='"+i+"' selected='selected'>"+rtype);
+							}else{
+								$('#rest-setting-rtype').append("<option value='"+i+"'>"+rtype);
+							}
+						}
 						$("#rest-setting-addres").val(window.user.restuarant.adress);
 						$("#rest-setting-minprice").val(window.user.restuarant.minprice);
 						$("#rest-setting-phone").val(window.user.restuarant.telephone);
@@ -168,13 +190,18 @@ $(function(){
 		$('#main-info-container').css('height',$('.content').height()-$('#map-canvas').height())
 		$('.menu').css('height','200px')
 		$('#shoppingCart-container').css('left',($(window).width()-$('#shoppingCart-container').width())*0.5);
-		$('#site-nav-container').css('bottom',$('.navbar-fixed-bottom').height());
+		$('#site-nav-container').css('bottom',$('.navbar-fixed-bottom').height()-$('#site-nav-container').height());
 		$('#site-nav-container').css('left',($(window).width()-$('#site-nav-container').width())*0.5);
+		$('#view-order-item-container,#boss-order-item-container').css('height',$('.content').height()-$('.navbar-fixed-top').height()-80);
 	}
 //	window.changePage(1);
 	initLayout();
-	$('#site-nav-container,.tooltip-enable').tooltip({
+	$('.tooltip-enable').tooltip({
 	      selector: "a[rel=tooltip]"
+	    });
+	$('.tooltip-enable-bottom').tooltip({
+	      selector: "a[rel=tooltip]",
+	      placement: "bottom"
 	    });
 	window.hideShoppingCart();
 	

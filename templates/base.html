@@ -40,22 +40,27 @@
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
 				<div class="container">
-					<a class="brand" href="/">Lunch</a>
+					<ul class="nav">
+					  <li id="navbar-fixed-top-index" class="active"><a class="brand active" onclick="changePage(1)">Lunch</a></li>
+	                  <li id="navbar-fixed-top-rest"><a onclick="changePage(2)">餐厅</a></li>
+	                  <li id="navbar-fixed-top-order"><a onclick="changePage(3)">订单</a></li>
+	                  <li id="navbar-fixed-top-user"><a onclick="changePage(4)">管理</a></li>
+	                </ul>
 					<form class="navbar-search pull-left">
-			            <input type="text" class="search-query span2" placeholder="Search"  onkeypress="return event.keyCode != 13">
+			            <input type="text" class="search-query span2" placeholder="Search"  onkeypress="if(event.keyCode == 13){search('adress');return false}return true">
 			        </form>
                 	<ul class="nav">
 			            <li class="dropdown">
 			              <a href="#" class="dropdown-toggle" data-toggle="dropdown">搜索<b class="caret"></b></a>
 			              <ul class="dropdown-menu">
 			              	<li onclick="search('adress');"><a>搜索地址</a></li>
-			                <li onclick="search('shop');"><a href="#">搜索店铺</a></li>
+			                <li onclick="search('shop');"><a>搜索店铺</a></li>
 			              </ul>
 			            </li>
 			        </ul>
 					<ul class="nav pull-right">
 						<li><a id="nav-shopping-cart-btn" onclick="toggleShoppingCart()"><i class="icon-shopping-cart icon-white" style="margin-right: 5px"></i>购物车(<span class="order-num">0</span>)</a></li>
-						<li><a onclick="playSound()"  rel="tooltip" data-original-title="首页">首页</a></li>
+						<li class="tooltip-enable-bottom"><a id="nav-my-location" onclick="relocal();" rel='tooltip' data-original-title=""><i class="icon-screenshot icon-white"></i>我的位置</a></li>
 					</ul>
 					<ul id="nav-right" class="nav pull-right">
 						{% if user %}
@@ -78,18 +83,21 @@
 		{% include 'modal.html' %}
 		<div id="content">
 			{% block content %}this is the defualt content{% endblock %}
-			<div id="site-nav-container" class="nav-collapse">
-				<a href="#" id="bottom-nav-overview" class="bottom-nav-a" onclick="changePage(1);" rel="tooltip" data-original-title="首页"></a>
+			<div id="site-nav-container" class="nav-collapse tooltip-enable">
+				<a id="bottom-nav-overview" class="bottom-nav-a" onclick="changePage(1);" rel="tooltip" data-original-title="首页"></a>
 				<a id="bottom-nav-restview" class="bottom-nav-a" onclick="changePage(2);" rel="tooltip" data-original-title="店铺"></a>
 				<a id="bottom-nav-orderview" class="bottom-nav-a" onclick="changePage(3);" rel="tooltip" data-original-title="订单"></a>
 				<a id="bottom-nav-user"  class="bottom-nav-a" onclick="changePage(4);" rel="tooltip" data-original-title="管理"></a>
 			</div>
 		</div>
-		<div id="loading" class="progress progress-striped active">
-		  <div class="bar" style="width: 1%;"></div>
+		<div id="loading" >
+			<div class="progress progress-striped active">
+			  <div class="bar" style="width: 1%;"></div>
+			</div>
+			<div id="loading-tip">正在加载谷歌地图...</div>
 		</div>
 		<!-- <button class="change-page-btn" id="left-btn" onclick="changePage(window.page-1)"><</button>
-		<button class="change-page-btn" id="right-btn" onclick="changePage(window.page+1)">></button>
-		<audio id="new-order-sound" src="/static/sound/neworder.mp3"></audio> -->
+		<button class="change-page-btn" id="right-btn" onclick="changePage(window.page+1)">></button> -->
+		<audio id="new-order-sound" src="/static/sound/neworder.mp3"></audio>
 	</body>
 </html>

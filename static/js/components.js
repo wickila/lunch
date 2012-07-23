@@ -49,9 +49,11 @@ Menu.prototype.getDiv = function(){
 							"<div class='thumbnail menu' data-mid='"+ this.menu.id +"'>" +
 							"<img class='menu-img' src='"+this.menu.thumbnail+"' alt='"+this.menu.name+"' data-mid='"+ this.menu.id +"'>" +
 							"</div>" +
-							"<p style='float:right' data-mid='"+ this.menu.id +"'>"+this.menu.price+"￥</p>" +
-							"<h5 data-mid='"+ this.menu.id +"'>"+this.menu.name+"</h5>" +
+							"<table width='100%' data-mid='"+ this.menu.id +"'><tr><td width='100%' style='padding-top: 6px;'><h5>"+this.menu.name+"</h5></td><td align='right' style='padding-top: 6px;'>"+this.menu.price+"￥</td><td align='right'><span class='label label-info'>"+this.menu.discount+"折</span></td></tr><table>" +
 					"</li>");
+	}
+	if(this.menu.discount >= 10){
+		this.div.find('.label').parent().remove();
 	}
 	return this.div;
 };
@@ -779,6 +781,7 @@ OrderView.prototype.removeRest = function(rid){
 		orderItem.element.animate({'height':30},500,function(){
 			orderItem.element.hide(200,function(){
 				orderItem.dispose();
+				$('#orderview-left-buyer').click();
 			});
 		});
 	}
@@ -798,7 +801,7 @@ var ViewOrderItem = function(type,expanded){
 							"<tr><td>详细信息:<span class='view-order-item-num'></span><span class='view-order-item-price'></span></td><td align='right'><span id='show-order-detail-btn' class='icon-list'></span></td></tr>" +
 							"<tr id='order-detail-info' style='display:none'><td colspan='3'><table width='100%' class='order-detail-info-table'></table></td></tr>" +
 							"<tr><td>联系方式:<span class='view-order-item-concact-adress'></span><span class='view-order-item-concact-name'></span><span class='view-order-item-concact-phone'></span></td></tr>" +
-							"<tr><td></td><td aligin='right'><a class='btn btn-mini btn-primary order-cancel-btn'>取消</a><button class='btn btn-mini order-option-btn'>待确认</button></td></tr>" +
+							"<tr><td></td><td aligin='right' class='tooltip-enable'><a rel='tooltip' class='btn btn-mini btn-primary order-cancel-btn'>取消</a><a rel='tooltip' class='btn btn-mini order-option-btn'>待确认</a></td></tr>" +
 						"</table>" +
 					"</div>");
 	this.element.find('#show-order-detail-btn').click($.proxy(function(){
@@ -857,6 +860,7 @@ ViewOrderItem.prototype.setOrder = function(order){
 		this.hideDetail();
 	}
 	this.element.find('.order-option-btn').click($.proxy(this.onButtonClick,this));
+	this.updateTip();
 	this.element.find('.order-cancel-btn').click($.proxy(function(){
 		$('#cancelOrderModal').modal('show');
 		window.cancelOrder = $.proxy(function(){
@@ -1001,6 +1005,7 @@ ViewOrderItem.prototype.update = function(scope){
 	    					data.order.concact = JSON.parse(data.order.concact);
 	    					data.order.menus = JSON.parse(data.order.menus);
 	    					this.scope.updateView();
+	    					this.scope.updateTip();
 	    					if(!this.scope.disposed && this.scope.order.state != -1 && this.scope.order.state != 3){
 	    						setTimeout(this.scope.update,this.scope.interval,this.scope);
 	    					}
@@ -1010,6 +1015,33 @@ ViewOrderItem.prototype.update = function(scope){
 	    		    },
 	      error: function(){alert('刷新订单失败');}
 	    });
+}
+
+ViewOrderItem.prototype.updateTip = function(){
+	var tip='';
+	switch(this.element.find('.order-option-btn').html()){
+		case '待确认':
+			tip = '等待餐厅确认订单中，请稍后';
+			break;
+		case '已确认':
+			tip = '餐厅已于'+window.getTimeStr(new Date(this.order.modifiedtime))+'确认订单,美味正在制作中';
+			break;
+		case '发货':
+			tip = '';
+			break;
+		case '确认收货':
+			tip = '餐厅已于'+window.getTimeStr(new Date(this.order.modifiedtime))+'送出美食';
+			break;
+		case '已结算':
+			tip = '顾客已于'+window.getTimeStr(new Date(this.order.modifiedtime))+'确认收到美食';
+			break;
+	}
+	if(tip){
+		this.element.tooltip({
+		      selector: "a[rel=tooltip]"
+		    });
+	}
+	this.element.find('.order-option-btn').attr('data-original-title',tip);
 }
 
 ViewOrderItem.prototype.dispose = function(){
@@ -1025,7 +1057,7 @@ var ViewOrderView = function(element,type){
 	this.disposed = false;
 	this.element = element;
 	this.controller = $("<hr/><table width='100%'>" +
-										"<tr><td align='left'><button class='btn pre-page'>上一页</button></td><td><span class='page'>1</span>/<span class='total-page'>1</span></td><td align='right'><button class='btn next-page'>下一页</button></td></tr>" +
+										"<tr><td width='35%' align='left'><button class='btn pre-page'>上一页</button></td><td width='30%' align='center'><span class='page'>1</span>/<span class='total-page'>1</span></td><td width='35%' align='right'><button class='btn next-page'>下一页</button></td></tr>" +
 								"</table>");
 	this.element.parent().append(this.controller);
 	this.type = type;
@@ -1063,19 +1095,6 @@ ViewOrderView.prototype.setPage = function(scope){
 		  success: function(data){
 	    				if(data.result){
 	    					this.scope.currentOffset = this.scope.element[0].offsetTop;
-//	    					this.scope.element.empty();
-	    					for(var l in this.scope.items){
-	    						var item = this.scope.items[l];
-//	    						for(var m in data.orders){
-//	    							var o = data.orders[m];
-//	    							if(o.id == item.order.id){
-//	    								o['expanded']=item.expanded; 
-//	    							}
-//	    						}
-//	    						item.dispose();
-//	    						item.element.hide();
-	    					}
-	    					this.scope.items = [];
 	    					for(var i in data.orders){
 	    						var order = data.orders[i];
 	    						order.concact = JSON.parse(order.concact);
@@ -1084,9 +1103,19 @@ ViewOrderView.prototype.setPage = function(scope){
 	    						for(var j in order.menus){
 	    							order.menunum += order.menus[j].num;
 	    						}
-	    						var orderItem = this.scope.items[i];
+	    						var orderItem = null;
+	    						if(this.scope.items){
+	    							orderItem = this.scope.items[i];
+//	    							for(var l in this.scope.items){
+//			    						var item = this.scope.items[l];
+//			    						if(order.id == item.order.id){
+//			    							orderItem = item;
+//				    						break;
+//			    						}
+//			    					}
+	    						}
 	    						if(!orderItem){
-	    							var orderItem = new ViewOrderItem(this.scope.type,order.expanded);
+	    							orderItem = new ViewOrderItem(this.scope.type,order.expanded);
 	    							this.scope.element.append(orderItem.element);
 	    							this.scope.items.push(orderItem);
 	    						}

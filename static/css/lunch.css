@@ -19,6 +19,15 @@ body{
 	height:100%;
 }
 
+.navbar-fixed-top{
+	opacity:0;
+	transition: opacity 500ms ease-in-out;
+	-webkit-transition: opacity 500ms ease-in-out;
+	-moz-transition: opacity 500ms ease-in-out;
+	-o-transition: opacity 500ms ease-in-out;
+	-ms-transition: opacity 500ms ease-in-out;
+}
+
 .content{
 	padding-top:20px;
 }
@@ -89,23 +98,16 @@ a{
 
 #site-nav-container{
 	position:fixed;
-	width: 216px;
-	height: 57px;
-	background-image: url(../img/site-nav-bg.png);
+	z-index: 10000;
 }
 
 .bottom-nav-a{
 	display: inline-block;
 	vertical-align: text-top;
-	margin: 25px -11px 0px 34px;
-	width: 14px;
-	height: 14px;
-	background: gray;
-	border: 1px solid #DDD;
-	border-width: 1px;
-	border-radius: 7px;
-	-webkit-border-radius: 7px;
-	-moz-border-radius: 7px
+	width: 40px;
+	height: 2px;
+	margin-left: -3px;
+	background: rgb(182,182,182);
 }
 
 .bottom-nav-a:HOVER{

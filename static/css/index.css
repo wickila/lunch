@@ -80,9 +80,22 @@ section{
 	-moz-border-radius: 4px
 }
 
+#overview-tip{
+	margin: -10px 0 10px -5px;
+}
+
 #map-canvas{
 	height: 97%;
 	padding: 5px;
+}
+
+.infowindow-div{
+	margin-top: 6px;
+	cursor: pointer;
+}
+
+.infowindow-div:HOVER{
+	background-color: #eee;
 }
 
 #left-bar{
@@ -363,6 +376,14 @@ section{
 .menus-filter-item a{
 	margin-right: 10px;
 	padding: 2px 5px 2px 5px;
+	text-decoration: none;
+}
+
+.menus-filter-item a:HOVER{
+	background: gray;
+	border-radius: 3px;
+	text-decoration: none;
+	color: white;
 }
 
 .menus-filter-item .select{

@@ -36,7 +36,7 @@ class Edit():
     def POST(self):
         user_data = web.input()
         name = user_data.name
-        rtype = user_data.rtype
+        rtype = int(user_data.rtype)
         description = user_data.description
         adress = user_data.adress
         phone = user_data.phone

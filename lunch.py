@@ -7,6 +7,8 @@ import model
 import re
 import urllib2
 import web
+
+import config
 #from jinja2 import Environment, PackageLoader
 
 web.config.debug = False
@@ -100,7 +102,7 @@ class Index:
 		"""index page"""
 		if not session.location:
 			session.location = self.get_location(web.ctx.ip)
-		return env.get_template('index.html').render({"user":session.user,"location":session.location})
+		return env.get_template('index.html').render({"user":session.user,"location":session.location,"rest_types":json.dumps(config.REST_TYPES)})
 	
 class ViewRest:
 	def get_location(self,ip):
@@ -116,8 +118,8 @@ class ViewRest:
 		rests = model.db.select('restuarant',where='username=$username',vars=locals())
 		if len(rests)>0:
 			rest = rests[0]
-			return env.get_template('index.html').render({"user":session.user,"location":(rest.lat,rest.lng),"current_rest_id":rest.id})
-		return 'the restaurant is not exist';
+			return env.get_template('index.html').render({"user":session.user,"location":(rest.lat,rest.lng),"current_rest_id":rest.id,"rest_types":json.dumps(config.REST_TYPES)})
+		return u'对不起，您访问的餐厅不存在'
 
 class Signin:
 	def GET(self):

@@ -13,8 +13,6 @@ $(function(){
 	var circle;
 	var total = 4;
 	var complete = 0;
-	window.loaded = false;
-	window.complete = false;
 	window.shoppingCartShow = true;
 	window.restuarants = {}
 	window.currentRest = null;
@@ -24,6 +22,17 @@ $(function(){
 	window.calcProgress = function(){
 		var progress = (complete/total)*100;
 		$('#loading .bar').css('width',progress+'%');
+		if(complete == 0){
+			$('#loading-tip').html('正在加载本地餐厅...');
+		}else if(complete == 1){
+			$('#loading-tip').html('正在加载本地餐厅...');
+		}else if(complete == 2){
+			
+		}else if(complete == 3){
+			
+		}else{
+			$('#loading-tip').html('正在初始化应用程序...');
+		}
 	}
 	
 	window.startApp = function(){
@@ -36,10 +45,14 @@ $(function(){
 			$('#loading').css('-ms-transform','translate(500%,0px)');
 		},200);
 		setTimeout(function(){
-			$('#content').css('opacity',1);
+			$('#content,.navbar-fixed-top').css('opacity',1);
 		},400);
 		setTimeout(function(){
-			changePage(1);
+			if(CURRENT_REST_ID){
+				changePage(2);
+			}else{
+				changePage(1);
+			}
 		},1000);
 		marker = new google.maps.Marker({
 	      position: initialLocation,
@@ -145,6 +158,11 @@ $(function(){
 		});
 	}
 	
+	window.relocal = function(){
+		changePage(1);
+		map.panTo(initialLocation);
+	}
+	
 	window.initialize =  function() {
 		geocoder = new google.maps.Geocoder();
 	    var latlng = new google.maps.LatLng(GEOCHAT_VARS['initial_latitude'], GEOCHAT_VARS['initial_longitude']);
@@ -180,8 +198,19 @@ $(function(){
 	    }
 	    function initLocation(){
 	    	complete+=1;
+	    	calcProgress();
 	    	map.setCenter(initialLocation);
 	    	startLoad();
+	    	geocoder.geocode({'latLng': initialLocation}, function(results, status) {
+		      if (status == google.maps.GeocoderStatus.OK) {
+		        if(results[0]) {
+		        	var adress = results[0].formatted_address;
+					$('#nav-my-location').attr('data-original-title',adress);
+		        }
+		      } else {
+		        alert("Geocoder failed due to: " + status);
+		      }
+		    });
 	    }
 	    function handleNoGeolocation(errorFlag) {
 	      if (errorFlag == true) {
@@ -314,11 +343,24 @@ $(function(){
 	    
 	    this.marker.setMap(map);
 	    window.restuarants[this.id] = this;
-	    google.maps.event.addListener(this.marker, 'click', function() {
-		    	var rest = restuarants[this.id];
-		        map.panTo(this.getPosition());
-		        setCurrentRest(rest.info);
+	    
+	    var headDiv = "<div class='infowindow-div' onclick='changePage(2);'>"+
+		"<table width='100%'>" +
+		"<tr><td rowspan='3'><img class='small-avatar' style='padding: 0 2px 0 0;' src='"+this.info.avatarurl+"'></img></td><td><h4>"+this.info.name+"</h4></td><td align='right' style='font-size: 10pt;'><span class='icon-heart'></span>谢谢:<span style='font-size: 11pt'>"+this.info.thanks+"</span></td></tr>" +
+		"<tr><td colspan='2'><span style='font-size: 10pt;color: gray;'>"+this.info.description+"</span></td></tr>" +
+		"</table></div>";
+
+		this.infowindow = new google.maps.InfoWindow({
+		    content: headDiv
 		});
+	    google.maps.event.addListener(this.marker, 'click', $.proxy(function() {
+		        map.panTo(this.marker.getPosition());
+		        if(window.currentRest != this.info){
+	        		window.restuarants[window.currentRest.id].infowindow.close();
+		        }
+		        this.infowindow.open(map,this.marker);
+		        setCurrentRest(this.info);
+		},this));
 	};
 	  
 	window.new_restuarant = function(){
@@ -439,6 +481,15 @@ $(function(){
 				$('#rest-setting-name').val(window.user.restuarant.name);
 				$('#rest-settting-type').val(window.user.restuarant.rtype);
 				$('#rest-setting-des').val(window.user.restuarant.description);
+				$('#rest-setting-rtype').empty();
+				for(var i in REST_TYPES){
+					var rtype = REST_TYPES[i];
+					if(window.user.restuarant.rtype == parseInt(i)){
+						$('#rest-setting-rtype').append("<option value='"+i+"' selected='selected'>"+rtype);
+					}else{
+						$('#rest-setting-rtype').append("<option value='"+i+"'>"+rtype);
+					}
+				}
 				$('#rest-setting-addres').val(window.user.restuarant.adress);
 				$('#rest-setting-phone').val(window.user.restuarant.telephone);
 				$('#rest-setting-minprice').val(window.user.restuarant.minprice);
@@ -592,6 +643,39 @@ $(function(){
 			error: function(){alert('服务器繁忙，请稍后再试')}
 	    });
 	};
+	
+	window.synsSetCurrentRest = function(id,callback){
+		for(var i in window.restuarants){
+			var info = window.restuarants[i].info;
+			if(info.id == id){
+				setCurrentRest(info);
+				if(callback){
+					callback();
+				}
+				return;
+			}
+		}
+		$.ajax({
+	        type: 'GET',
+	        url: '/api/resturant/view/'+id,
+	        ContentType: "application/json",
+	        callback: callback,
+			success: function(data){
+				if(data.result){
+					if(!window.restuarants[data.restuarant.id]){
+						new Restuarant(data.restuarant);
+					}
+					setCurrentRest(data.restuarant);
+					if(callback){
+						callback();
+					}
+				}else{
+					alert(data.message);
+				}
+			},
+			error: function(){alert('服务器繁忙，请稍后再试')}
+	    });
+	}
 		
 	window.check = function() {
 		var password = $("#password").val();
@@ -713,7 +797,39 @@ $(function(){
 		element.css('-ms-transform','translate(0px,'+ num +')');
 	}
 	
+	window.getTimeStr = function(time){
+		var minute = 1000 * 60;
+		var hour = minute * 60;
+		var day = hour * 24;
+		var halfamonth = day * 15;
+		var month = day * 30;
+		var now = new Date();
+		var diffValue = now.getTime() - time.getTime();
+		var dayC =diffValue/day;
+		var hourC =(diffValue%day)/hour;
+		var minC =(diffValue%hour)/minute;
+		var timestr = '';
+		if(dayC>=1){
+			timestr += Math.floor(dayC) + '天';
+		}
+		if(hourC>=1){
+			timestr += Math.floor(hourC) + '小时';
+		}
+		if(minC>=1){
+			timestr += Math.floor(minC) + '分钟'
+		}
+		if(!timestr){
+			timestr='刚刚';
+		}else{
+			timestr += '前';
+		}
+		return timestr;
+	}
+	
 	window.startLoad = function(){
+		if(map.getZoom()<PERSISSION){
+			$('#overview-tip').html('您的附近好像还没有餐厅哦，您可以亲自开设一家餐厅或者邀请您最喜爱的餐厅来Lunch开店')
+		}
 		getLocalRestuarants(function(){
 			var hasRest = false;
 			for(var i in window.restuarants) {
@@ -732,21 +848,41 @@ $(function(){
 						getMyRestuarant(function(){
 							complete+=1;
 							calcProgress();
-							if(window.user.restuarant){
-								setCurrentRest(window.user.restuarant);
+							if(CURRENT_REST_ID){
+								synsSetCurrentRest(CURRENT_REST_ID,function(){
+									startApp();
+								});
+							}else{
+								if(window.user.restuarant){
+									setCurrentRest(window.user.restuarant);
+								}else{
+									var theChoosenOne = {'thanks':0}
+									for(var i in window.restuarants){
+										var info = window.restuarants[i].info;
+										if(info.thanks>=theChoosenOne.thanks){
+											theChoosenOne = info;
+										}
+									}
+								}
 								startApp();
 							}
 						});
 					}else{
-						var theChoosenOne = {'thanks':0}
-						for(var i in window.restuarants){
-							var info = window.restuarants[i].info;
-							if(info.thanks>=theChoosenOne.thanks){
-								theChoosenOne = info;
+						if(CURRENT_REST_ID){
+							synsSetCurrentRest(CURRENT_REST_ID,function(){
+								startApp();
+							});
+						}else{
+							var theChoosenOne = {'thanks':0}
+							for(var i in window.restuarants){
+								var info = window.restuarants[i].info;
+								if(info.thanks>=theChoosenOne.thanks){
+									theChoosenOne = info;
+								}
 							}
+							setCurrentRest(theChoosenOne);
+							startApp();
 						}
-						setCurrentRest(theChoosenOne);
-						startApp();
 					}
 				});
 			}else{

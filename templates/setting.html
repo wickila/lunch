@@ -19,14 +19,12 @@
 			<div class="tab-content radius-border" style="padding: 10px;">
 				<div class="tab-pane fade active in user" id="message">
 					<h3>消息中心</h3>
-					<hr></hr>
 					<div id="setting-message-item-container">
 						<div class="blank-place">您暂时没有任何未读消息</div>
 					</div>
 				</div>
 				<div class="tab-pane fade in user" id="profile">
 					<h3>个人资料</h3>
-					<hr></hr>
 					<form id="email_form" method="post" action="/user/email">
 						<h4>修改邮箱</h4>
 						<fieldset>
@@ -45,7 +43,6 @@
 				</div>
 				<div class="tab-pane fade in user" id="security">
 					<h3>安全设置</h3>
-					<hr></hr>
 					<form id="pwd_form" method="post" action="/user/security">
 						<h4>修改密码</h4>
 						<fieldset>
@@ -63,7 +60,6 @@
 				</div>
 				<div class="tab-pane fade in boss" id="menus-edit-view">
 					<table width="100%"><tr><td><h3>菜单资料</h3></td><td><a class="btn" style="float: right" onclick="newMenu();">新建菜单</a></td></tr></table>
-					<hr></hr>
 					<div id="setting-menus-form-container">
 						<a class="close" onclick="close_menu_form()">&times;</a>
 						<table>
@@ -104,8 +100,7 @@
 				</div>
 				<div class="tab-pane fade in boss" id="boss-order-view">
 					<h3>订单列表</h3>
-					<hr></hr>
-					<div id="boss-order-item-container"></div>
+					<div id="boss-order-item-container" class="scrollable"></div>
 				</div>
 			</div>
 		</div>
