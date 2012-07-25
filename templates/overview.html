@@ -16,29 +16,25 @@
 	</div>
 	<div class="container-fluid">
 	  <div id="main-info-container" class="row-fluid radius-border">
-	    <div class="span2" id="main-info-view-left">
-	    	<ul class="nav nav-list">
-			  <li class="active">
-			    <a href="#about-us-view" data-toggle="tab">关于我们</a>
-			  </li>
-			  <li>
-			    <a href="#concact-us-view" data-toggle="tab">联系我们</a>
-			  </li>
-			  <li>
-			    <a href="#apply-open-shop-view" data-toggle="tab">申请开店</a>
-			  </li>
-			  <li>
-			    <a href="#donate-view" data-toggle="tab">赞助我们</a>
-			  </li>
-			</ul>
-		</div>
-		<div class="span10">
-			<div class="tab-content scrollable">
+		<div class="span9">
+			<div class="tab-content scrollable" style="padding:10px">
 		    	<div class="tab-pane fade active in" id="about-us-view">
-		    		我们只做小事儿
+		    		<p>有米是一个完全免费的轻量级的网上餐厅平台。在有米，你可以：</p>
+		    		<ul>
+					<li>1，完全免费的开设并且运营自己的网上餐厅，不管您有没有实体餐饮店。您都可以开设自己的餐厅，提供美食给您周围的吃货。</li>
+					<li>2，帮助快餐店老板开设网上餐厅，构建起方便的网上订餐系统。</li>
+					<li>3，如果您是忙于上班的上班族，或者每天窝家里的御宅族，您可以用您熟悉的鼠标轻轻一点，美食即刻就可以到您身边来哦。</li>
+					</ul>
 		    	</div>
 		    	<div class="tab-pane fade in" id="concact-us-view">
-		    		gzswicki@gmail.com
+		    		我们的邮箱是：gzswicki@gmail.com,QQ号码是:2253886979.您也可以登录后给我们留言.
+		    		<hr></hr>
+		    		<form class="user" id="index-message-form" method="POST" action="/api/message/new">
+		    			<input type="hidden" name="messagetype" required value="1"></input>
+		    			<input type="hidden" name="receiver" required value="yaammy"></input>
+		    			留言:<textarea style="width: 100%" name="content" required></textarea><br>
+		    			<input style="float:right;" class="btn" type="submit" onclick="postIndexMessage();" value="发送"></input>
+		    		</form>
 		    	</div>
 		    	<div class="tab-pane fade in" id="apply-open-shop-view">
 		    		<p class='show-login-tip'>您还没有登录，请先<a data-toggle='modal' data-target='#signup'>注册</a>或<a data-toggle='modal' data-target='#login'>登录</a></p>
@@ -46,8 +42,8 @@
 		    			店名:<input type="text" name="restname" required><br>
 		    			地址:<input type="text" name="adress" required></input><br>
 		    			电话:<input type="" name="phone" required></input><br>
-		    			留言:<input type="" name="message"></input><br>
-		    			<input class="btn" type="submit" onclick="applyOpenShop();" value="提交申请"></input>
+		    			留言:<textarea style="width: 100%" name="message"></textarea><br>
+		    			<input style="float:right;" class="btn" type="submit" onclick="applyOpenShop();" value="提交申请"></input>
 		    		</form>
 		    		<div id="apply-open-shop-success" style="display: none;">恭喜你提交申请成功，我们将会在一个工作日内给您回复消息，谢谢您的支持！</div>
 		    	</div>
@@ -55,6 +51,25 @@
 		    	</div>
 		    </div>
 		</div>
+		<div class="span3" id="main-info-view-left">
+	    	<ul class="nav nav-list">
+			  <li class="active">
+			    <a href="#about-us-view" data-toggle="tab">关于有米</a>
+			  </li>
+			  <li>
+			    <a href="#concact-us-view" data-toggle="tab">联系我们</a>
+			  </li>
+			  <li>
+			    <a href="#apply-open-shop-view" data-toggle="tab">申请开店</a>
+			  </li>
+			  <!-- <li>
+			    <a href="#donate-view" data-toggle="tab">赞助我们</a>
+			  </li> -->
+			</ul>
+		</div>
+		<!-- <table width="100%">
+			<tr><td width="100%"><input type="text" id="broadcast-input" required placeholder=""></input></td><td><a class="btn">发送</a></td></tr>
+		</table> -->
 	  </div>
 	</div>
 </div>

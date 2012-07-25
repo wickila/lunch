@@ -59,9 +59,8 @@
 					{% include 'restuarant_setting.html' %}
 				</div>
 				<div class="tab-pane fade in boss" id="menus-edit-view">
-					<table width="100%"><tr><td><h3>菜单资料</h3></td><td><a class="btn" style="float: right" onclick="newMenu();">新建菜单</a></td></tr></table>
+					<table width="100%"><tr><td><h3>菜单资料</h3></td><td><a class="btn btn-small" style="float: right" onclick="toggleMenu(event);">新建菜单</a></td></tr></table>
 					<div id="setting-menus-form-container">
-						<a class="close" onclick="close_menu_form()">&times;</a>
 						<table>
 							<tr valign="top">
 								<td width="40%">
@@ -96,7 +95,10 @@
 							</tr>
 						</table>
 					</div>
-					<div id="setting-menus-container"></div>
+					<div id="settting-menus-view">
+						<table width="100%" id="setting-menus-filter"></table>
+						<div id="setting-menus-container" class="scrollable"></div>
+					</div>
 				</div>
 				<div class="tab-pane fade in boss" id="boss-order-view">
 					<h3>订单列表</h3>

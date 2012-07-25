@@ -57,6 +57,7 @@ urls = (
 	'/api/search/rest','api.SearchRestuarant',
 	'/api/restuarant/apply','api.ApplyOpenRest',
 	'/api/messages/(.*)','api.Messages',
+	'/api/message/new','api.Message',
 	'/admin','Admin',
 	'/admin/signin','AdminSignIn',
 	'/admin/restapply','admin.RestApply',
@@ -76,6 +77,7 @@ def gender_filter(gender):
 		return "男"
 	
 env.filters['genderfiler'] = gender_filter
+env.filters['dumps'] = json.dumps
 
 def get_current_user():
 	return web.config._session.user

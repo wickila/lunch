@@ -154,7 +154,6 @@ section{
 	text-align: center;
 	vertical-align: middle;
 	line-height: 100%;
-	border-right: solid 1px #AAA;
 }
 
 #main-info-view-left ul{
@@ -164,7 +163,7 @@ section{
 
 .order-item{
 	color: #555;
-	padding: 10px 10px 50px 10px;
+	padding: 10px 10px 40px 10px;
 }
 
 .order-item table{
@@ -182,7 +181,18 @@ section{
 }
 
 .order-item-head span{
-	margin-right: 33%;
+	padding: 4px;
+	margin-right: 2%;
+	font-size: 10.998px;
+	font-weight: bold;
+	line-height: 13px;
+	color: #ffffff;
+	vertical-align: middle;
+	white-space: nowrap;
+	background-color: #999999;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 
 .concacts-container{
@@ -191,6 +201,29 @@ section{
 
 .concact-item span{
 	margin-right: 10px;
+}
+
+.concact-left-btn{
+	margin-left: 0;
+	-webkit-border-top-left-radius: 4px!important;
+	-moz-border-radius-topleft: 4px!important;
+	border-top-left-radius: 4px!important;
+	-webkit-border-bottom-left-radius: 4px!important;
+	-moz-border-radius-bottomleft: 4px!important;
+	border-bottom-left-radius: 4px!important;
+}
+
+.concact-right-btn{
+	-webkit-border-top-right-radius: 4px!important;
+	-moz-border-radius-topright: 4px!important;
+	border-top-right-radius: 4px!important;
+	-webkit-border-bottom-right-radius: 4px!important;
+	-moz-border-radius-bottomright: 4px!important;
+	border-bottom-right-radius: 4px!important;
+}
+
+.menus{
+	margin: 10px auto 0 auto;
 }
 
 .menu{
@@ -374,6 +407,18 @@ section{
 }
 
 .menus-filter-item a{
+	border-radius: 3px;
+	background-color: transparent;
+	-webkit-transition: background-color 200ms linear;
+	-moz-transition: background-color 200ms linear;
+	-o-transition: background-color 200ms linear;
+	-ms-transition: background-color 200ms linear;
+	transition: background-color 200ms linear;
+	-webkit-transition: color 200ms linear;
+	-moz-transition: color 200ms linear;
+	-o-transition: color 200ms linear;
+	-ms-transition: color 200ms linear;
+	transition: color 200ms linear;
 	margin-right: 10px;
 	padding: 2px 5px 2px 5px;
 	text-decoration: none;

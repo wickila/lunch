@@ -481,3 +481,19 @@ class Messages:
                 msgs.append(message)
             return lunch.write_json({'result':True,'message':'success','total':total,'messages':msgs})
         return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+    
+class Message:
+    def GET(self):
+        data = web.input()
+        
+    def POST(self):
+        data = web.input()
+        receiver = data.receiver
+        content = data.content
+        messagetype = int(data.messagetype)
+        user = lunch.get_current_user()
+        if user:
+            model.db.insert('message',receiver=receiver,content=content,sender=user.username,messagetype=messagetype)
+            return lunch.write_json({'result':True,'message':'success'})
+        return lunch.write_json({'result':False,'message':'you have not login or you permission is not enough'})
+        

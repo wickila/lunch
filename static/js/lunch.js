@@ -4,10 +4,10 @@
  *   application.
  */
 $(function(){
-	var map = null;
+	window.map = null;
 	var geocoder = null;
 	var lastUpdate = 0;
-	var initialLocation;
+	window.initialLocation;
 	var browserSupportFlag =  new Boolean();
 	var mark;
 	var circle;
@@ -16,6 +16,10 @@ $(function(){
 	window.shoppingCartShow = true;
 	window.restuarants = {}
 	window.currentRest = null;
+	window.restView = null;;
+	window.settingMenus = null;
+	window.orderView = null;;
+	window.shoppintCart = null;
 	var PERSISSION = 15;
 	window.orderMenus = [];//购物车里面的条目
 	
@@ -56,7 +60,7 @@ $(function(){
 		},1000);
 		marker = new google.maps.Marker({
 	      position: initialLocation,
-	      title:window.user?window.user.username:'您的位置'
+	      title:window.user?window.user.username+'的位置':'您的位置'
 	    });
 	    circle = new google.maps.Circle({
 	    	  map: map,
@@ -68,6 +72,16 @@ $(function(){
 	    circle.bindTo('center', this.marker, 'position');
 	    circle.setVisible(false);
 	    marker.setMap(map);
+	    window.shoppingCart = new ShoppingCart($('#shoppingCart-container ul'));
+	    $('.tooltip-enable').tooltip({
+		      selector: "a[rel=tooltip]"
+		});
+		$('.tooltip-enable-bottom').tooltip({
+		      selector: "a[rel=tooltip]",
+		      placement: "bottom"
+		});
+		window.hideShoppingCart();
+		updateUserInfoView();
 		initAppEvents();
 	}
 	
@@ -78,89 +92,120 @@ $(function(){
 		google.maps.event.addListener(map,'zoom_changed',function(e){
 			getLocalRestuarants();
 		});
-	}
-	
-	window.search = function(type){
-		if(!$('.search-query').val()){
-			lunchAlert('请输入搜索关键字');
-			return;
-		}
-		if(type == 'adress'){
-			var address = $('.search-query').val();
-		    geocoder.geocode( { 'address': address}, function(results, status) {
-		      if (status == google.maps.GeocoderStatus.OK) {
-		        map.panTo(results[0].geometry.location,PERSISSION);
-		      } else {
-		        alert("Geocode was not successful for the following reason: " + status);
-		      }
-		    });
-		}else{
-			var restname = $('.search-query').val();
-			for(var i in window.restuarants){
-				if(window.restuarants[i].info.name == restname){
-					window.setCurrentRest(window.restuarants[i].info);
-					return;
-				}
+		$('#main').bind('mousedown',function(evt){
+			var canmove = false;
+			if($(evt.target).parent().attr('id')=='main' ||
+					$(evt.target).hasClass('container') ||
+					$(evt.target).hasClass('content') ||
+					$(evt.target).hasClass('radius-border') ||
+					$(evt.target).hasClass('span3') ||
+					$(evt.target).hasClass('span9')){
+				canmove = true;
 			}
-			var theChooseOne = {'thanks':0}
-			for(var j in window.restuarants){
-				if(window.restuarants[j].info.name.indexOf(restname)>-1){
-					var info = window.restuarants[j].info;
-					if(theChooseOne.thanks<=info.thanks){
-						theChooseOne = info;
-					}
-				}
+			if(evt.which == 1&&canmove){
+				window.isDragging = true;
+				window.orignClientX = evt.clientX;
+				window.speed = 0;
+				window.maxSpeed = 0;
+				window.dragStartTime = (new Date()).getTime();
+				evt.preventDefault();
 			}
-			if(theChooseOne.name){
-				window.setCurrentRest(theChooseOne);
-				return;
-			}
-			$.ajax({
-	            type: 'GET',
-	            url: '/api/search/rest',
-	            ContentType: "application/json",
-	            data: {'restname':restname},
-	    		'success': function(data){
-	    			if(data.result){
-	    				var rests = data.restuarants;
-	    				var theMostPopRest = rests[0];
-	    				for(var k in rests){
-	    					var rest = rests[k];
-	    					if(theMostPopRest.thanks<rest.thanks){
-    							theMostPopRest = rest;
-    						}
-	    				}
-	    				window.setCurrentRest(theMostPopRest);
-	    				if(!window.restuarants[theMostPopRest.id]){
-    						r = new Restuarant(theMostPopRest);
-    					}
-	    			}else{
-	    				alert(data.message);
-	    			}
-	    		},
-	    		'error': function(){alert('获取本地餐厅失败')}
-	        });
-		}
-	}
-	
-	window.applyOpenShop = function(){
-		$('#apply-open-shop-form').ajaxForm({
-			'dataType': 'json',
-			'success':function(data){
-				if(data.result){
-					$('#apply-open-shop-form').hide();
-					$('#apply-open-shop-success').show();
-				}
-			},
-			'error':function(){
-					alert('由于服务器繁忙，提交申请失败，请稍后再试');
-				}
 		});
-	}
-	
-	window.relocal = function(){
-		changePage(1);
-		map.panTo(initialLocation);
+		$('#main').bind('mousemove',function(evt){
+			if(window.isDragging){
+				window.speed = Math.abs(evt.clientX - window.orignClientX)/((new Date()).getTime()-window.dragStartTime);
+				window.maxSpeed = window.maxSpeed<window.speed?window.speed:window.maxSpeed;
+				var x = ((1-page)+(evt.clientX - window.orignClientX)/$(window).width())*100;
+				$('#main').css('transform','translate('+ x +'%, 0px)');
+				$('#main').css('-webkit-transform','translate('+ x +'%, 0px)');
+				$('#main').css('-moz-transform','translate('+ x +'%, 0px)');
+				$('#main').css('-o-transform','translate('+ x +'%, 0px)');
+				$('#main').css('-ms-transform','translate('+ x +'%, 0px)');
+				x = (evt.clientX - window.orignClientX)/$(window).width()*100;
+				if(Math.abs(x)>60||window.maxSpeed>1){
+					window.changePage(window.page-(x/Math.abs(x)));
+					window.isDragging = false;
+				}
+				evt.preventDefault();
+			}
+		});
+		$('#main').bind('mouseup',function(evt){
+			window.isDragging = false;
+			$('#main').css('transform','translate('+ (1-page) +'00%, 0px)');
+			$('#main').css('-webkit-transform','translate('+ (1-page) +'00%, 0px)');
+			$('#main').css('-moz-transform','translate('+ (1-page) +'00%, 0px)');
+			$('#main').css('-o-transform','translate('+ (1-page) +'00%, 0px)');
+			$('#main').css('-ms-transform','translate('+ (1-page) +'00%, 0px)');
+		});
+		$('.modal').on('shown',function(){
+			$(this).find('input:first').focus();
+		});
+		$('#select-thumbnail-modal').on('shown',function(){
+			if(!window.thumbnails){
+				$.ajax({
+			          type: 'GET',
+			          url: '/api/thumbnaillib',
+			          ContentType: "application/json",
+			          success: function(data){
+			  					if(data.result){
+			  						window.thumbnails = data.thumbnails;
+			  						for(var i in window.thumbnails){
+			  							$('#thumb-lib').find('.thumbnails').append($("<li>"+
+			  																		"<a href='#' class='thumbnail'><img style='width:160px;height:160px' src='"+window.thumbnails[i].src+"' alt='"+window.thumbnails[i].name+"'></a>"+
+			  																		"<h5>"+window.thumbnails[i].name+"</h5>"+
+			  																		"</li>"));
+			  						}
+			  						$('#select-thumbnail-modal').css('width',190*3+30+10)
+			  						$('#thumb-lib .thumbnail').bind('click',function(){
+			  							$('#thumb-lib .thumbnail').removeClass('select')
+			  							$(this).addClass('select');
+			  							$('#thumb-lib').data('selected-src',$(this).find('img').attr('src'))
+			  						});
+			  					}
+			          		},
+			          error: function(){alert('获取菜单失败')}
+			    });
+			}
+		});
+		$('#select-thumbnail-btn').bind('click',function(){
+			if($('#thumb-lib').hasClass('active')){
+				$('#setting-menu-imgurl').val($('#thumb-lib').data('selected-src'));
+				$('#setting-menu-img-form').get(0).reset();
+				$('#setting-menu-img').attr('src',$('#thumb-lib').data('selected-src'));
+			}else if($('#thumb-upload').hasClass('active')){
+				$('#setting-menu-img').attr('src',$('#setting-menu-img-modal').attr('src'));
+				$('#setting-menu-imgurl').val('');
+			}else{
+				$('#setting-menu-imgurl').val($('#setting-menu-img-modal-internet').attr('src'));
+				$('#setting-menu-img').attr('src',$('#setting-menu-img-modal-internet').attr('src'));
+				$('#setting-menu-img-form').get(0).reset();
+			}
+			$('#select-thumbnail-modal').modal('hide');
+		})
+
+		var theChoosenOne
+		setInterval(function(){
+			if(theChoosenOne){
+				theChoosenOne.shutup();
+			}
+			var rolls = [];
+			var bounds = map.getBounds();
+			for(var i in window.restuarants){
+				if(bounds.contains(window.restuarants[i].marker.getPosition())){
+					window.restuarants[i].roll = Math.random();
+					rolls.push(window.restuarants[i])
+				}
+			}
+			theChoosenOne = rolls[0];
+			for(var j in rolls){
+				if(!theChoosenOne || rolls[j].roll > theChoosenOne.roll){
+					theChoosenOne = rolls[j];
+				}
+			}
+			if(theChoosenOne){
+				theChoosenOne.say(theChoosenOne.info.description);
+			}
+		},15000);
 	}
 	
 	window.initialize =  function() {
@@ -172,29 +217,25 @@ $(function(){
 	    };
 	    map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
 
-	    // Try W3C Geolocation (Preferred)
 	    if(navigator.geolocation) {
-	      browserSupportFlag = true;
+	      $('#loading-tip').html('正在获取您的地理位置，请点击浏览器上方的允许按钮...');
 	      navigator.geolocation.getCurrentPosition(function(position) {
 	        initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
 	        initLocation();
 	      }, function() {
-	        handleNoGeolocation(browserSupportFlag);
+	        alert('您拒绝了浏览器定位您的位置，我们获取到您的位置可能不太准确。您可以在浏览器设置里面重新设置此选项');
+	        handleNoGeoLocation();
 	      });
-	    // Try Google Gears Geolocation
-	    } else if (google.gears) {
-	      browserSupportFlag = true;
+	    }else if(google.gears) {
 	      var geo = google.gears.factory.create('beta.geolocation');
 	      geo.getCurrentPosition(function(position) {
 	        initialLocation = new google.maps.LatLng(position.latitude,position.longitude);
 	        initLocation();
 	      }, function() {
-	        handleNoGeoLocation(browserSupportFlag);
+	    	  handleNoGeoLocation();
 	      });
-	    // Browser doesn't support Geolocation
 	    }else{
-	      browserSupportFlag = false;
-	      handleNoGeolocation(browserSupportFlag);
+	    	handleNoGeoLocation();
 	    }
 	    function initLocation(){
 	    	complete+=1;
@@ -212,15 +253,9 @@ $(function(){
 		      }
 		    });
 	    }
-	    function handleNoGeolocation(errorFlag) {
-	      if (errorFlag == true) {
-	        alert("Geolocation service failed.");
-	        initialLocation = latlng;
-	      } else {
-	        alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
-	        initialLocation = latlng;
-	      }
-	      initLocation();
+	    function handleNoGeoLocation(){
+	    	initialLocation = latlng;
+	    	initLocation();
 	    }
 	    
 	    var contextMenu = $(document.createElement('ul'))
@@ -358,11 +393,24 @@ $(function(){
 		        if(window.currentRest != this.info){
 	        		window.restuarants[window.currentRest.id].infowindow.close();
 		        }
+		        this.infowindow.setOptions({disableAutoPan:false});
+		        this.infowindow.setContent(headDiv);
 		        this.infowindow.open(map,this.marker);
 		        setCurrentRest(this.info);
 		},this));
 	};
 	  
+	Restuarant.prototype.say = function(content){
+		this.infowindow.setContent("<div class='infowindow-div' data-rid='"+this.info.id+"' onclick='synsSetCurrentRest("+this.info.id+")'>"+content+"</div>");
+		this.infowindow.setOptions({disableAutoPan:true});
+		this.infowindow.open(map,this.marker);
+		setTimeout($.proxy(this.shutup,this),3000);
+	}
+	
+	Restuarant.prototype.shutup = function(){
+		this.infowindow.close();
+	}
+	
 	window.new_restuarant = function(){
 		$('#new_restuarant_form').ajaxForm({
 				'dataType': 'json',
@@ -408,35 +456,6 @@ $(function(){
 	          		'error': function(){alert('获取本地餐厅失败')}
 	      });
 	};
-		
-	window.getUser = function(callback){
-		$.ajax({
-	        type: 'GET',
-	        url: '/api/checklogin',
-	        ContentType: "application/json",
-	        callback:callback,
-			success: function(data){
-				if(data.result){
-					window.user = data.user;
-					if(user){
-						$('.user').addClass('user-login');
-						$('.user').removeClass('user');
-						if(user.permission > 0){
-							$('.boss').addClass('boss-login');
-							$('.boss').removeClass('boss');
-						}
-						$('.show-login-tip').hide();
-					}
-					if(callback){
-						callback();
-					}
-				}else{
-					alert(data.message);
-				}
-			},
-			error: function(){alert('登录失败')}
-	    });
-	}
 		
 	window.getMyRestuarant = function(callback){
 		if(window.user && window.user.permission>0 && window.user.restuarant==undefined){
@@ -495,13 +514,25 @@ $(function(){
 				$('#rest-setting-minprice').val(window.user.restuarant.minprice);
 				$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
 				$('#setting-avatar-img').attr('src',window.user.avatarurl);
-			}
-			if(!window.bossOrderView){
-				if(window.user && window.user.restuarant){
+				if(!window.bossOrderView){
 					window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
 				}
 			}
+			$('#nav-right').html("<li><a onclick='changePage(4)'>"+window.user.username+"</a></li><li><a onclick='logout()'>登出</a></li>");
+			$('.user').addClass('user-login');
+			$('.user').removeClass('user');
+			if(user.permission > 0){
+				$('.boss').addClass('boss-login');
+				$('.boss').removeClass('boss');
+			}
+			$('.show-login-tip').hide();
 		}else{
+			$('#nav-right').html("<li><a data-toggle='modal' data-target='#login'>登录</a></li><li><a id='nav-signup' data-toggle='modal' data-target='#signup'>注册</a>");
+			$('.user-login').addClass('user');
+			$('.user-login').removeClass('user-login');
+			$('.boss-login').addClass('boss');
+			$('.boss-login').removeClass('boss-login');
+			$('.show-login-tip').show();
 			$('#rest-setting-name').val("");
 			$('#rest-settting-type').val('');
 			$('#rest-setting-des').val('');
@@ -572,15 +603,7 @@ $(function(){
 				if(data.result){
 					window.user = data.user;
 					$('#login').modal('hide');
-					$('#nav-right').html("<li><a id='nav-username' onclick='changePage(4);'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li>");
-					$('#nav-logout').click(logout);
-					$('.user').addClass('user-login');
-					$('.user').removeClass('user');
-					if(user.permission > 0){
-						$('.boss').addClass('boss-login');
-						$('.boss').removeClass('boss');
-					}
-					$('.show-login-tip').hide();
+					window.updateUserInfoView();
 					window.updateView();
 					getMyRestuarant();
 				}else{
@@ -597,19 +620,7 @@ $(function(){
 				if(data.result){
 					window.user = data.user
 					$('#signup').modal('hide');
-					user = data.user;
-					$('#nav-right').html("<li><a id='nav-username' onclick='changePage(4)'>"+user.username+"</a></li><li><a id='nav-logout' onlick='logout()'>登出</a></li>");
-					$('#nav-logout').click(logout);
-					$('#main').append($("<section id='"+ user.username +"' style='left:400%;background-color: #0f0;'>" +
-										"<div>fivth div</div>" +
-										"</section>"));
-					$('.user').addClass('user-login');
-					$('.user').removeClass('user');
-					if(user.permission > 0){
-						$('.boss').addClass('boss-login');
-						$('.boss').removeClass('boss');
-					}
-					$('.show-login-tip').hide();
+					window.updateUserInfoView();
 					window.updateView();
 				}else{
 					$('#usernameErrorMessage').html(data.usernameErrorMessage);
@@ -628,12 +639,6 @@ $(function(){
 			success: function(data){
 				if(data.result){
 					window.user = null;
-					$('#nav-right').html("<li><a data-toggle='modal' data-target='#login'>登录</a></li><li><a id='nav-signup' data-toggle='modal' data-target='#signup'>注册</a>");
-					$('.user-login').addClass('user');
-					$('.user-login').removeClass('user-login');
-					$('.boss-login').addClass('boss');
-					$('.boss-login').removeClass('boss-login');
-					$('.show-login-tip').show();
 					window.updateView();
 					window.updateUserInfoView();
 				}else{
@@ -677,25 +682,6 @@ $(function(){
 	    });
 	}
 		
-	window.check = function() {
-		var password = $("#password").val();
-		var repassword = $("#repassword").val();
-		var rpwd = $("#repassword")[0];
-		if(repassword.length > 0)
-		{
-			if(password != repassword)
-			{
-				rpwd.setCustomValidity("密码不一致!"); 
-			}else
-			{
-				rpwd.setCustomValidity("");
-			}
-		}else
-		{
-			rpwd.setCustomValidity("请输入此字段!");
-		}
-	};
-	
 	window.showAddOrderAnimation = function(element,menuname,callback){
 		var mirror = $('<div id="cart_shadow" style="display: none;background-color:rgb(251,255,35); border:1px solid #000;z-index: 9999;">'+menuname+'</div>');
 		mirror.appendTo($('body'));
@@ -828,7 +814,7 @@ $(function(){
 	
 	window.startLoad = function(){
 		if(map.getZoom()<PERSISSION){
-			$('#overview-tip').html('您的附近好像还没有餐厅哦，您可以亲自开设一家餐厅或者邀请您最喜爱的餐厅来Lunch开店')
+			$('#overview-tip').html('您的附近好像还没有餐厅哦，您可以亲自开设一家餐厅或者邀请您最喜爱的餐厅来有米开设一家餐厅')
 		}
 		getLocalRestuarants(function(){
 			var hasRest = false;
@@ -841,55 +827,194 @@ $(function(){
 			    }
 			}
 			if(hasRest){
-				getUser(function(){
-					complete+=1;
-					calcProgress();
-					if(window.user && window.user.permission>0){
-						getMyRestuarant(function(){
-							complete+=1;
-							calcProgress();
-							if(CURRENT_REST_ID){
-								synsSetCurrentRest(CURRENT_REST_ID,function(){
-									startApp();
-								});
-							}else{
-								if(window.user.restuarant){
-									setCurrentRest(window.user.restuarant);
-								}else{
-									var theChoosenOne = {'thanks':0}
-									for(var i in window.restuarants){
-										var info = window.restuarants[i].info;
-										if(info.thanks>=theChoosenOne.thanks){
-											theChoosenOne = info;
-										}
-									}
-								}
-								startApp();
-							}
-						});
-					}else{
+				complete+=1;
+				calcProgress();
+				if(window.user && window.user.permission>0){
+					getMyRestuarant(function(){
+						complete+=1;
+						calcProgress();
 						if(CURRENT_REST_ID){
 							synsSetCurrentRest(CURRENT_REST_ID,function(){
 								startApp();
 							});
 						}else{
-							var theChoosenOne = {'thanks':0}
-							for(var i in window.restuarants){
-								var info = window.restuarants[i].info;
-								if(info.thanks>=theChoosenOne.thanks){
-									theChoosenOne = info;
+							if(window.user.restuarant){
+								setCurrentRest(window.user.restuarant);
+							}else{
+								var theChoosenOne = {'thanks':0}
+								for(var i in window.restuarants){
+									var info = window.restuarants[i].info;
+									if(info.thanks>=theChoosenOne.thanks){
+										theChoosenOne = info;
+									}
 								}
 							}
-							setCurrentRest(theChoosenOne);
 							startApp();
 						}
+					});
+				}else{
+					if(CURRENT_REST_ID){
+						synsSetCurrentRest(CURRENT_REST_ID,function(){
+							startApp();
+						});
+					}else{
+						var theChoosenOne = {'thanks':0}
+						for(var i in window.restuarants){
+							var info = window.restuarants[i].info;
+							if(info.thanks>=theChoosenOne.thanks){
+								theChoosenOne = info;
+							}
+						}
+						setCurrentRest(theChoosenOne);
+						startApp();
 					}
-				});
+				}
 			}else{
 				map.setZoom(map.getZoom()-1)
 				startLoad();
 			}
 		});
 	}
-//	interval = setInterval('calcProgress();',20);
+	
+	window.changePage = function(page){
+		window.isDragging = false;
+		if(window.page == page)return;
+		if(page<1)page=1;
+		if(page>4)page=4;
+		$('.bottom-nav-a').each(function(){
+			$(this).removeClass($(this).attr('id')+'-active');
+		});
+		$('.navbar-fixed-top').find('.nav:first').find('li').removeClass('active')
+		switch(page){
+			case 1:
+				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
+				$('#navbar-fixed-top-index').addClass('active');
+				$('title').html('Yaammy-首页');
+				break;
+			case 2:
+				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
+				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
+				$('#navbar-fixed-top-rest').addClass('active');
+				$('title').html('Yaammy-'+window.currentRest.name);
+				break;
+			case 3:
+				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
+				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
+				$('#bottom-nav-orderview').addClass('bottom-nav-orderview-active');
+				$('#navbar-fixed-top-order').addClass('active');
+				$('title').html('Yaammy-订单页面');
+				break;
+			case 4:
+				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
+				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
+				$('#bottom-nav-orderview').addClass('bottom-nav-orderview-active');
+				$('#bottom-nav-user').addClass('bottom-nav-user-active');
+				$('#navbar-fixed-top-user').addClass('active');
+				$('title').html('Yaammy-管理页面');
+				break;
+		}
+		window.page = page;
+		window.hideShoppingCart();
+		$('#main').css('transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-webkit-transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-moz-transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-o-transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('-ms-transform','translate('+ (1-page) +'00%, 0px)');
+		window.updateView();
+	}
+	
+	window.gotoCharge = function(rideOrder){
+		window.rideOrder=rideOrder;
+		$('#orderview-left-ensure-order').click();
+		changePage(3);
+	}
+	
+	window.updateView = function(){
+		if(window.viewOrderView)window.viewOrderView.dispose();
+		window.viewOrderView = null;
+		switch(window.page){
+			case 1:
+				break;
+			case 2:
+				if(!window.restView){
+					window.restView = new RestView($('#restview'),window.currentRest);
+				}else{
+					window.restView.setRest(window.currentRest);
+				}
+				break;
+			case 3:
+				if(!window.user){
+					$('#order-container').empty();
+					$('#order-container').append($("<p class='show-login-tip'>您还没有登录，请先<a data-toggle='modal' data-target='#signup'>注册</a>或<a data-toggle='modal' data-target='#login'>登录</a></p>"));
+				}else{
+					if(!window.orderView){
+						window.orderView = new OrderView($('#order-container'));
+					}
+					if(!window.viewOrderView){
+						window.viewOrderView = new ViewOrderView($('#view-order-item-container'),'user');
+					}
+					window.orderView.setMenus(window.orderMenus);
+				}
+				break;
+			case 4:
+				if(window.user){
+					if(!window.menutypeSetting){
+						window.menutypeSetting = new MenuTypeSetting();
+					}
+					if(!window.messages){
+						window.messages = new Messages();
+						$('#setting-message-item-container').append(window.messages.element);
+					}
+				}
+				break;
+		}
+	}
+	
+	window.updateLayout = function(){
+		$('.content').css('height',$(window).height()-$('.navbar-fixed-top').height()-$('.navbar-fixed-bottom').height()-40);
+		$('.content').css('margin-top',$('.navbar-fixed-top').height());
+		overviewHeight = $('.content').height()*0.65;
+		$('#map-canvas').parent().parent().parent().css('height',overviewHeight);
+		$('#main-info-container').css('height',$('.content').height()-$('#map-canvas').height()-$('#overview-tip').height()-40);
+		$('.menu').css('height','200px')
+		$('#shoppingCart-container').css('left',($(window).width()-$('#shoppingCart-container').width())*0.5);
+		$('#site-nav-container').css('bottom',$('.navbar-fixed-bottom').height()-$('#site-nav-container').height());
+		$('#site-nav-container').css('left',($(window).width()-$('#site-nav-container').width())*0.5);
+		$('#view-order-item-container,#boss-order-item-container,#setting-menus-container,#menus-wrapper').css('height',$('.content').height()-$('.navbar-fixed-top').height()-80);
+	}
+	
+	$.setSideBarRest = function(rest){
+		$('#o-side-bar-rest-avatar').attr('src',rest.avatarurl)
+		$('#o-side-bar-rest-name').html(rest.name);
+		$('#o-side-bar-rest-description').html(rest.description);
+		$('#o-side-bar-rest-thanks').html(rest.thanks);
+		$('#overview-side-info-menus').css('max-height',$('#overview-side-info-head').parent().height()-$('#overview-side-info-head').find('table').height());
+	}
+	
+	$.setSideBarMenus = function(menus){
+		$('#overview-side-info-menus').slideUp(20,function(){
+			$('#overview-side-info-menus').empty();
+			for(var i in menus)
+			{
+				var menu = new SmallMenu(menus[i]);
+				$('#overview-side-info-menus').append($(menu.getDiv()));
+			}
+			$('#overview-side-info-menus').find('button').bind('click',onCheckClick);
+			function onCheckClick(){
+				var mid = parseInt($(this).data('mid'));
+				var m;
+				for(var i in menus){
+					if(menus[i].id == mid){
+						m = menus[i];
+						break;
+					}
+				}
+				window.showAddOrderAnimation($('#small-menu-'+mid),m.name,function(){window.addOrderMenu(m);})
+			}
+			$('#overview-side-info-menus').css('max-height',$('#overview-side-info-head').parent().height()-$('#overview-side-info-head').find('table').height());
+			$('#overview-side-info-menus').slideDown(400);
+		});
+	}
+	
+	updateLayout();
 });

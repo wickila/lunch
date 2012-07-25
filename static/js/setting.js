@@ -77,13 +77,18 @@ $(function(){
 					option.attr('selected',true);
 				}
 			});
+			$('#menus-edit-view').find('.btn-small').html('完成');
+			$('#menus-edit-view').find('.btn-small').addClass('btn-primary');
 			$('#setting-menus-form-container').slideDown();
-			$('#setting-menus-container').slideUp();
+			$('#settting-menus-view').slideUp();
 		});
 	}
 	
 	function createMenus(){
 		menus = new Menus($('#setting-menus-container'),window.user.restuarant.menus);
+		if(!window.setttingMenusFilter){
+			window.setttingMenusFilter = new MenuFilter($('#setting-menus-filter'),window.user.restuarant,menus);
+		}
 		initEvents();
 	}
 	
@@ -92,24 +97,28 @@ $(function(){
 		initEvents();
 	}
 	
-	window.newMenu = function(){
-		$('#setting-menu-form').attr('action','/api/menu/new');
-		$('#setting-menu-form')[0].reset();
-		$('#setting-menu-img-form')[0].reset();
-		$('#setting-menu-img').attr('src','http://placehold.it/160x160');
-		$('#setting-menu-mtype').empty();
-		$('#setting-menu-mtype').append("<option value='0'>全部");
-		for(var j in window.user.restuarant.menutypes){
-			var menutype = window.user.restuarant.menutypes[j];
-			$('#setting-menu-mtype').append("<option value='"+menutype.id+"'>"+menutype.name);
+	window.toggleMenu = function(event){
+		if($(event.currentTarget).html()=='新建菜单'){
+			$('#setting-menu-form').attr('action','/api/menu/new');
+			$('#setting-menu-form')[0].reset();
+			$('#setting-menu-img-form')[0].reset();
+			$('#setting-menu-img').attr('src','http://placehold.it/160x160');
+			$('#setting-menu-mtype').empty();
+			$('#setting-menu-mtype').append("<option value='0'>全部");
+			for(var j in window.user.restuarant.menutypes){
+				var menutype = window.user.restuarant.menutypes[j];
+				$('#setting-menu-mtype').append("<option value='"+menutype.id+"'>"+menutype.name);
+			}
+			$('#setting-menus-form-container').slideDown();
+			$('#settting-menus-view').slideUp();
+			$(event.currentTarget).html('完成');
+			$(event.currentTarget).addClass('btn-primary');
+		}else{
+			$('#setting-menus-form-container').slideUp();
+			$('#settting-menus-view').slideDown();
+			$(event.currentTarget).html('新建菜单');
+			$(event.currentTarget).removeClass('btn-primary');
 		}
-		$('#setting-menus-form-container').slideDown();
-		$('#setting-menus-container').slideUp();
-	}
-	
-	window.close_menu_form = function(){
-		$('#setting-menus-form-container').slideUp();
-		$('#setting-menus-container').slideDown();
 	}
 	
 	window.menu_img_change = function(event){
@@ -141,6 +150,10 @@ $(function(){
 							}
 							if(!isOld)window.user.restuarant.menus.push(m);
 							updateMenus(window.user.restuarant.menus);
+							$('#menus-edit-view').find('.btn-small').html('完成');
+							$('#menus-edit-view').find('.btn-small').addClass('btn-primary');
+							$('#setting-menus-form-container').slideDown();
+							$('#settting-menus-view').slideUp();
 						}
 					}).submit();
 				}else{
@@ -159,7 +172,10 @@ $(function(){
 					}
 					if(!isOld)window.user.restuarant.menus.push(m);
 					updateMenus(window.user.restuarant.menus);
-					close_menu_form();
+					$('#menus-edit-view').find('.btn-small').html('完成');
+					$('#menus-edit-view').find('.btn-small').addClass('btn-primary');
+					$('#setting-menus-form-container').slideDown();
+					$('#settting-menus-view').slideUp();
 				}
 			}
 		});
