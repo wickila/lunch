@@ -52,8 +52,8 @@ CREATE TABLE `lunch`.`menu` (
   `thumbnail` TEXT  NOT NULL,
   `price` FLOAT  NOT NULL,
   `discount` FLOAT  NOT NULL DEFAULT 10,
-  `soldout` INT  NOT NULL DEFAULT 1;
-  `taste` INT  NOT NULL;
+  `soldout` INT  NOT NULL DEFAULT 1,
+  `taste` INT  NOT NULL,
   `favorites` INT  NOT NULL,
   `comments` INT  NOT NULL,
   PRIMARY KEY (`id`)
