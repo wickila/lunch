@@ -142,3 +142,7 @@ CREATE TABLE `lunch`.`restapply` (
 )
 ENGINE = MyISAM
 CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+INSERT INTO user (username, password, email, permission) VALUES ('wickila', '5591089f131b5fe009dcfe02a82179318b81c4fd', 'gzswicki@gmail.com', '11');
+INSERT INTO user (username, password, email, permission) VALUES ('yaammy', '5591089f131b5fe009dcfe02a82179318b81c4fd', 'gzswicki@gmail.com', '11');
+INSERT INTO restuarant (username, name, hash_location, lat, lng, adress) VALUES ('wickila', '\xe6\xb2\x99\xe5\x8e\xbf\xe5\xb0\x8f\xe5\x90\x83', 'ws0bpb269xy7', 22.501844666434792, 113.89567994368599, '\xe4\xb8\xad\xe5\x9b\xbd\xe5\xb9\xbf\xe4\xb8\x9c\xe7\x9c\x81\xe6\xb7\xb1\xe5\x9c\xb3\xe5\xb8\x82\xe5\x8d\x97\xe5\xb1\xb1\xe5\x8c\xba\xe6\xb8\xaf\xe5\x9f\x8e\xe8\xb7\xaf')

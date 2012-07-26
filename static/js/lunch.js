@@ -816,6 +816,10 @@ $(function(){
 		if(map.getZoom()<PERSISSION){
 			$('#overview-tip').html('您的附近好像还没有餐厅哦，您可以亲自开设一家餐厅或者邀请您最喜爱的餐厅来有米开设一家餐厅')
 		}
+		if(map.getZoom() == 1){
+			startApp();
+			return;
+		}
 		getLocalRestuarants(function(){
 			var hasRest = false;
 			for(var i in window.restuarants) {
