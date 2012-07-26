@@ -17,7 +17,7 @@ CREATE TABLE `lunch`.`user` (
   PRIMARY KEY (`id`)
 )
 ENGINE = MyISAM
-CHARACTER SET utf8
+CHARACTER SET utf8;
 
 CREATE TABLE `lunch`.`restuarant` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -40,7 +40,7 @@ CREATE TABLE `lunch`.`restuarant` (
   PRIMARY KEY (`id`)
 )
 ENGINE = MyISAM
-CHARACTER SET utf8
+CHARACTER SET utf8;
 
 CREATE TABLE `lunch`.`menu` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -59,7 +59,7 @@ CREATE TABLE `lunch`.`menu` (
   PRIMARY KEY (`id`)
 )
 ENGINE = MyISAM
-CHARACTER SET utf8
+CHARACTER SET utf8;
 
 CREATE TABLE `lunch`.`lunchorder` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
