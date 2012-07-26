@@ -65,8 +65,15 @@ urls = (
 )
 
 app = web.application(urls, globals())
-session = web.session.Session(app, web.session.DiskStore('sessions'),initializer={'user':None,'location':None})
 env = Environment(loader=PackageLoader('lunch','templates'))
+def getSession():
+	web.config.session_parameters['timeout'] = 86400*14, #24 * 60 * 60 *14
+	global session
+	if '_session' not in web.config:
+		session = web.session.Session(app, web.session.DiskStore('sessions'),initializer={'user':None,'location':None})
+		web.config._session = session
+	else:
+		session = web.config._session
 
 def gender_filter(gender):
 	if gender == 0:
@@ -256,10 +263,9 @@ class AdminSignOut:
 		session.user = None
 		raise web.seeother('/admin/signin')
 
-def getSession():
-	if '_session' not in web.config:
-		web.config._session = session
+#if __name__ == '__main__': #for local
+#	getSession()
+#	app.run()
 
-if __name__ == '__main__':
-	getSession()
-	app.run()
+getSession()  #for remote 
+application = app.wsgifunc() #for remote 
