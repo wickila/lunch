@@ -118,7 +118,7 @@ class ViewRest:
 		try:
 			URL='http://ip.json.dotcloud.com/json/'+ip.strip()
 			tempFile = urllib2.urlopen(URL).read()
-			jsonobj = json.load(tempFile)
+			jsonobj = json.loads(tempFile)
 			return (float(jsonobj['latitude']),float(jsonobj['longitude']))
 		except:
 			return (23,114)
