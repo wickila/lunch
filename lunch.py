@@ -100,7 +100,7 @@ def write_json(obj):
 class Index:
 	def get_location(self,ip):
 		try:
-			URL='http://ip.json.dotcloud.com/json/'++ip.strip()
+			URL='http://ip.json.dotcloud.com/json/'+ip.strip()
 			tempFile = urllib2.urlopen(URL).read()
 			jsonobj = json.loads(tempFile)
 			return (float(jsonobj['latitude']),float(jsonobj['longitude']))
