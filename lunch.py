@@ -100,16 +100,16 @@ def write_json(obj):
 class Index:
 	def get_location(self,ip):
 		try:
-			URL='http://ip.json.dotcloud.com/json/'+ip.strip()
+			URL='http://ip.json.dotcloud.com/json/'++ip.strip()
 			tempFile = urllib2.urlopen(URL).read()
-			jsonobj = json.load(tempFile)
+			jsonobj = json.loads(tempFile)
 			return (float(jsonobj['latitude']),float(jsonobj['longitude']))
 		except:
 			return (23,114)
 	
 	def GET(self):
 		"""index page"""
-		if not session.location:
+		if (not session.user) or (not session.location):
 			session.location = self.get_location(web.ctx.ip)
 		return env.get_template('index.html').render({"user":session.user,"location":session.location,"rest_types":json.dumps(config.REST_TYPES)})
 	
@@ -263,9 +263,9 @@ class AdminSignOut:
 		session.user = None
 		raise web.seeother('/admin/signin')
 
-#if __name__ == '__main__': #for local
-#	getSession()
-#	app.run()
+if __name__ == '__main__': #for local
+	getSession()
+	app.run()
 
-getSession()  #for remote 
-application = app.wsgifunc() #for remote 
+#getSession()  #for remote 
+#application = app.wsgifunc() #for remote 
