@@ -9,7 +9,7 @@ $(function(){
 		}
 		if(type == 'adress'){
 			var address = $('.search-query').val();
-		    geocoder.geocode( { 'address': address}, function(results, status) {
+		    window.geocoder.geocode( { 'address': address}, function(results, status) {
 		      if (status == google.maps.GeocoderStatus.OK) {
 		        map.panTo(results[0].geometry.location,PERSISSION);
 		      } else {

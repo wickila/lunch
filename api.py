@@ -446,7 +446,7 @@ class SearchRestuarant:
     def GET(self):
         data = web.input()
         restname = data.restname
-        rests = model.db.select('restuarant',where='name=restname',vars=locals())
+        rests = model.db.select('restuarant',where='name=$restname',vars=locals())
         restuarants = []
         for restuarant in rests:
             restuarant.created_time = str(restuarant.created_time).split('.')[0]

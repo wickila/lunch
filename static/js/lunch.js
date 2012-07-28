@@ -5,7 +5,7 @@
  */
 $(function(){
 	window.map = null;
-	var geocoder = null;
+	window.geocoder = null;
 	var lastUpdate = 0;
 	window.initialLocation;
 	var browserSupportFlag =  new Boolean();
@@ -20,7 +20,7 @@ $(function(){
 	window.settingMenus = null;
 	window.orderView = null;;
 	window.shoppintCart = null;
-	var PERSISSION = 15;
+	PERSISSION = 15;
 	window.orderMenus = [];//购物车里面的条目
 	
 	window.calcProgress = function(){
@@ -370,7 +370,8 @@ $(function(){
 	    	  strokeColor: '#999999',
 	    	  strokeWeight: '1',
 	    	  radius: this.info.maxdistance,
-	    	  fillColor: '#aaaaaa'
+	    	  fillColor: '#aaaaaa',
+	    	  clickable:false,
 	    	});
 	    this.circle.bindTo('center', this.marker, 'position');
 	    this.circle.setVisible(false);
@@ -476,14 +477,16 @@ $(function(){
 	            callback:callback,
 	    		success: function(data){
 	    			if(data.result){
-	    				if(window.user.restuarant == undefined){
-	    					if(!window.restuarants[data.restuarant.id]){
-	    						new Restuarant(data.restuarant);
-	    					}
-	    					window.user.restuarant = data.restuarant;
-	    					if(callback){
-	    						callback();
-	    					}
+	    				if(data.restuarant){
+		    				if(window.user.restuarant == undefined){
+		    					if(!window.restuarants[data.restuarant.id]){
+		    						new Restuarant(data.restuarant);
+		    					}
+		    					window.user.restuarant = data.restuarant;
+		    					if(callback){
+		    						callback();
+		    					}
+		    				}
 	    				}
 	    			}else{
 	    				alert(data.message);
