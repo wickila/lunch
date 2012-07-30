@@ -17,15 +17,14 @@
 	{% block script %}
 	{% endblock %}
 	<script type="text/javascript">
-		window.initialize =  function() {
-	  	}
-		window.lunchAlert = function(message,callback){
-			$('#alert-message').html(message);
+		window.initialize = function(){}
+		window.lunchTip = function(message,callback){
+			$('#tip-message').html(message);
 			if(callback){
-				$('#alert-message').find('a').bind('click',callback);
+				$('#tip-message').find('a').bind('click',callback);
 			}
-			$('.alert').slideDown(200);
-			setTimeout(function(){$('.alert').slideUp(200);},2500);
+			$('#lunch-tip').slideDown(200);
+			setTimeout(function(){$('#lunch-tip').slideUp(200);},10000);
 		}
 		window.closeTip = function(){
 			$('.alert').hide();
@@ -33,6 +32,11 @@
 		function playSound(){
 			var sound=$('#new-order-sound');
 			$('#new-order-sound').get(0).play();
+		}
+		
+		window.lunchAlert = function(message){
+			$("#lunch-alert").fadeIn();
+			$('#alert-message').html(message);
 		}
 	</script>
 	</head>
@@ -44,27 +48,17 @@
 					  <li id="navbar-fixed-top-index" class="active"><a class="brand active" onclick="changePage(1)">有米</a></li>
 	                  <li id="navbar-fixed-top-rest"><a onclick="changePage(2)">餐厅</a></li>
 	                  <li id="navbar-fixed-top-order"><a onclick="changePage(3)">订单</a></li>
-	                  <li id="navbar-fixed-top-user"><a onclick="changePage(4)">管理</a></li>
 	                </ul>
 					<form class="navbar-search pull-left">
 			            <input type="text" class="search-query span2" placeholder="Search"  onkeypress="if(event.keyCode == 13){search('adress');return false}return true">
 			        </form>
-                	<ul class="nav">
-			            <li class="dropdown">
-			              <a href="#" class="dropdown-toggle" data-toggle="dropdown">搜索<b class="caret"></b></a>
-			              <ul class="dropdown-menu">
-			              	<li onclick="search('adress');"><a>搜索地址</a></li>
-			                <li onclick="search('shop');"><a>搜索店铺</a></li>
-			              </ul>
-			            </li>
-			        </ul>
 					<ul class="nav pull-right">
 						<li><a id="nav-shopping-cart-btn" onclick="toggleShoppingCart()"><i class="icon-shopping-cart icon-white" style="margin-right: 5px"></i>购物车(<span class="order-num">0</span>)</a></li>
 						<li class="tooltip-enable-bottom"><a id="nav-my-location" onclick="relocal();" rel='tooltip' data-original-title=""><i class="icon-screenshot icon-white"></i>我的位置</a></li>
 					</ul>
 					<ul id="nav-right" class="nav pull-right">
 						{% if user %}
-							<li><a onclick='changePage(4)'>{{user.username}}</a></li>
+							<li><a onclick='changePage(4)'><i class="icon-user icon-white" style="margin-right: 5px"></i>{{user.username}}</a></li>
 							<li><a onclick="logout()">登出</a></li>
 						{% else %}
 							<li><a data-toggle="modal" data-target="#login">登录</a></li>
@@ -75,9 +69,9 @@
 			</div>
 		</div>
 		<div class="subnav subnav-fixed">
-			<div class="alert fade in container" style="display: none;">
+			<div class="alert fade in container" style="display: none;" id="lunch-tip">
            		<a class="close" onclick="closeTip()">×</a>
-            	<strong id="alert-message"></strong>
+            	<strong id="tip-message"></strong>
 			</div>
 		</div>
 		{% include 'modal.html' %}
@@ -90,6 +84,11 @@
 				<a id="bottom-nav-user"  class="bottom-nav-a" onclick="changePage(4);" rel="tooltip" data-original-title="管理"></a>
 			</div>
 		</div>
+		<div class="alert alert-block alert-error" id="lunch-alert" style="display:none;width:360px;position:fixed;left:50%;top:50%;margin-left:-180px;margin-top:-50px;">
+            <a type="button" class="close" data-dismiss="alert">×</a>
+            <h4 class="alert-heading">噢，不好意思，老兄！有点意外！</h4>
+            <p id="alert-message">Change this and that and try again. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum.</p>
+    	</div>
 		<div id="loading" >
 			<div class="progress progress-striped active">
 			  <div class="bar" style="width: 1%;"></div>

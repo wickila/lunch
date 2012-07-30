@@ -37,7 +37,7 @@
 					<form id="avatar_form" enctype="multipart/form-data" method="post" action="/user/avatar">
 						<h4>修改头像</h4>
 						<fieldset>
-							<table><tr><td><img id="setting-avatar-img" style="width:35px;height=35px;" src=""></img></td><td><input type="file" name="img" required></input></td><td><input type="submit" value="保存" class="btn" onclick="uploadAvatar()"></input></td></tr></table>
+							<table><tr><td><img id="setting-avatar-img" style="width:35px;height=35px;" src="{{user.avatarurl or ''}}"></img></td><td><input id="setting-avatar-img-file" type="file" name="img" onchange="onUserAvatarChange();" required></input></td><td><input type="submit" value="保存" class="btn" onclick="uploadAvatar()"></input></td></tr></table>
 						</fieldset>
 					</form>
 				</div>
@@ -64,7 +64,7 @@
 						<table>
 							<tr valign="top">
 								<td width="40%">
-										<h3>缩略图</h3>
+										<h4>缩略图</h4>
 										<fieldset>
 											<div class='menu-img-container thumbnail'><img id="setting-menu-img" class="menu-img"></div>
 										</fieldset>
@@ -72,7 +72,7 @@
 								</td>
 								<td width="60%">
 									<form id="setting-menu-form" method="post" action="/api/menu/new">
-										<h3>菜单资料</h3>
+										<h4>菜单资料</h4>
 										<fieldset>
 											<span>名称:</span><input type="text" name="name" id="setting-menu-name" required></input><br/>
 											<span>描述:</span><input type="text" name="description" id="setting-menu-description" required></input><br/>

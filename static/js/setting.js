@@ -102,7 +102,7 @@ $(function(){
 			$('#setting-menu-form').attr('action','/api/menu/new');
 			$('#setting-menu-form')[0].reset();
 			$('#setting-menu-img-form')[0].reset();
-			$('#setting-menu-img').attr('src','http://placehold.it/160x160');
+			$('#setting-menu-img').attr('src','/static/img/160x160.gif');
 			$('#setting-menu-mtype').empty();
 			$('#setting-menu-mtype').append("<option value='0'>全部");
 			for(var j in window.user.restuarant.menutypes){
@@ -135,7 +135,7 @@ $(function(){
 					$('#setting-menu-img-form').ajaxForm({
 						'dataType': 'json',
 						'success':function(data){
-							lunchAlert('操作成功');
+							lunchTip('操作成功');
 							close_menu_form();
 							var m = data.menu;
 							$('#setting-menu-form')[0].reset();
@@ -157,7 +157,7 @@ $(function(){
 						}
 					}).submit();
 				}else{
-					lunchAlert('操作成功');
+					lunchTip('操作成功');
 					var m = data.menu;
 					$('#setting-menu-img').attr('src',m.thumbnail);
 					$('#setting-menu-form')[0].reset();
@@ -202,7 +202,8 @@ $(function(){
 				'dataType': 'json',
 				'success':function(data){
 					$("#avatar_img").attr('src',data.imgurl);
-				}
+				},
+				'error':function(){lunchAlert('修改头像失败')}
 			});
 	};
 	
@@ -259,7 +260,7 @@ $(function(){
 			'success':function(data){
 				if(data.result){
 //					$('#rest-setting-form')[0].reset();
-					window.lunchAlert("店铺资料保存成功");
+					window.lunchTip("店铺资料保存成功");
 				}
 			}
 		});
@@ -277,13 +278,25 @@ $(function(){
         reader.readAsDataURL(file);
 	}
 	
+	window.onUserAvatarChange = function(){
+		var viewFiles = document.getElementById("setting-avatar-img-file");
+	    var viewImg = document.getElementById("setting-avatar-img");
+		var file = viewFiles.files[0];
+	    //通过file.size可以取得图片大小
+        var reader = new FileReader();
+        reader.onload = function( evt ){
+            viewImg.src = evt.target.result;
+        }
+        reader.readAsDataURL(file);
+	}
+	
 	window.upload_rest_avatar = function(){
 		$('#rest-avatar-form').ajaxForm({
 				'dataType': 'json',
 				'success':function(data){
 					$("#rest-avatar-img").attr('src',data.imgurl);
 					window.user.restuarant.avatarurl = data.imgurl;
-					window.lunchAlert("店铺资料保存成功");
+					window.lunchTip("店铺资料保存成功");
 				}
 		});
 	};

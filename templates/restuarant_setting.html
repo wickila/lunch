@@ -8,9 +8,9 @@
 		<tr><td>地址:</td><td><input type="text" name="adress" id="rest-setting-addres" required></input></td></tr>
 		<tr><td>类型:</td><td><select name="rtype" id="rest-setting-rtype"></select></td></tr>
 		<tr><td>电话:</td><td><input type="text" name="phone" id="rest-setting-phone" required></input></td></tr>
-		<tr><td>起送金额:</td><td><input type="text" name="minprice" value="10" id="rest-setting-minprice" required></input></td></tr>
-		<tr><td>配送范围:</td><td><input type="number" max="10000" value="500" min="100" placeholder="单位:米" step="100" name="maxdistance" id="rest-setting-maxdistance"></input></td></tr>
-		<tr><td>配送时间:</td><td><input type="time" name="starttime" placeholder="格式：12：00：00" id="rest-setting-starttime"></input>至<input type="time" name="endtime" placeholder="格式：12：00：00" id="rest-setting-endtime"></input></td></tr>
+		<tr><td>起送金额:</td><td><input type="number" name="minprice" value="10" id="rest-setting-minprice" required></input></td></tr>
+		<tr><td>配送范围:</td><td><input type="number" max="10000" value="500" min="100" placeholder="单位:米" step="100" name="maxdistance" id="rest-setting-maxdistance" required></input></td></tr>
+		<tr><td>配送时间:</td><td><input type="time" name="starttime" placeholder="格式：12：00：00" id="rest-setting-starttime" required></input>至<input type="time" name="endtime" placeholder="格式：12：00：00" id="rest-setting-endtime" required></input></td></tr>
 		<tr><td valign="top">描述:</td><td><textarea name="description" id="rest-setting-des" required></textarea></td></tr>
 		</table>
 		<input type="submit" class="btn" onclick="edit_rest()" value="保存"></input>
@@ -20,7 +20,7 @@
 <form id="rest-avatar-form" enctype="multipart/form-data" method="post" action="/restuarant/avatar">
 	<h4>修改头像</h4>
 	<fieldset>
-		<table><tr><td><img id="rest-avatar-img" style="width:35px;height=35px;" src="{{ user and user.avatar_url }}"></img></td><td><input type="file" name="img" id="rest-avatar-form-imgfile" onchange="onRestAvatarChange();" required></input></td><td><input type="submit" value="保存" class="btn" onclick="upload_rest_avatar()"></input></td></tr></table>
+		<table><tr><td><img id="rest-avatar-img" style="width:35px;height=35px;" src=""></img></td><td><input type="file" name="img" id="rest-avatar-form-imgfile" onchange="onRestAvatarChange();" required></input></td><td><input type="submit" value="保存" class="btn" onclick="upload_rest_avatar()"></input></td></tr></table>
 	</fieldset>
 </form>
 <hr/>

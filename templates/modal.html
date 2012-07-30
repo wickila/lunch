@@ -101,12 +101,12 @@
 	    </div>
 	    <div class="tab-pane" id="thumb-upload">
 	    <form id="setting-menu-img-form" enctype="multipart/form-data" method="post" action="/api/menu/thumbnail">
-	      	<div class='thumbnail span2'><img id="setting-menu-img-modal" src="http://placehold.it/160x160"></div>
+	      	<div class='thumbnail span2'><img id="setting-menu-img-modal" src="/static/img/160x160.gif"></div>
 			<input type="file" name="imgfile" onchange="onMenuImgChoose()" id="setting-menu-img-file-modal"><br/>
 		</form>
 	    </div>
 	    <div class="tab-pane" id="thumb-internet">
-	      	<div class='thumbnail span2'><img id="setting-menu-img-modal-internet" class="menu-img" src="http://placehold.it/160x160"></div>
+	      	<div class='thumbnail span2'><img id="setting-menu-img-modal-internet" class="menu-img" src="/static/img/160x160.gif"></div>
 			图片地址:<input type="text" id="setting-menu-img-modal-input-internet" onchange="menu_img_change();">
 	    </div>
 	  </div>

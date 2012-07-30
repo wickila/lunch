@@ -45,11 +45,11 @@ Menu.prototype.setMenu = function(menu){
 
 Menu.prototype.getDiv = function(){
 	if(!this.div){
-		this.div = $("<li class='span2' data-mid='"+ this.menu.id +"'>" +
+		this.div = $("<li class='span3' data-mid='"+ this.menu.id +"'>" +
 							"<div class='thumbnail menu' data-mid='"+ this.menu.id +"'>" +
 							"<img class='menu-img' src='"+this.menu.thumbnail+"' alt='"+this.menu.name+"' data-mid='"+ this.menu.id +"'>" +
 							"</div>" +
-							"<table width='100%' data-mid='"+ this.menu.id +"'><tr><td width='100%' style='padding-top: 6px;'><h5>"+this.menu.name+"</h5></td><td align='right' style='padding-top: 6px;'>"+this.menu.price+"￥</td><td align='right'><span class='label label-info'>"+this.menu.discount+"折</span></td></tr><table>" +
+							"<table width='96%' data-mid='"+ this.menu.id +"'><tr><td width='100%' style='padding-top: 6px;'><h5>"+this.menu.name+"</h5></td><td align='right' style='padding-top: 6px;'>"+this.menu.price+"￥</td><td align='right'><span class='label label-info'>"+this.menu.discount+"折</span></td></tr><table>" +
 					"</li>");
 	}
 	if(this.menu.discount >= 10){
@@ -203,9 +203,16 @@ RestView.prototype.setRest = function(rest){
 	$("#rest-detail").find("#rest-maxdistance").html(rest.maxdistance);
 	$("#rest-detail").find("#rest-starttime").html(rest.starttime);
 	$("#rest-detail").find("#rest-endtime").html(rest.endtime);
+	$("#rest-detail").find("#rest-ensurespeed").html(Math.ceil(rest.totalensuretime/rest.totalensure/60));
+	$("#rest-detail").find("#rest-deliveryspeed").html(Math.ceil(rest.totaldeliverytime/rest.totaldelivery/60));
 	$("#rest-minprice").parent().attr('data-original-title','起送金额:'+rest.minprice+'￥');
 	$("#rest-maxdistance").parent().attr('data-original-title','配送范围:'+rest.maxdistance+'米');
 	$("#rest-starttime").parent().attr('data-original-title','送餐时间:'+rest.starttime+'至'+rest.endtime);
+	$("#rest-detail").find("#rest-deliveryspeed").parent().attr('data-original-title','发货速度:'+$("#rest-detail").find("#rest-deliveryspeed").html()+'分钟');
+	$("#rest-detail").find("#rest-ensurespeed").parent().attr('data-original-title','订单确认速度:'+$("#rest-detail").find("#rest-ensurespeed").html()+'分钟');
+	$("#rest-detail").find("#rest-username").parent().attr('data-original-title','店主:'+rest.username);
+	$("#rest-detail").find("#rest-createdtime").parent().attr('data-original-title','创建时间:'+rest.created_time.split(' ')[0]);
+	$("#rest-detail").find("#rest-telephone").parent().attr('data-original-title','电话:'+rest.username);
 	$("#rest-detail").find("#rest-description").html(rest.description);
 	$('#rest-detail').find('.rest-thumbnail').attr('src',rest.avatarurl);
 	this.getComments(1);
@@ -746,7 +753,7 @@ NewOrderItem.prototype.postOrder = function(){
 //	    					if(!window.user.orders)window.user.orders = [];
 //	    					window.user.orders.push(data.order);
 	    					window.viewOrderView.setPage(window.viewOrderView);
-	    					window.lunchAlert('提交订单成功');
+	    					window.lunchTip('提交订单成功');
 	    				}else{
 	    					alert(data.message)
 	    				}
@@ -926,7 +933,7 @@ ViewOrderItem.prototype.setOrder = function(order){
 			    					data.order.menus = JSON.parse(data.order.menus);
 			    					this.scope.updateView();
 			    				}else{
-			    					window.lunchAlert(data.message)
+			    					window.lunchTip(data.message)
 			    				}
 			    				$('#cancelOrderModal').modal('hide');
 			    		    },
@@ -962,9 +969,9 @@ ViewOrderItem.prototype.onButtonClick = function(){
 						'success':function(data){
 							if(data.result){
 								$('#commentOrderModal').modal('hide');
-								lunchAlert('评论成功');
+								lunchTip('评论成功');
 							}else{
-								lunchAlert(data.message);
+								lunchTip(data.message);
 							}
 						}
 					});
@@ -987,7 +994,7 @@ ViewOrderItem.prototype.onButtonClick = function(){
 		    					data.order.menus = JSON.parse(data.order.menus);
 		    					this.scope.updateView();
 		    				}else{
-		    					window.lunchAlert(data.message)
+		    					window.lunchTip(data.message)
 		    				}
 		    		    },
 		      error: function(){alert('修改订单失败');}
@@ -1051,7 +1058,7 @@ ViewOrderItem.prototype.update = function(scope){
 	    						setTimeout(this.scope.update,this.scope.interval,this.scope);
 	    					}
 	    				}else{
-	    					window.lunchAlert(data.message)
+	    					window.lunchTip(data.message)
 	    				}
 	    		    },
 	      error: function(){alert('刷新订单失败');}
@@ -1169,7 +1176,7 @@ ViewOrderView.prototype.setPage = function(scope){
     						if(!this.scope.disposed && this.scope.type == 'boss'){
     							if(data.hasNew){
     	    						playSound();
-    	    						lunchAlert('<a>恭喜你收到新订单！<a>',function(){
+    	    						lunchTip('<a>恭喜你收到新订单！<a>',function(){
     	    							changePage(4);
     	    							$('#settting-left-bar-bossorder').find('a').click();
     	    						});
@@ -1177,7 +1184,7 @@ ViewOrderView.prototype.setPage = function(scope){
     							setTimeout(this.scope.setPage,5000,this.scope);
     						}
 	    				}else{
-	    					window.lunchAlert(data.message)
+	    					window.lunchTip(data.message)
 	    				}
 	    		    },
 	      error: function(){alert('获取订单失败');}
@@ -1229,7 +1236,7 @@ var MenuTypeSetting = function(){
 		    						this.element.find('#show-new-menutype-btn').addClass('icon-plus').removeClass('icon-minus');
 		    					},this.scope));
 		    				}else{
-		    					window.lunchAlert(data.message)
+		    					window.lunchTip(data.message)
 		    				}
 		    		    },
 		      error: function(){alert('失败');}
@@ -1273,9 +1280,9 @@ MenuTypeSetting.prototype.addType = function(menutype){
 		    					this.scope.find('.icon-edit').show();
 		    					this.scope.find('.icon-ok').hide();
 		    					this.scope.data('menutype-name',this.scope.find('input').val());
-		    					window.lunchAlert('保存成功');
+		    					window.lunchTip('保存成功');
 		    				}else{
-		    					window.lunchAlert(data.message);
+		    					window.lunchTip(data.message);
 		    				}
 		    		    },
 		      error: function(){alert('失败');}
@@ -1295,12 +1302,12 @@ MenuTypeSetting.prototype.addType = function(menutype){
 		    					for(var i in window.user.restuarant.menutypes){
 		    						if(window.user.restuarant.menutypes[i].id == this.scope.data('id')){
 		    							window.user.restuarant.menutypes.splice(i,1);
-		    							window.lunchAlert('删除成功');
+		    							window.lunchTip('删除成功');
 		    							return;
 		    						}
 		    					}
 		    				}else{
-		    					window.lunchAlert(data.message);
+		    					window.lunchTip(data.message);
 		    				}
 		    		    },
 		      error: function(){alert('失败');}

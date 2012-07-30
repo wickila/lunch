@@ -29,7 +29,7 @@ class Avatar:
                 pydic = {'imgurl':filedir +'/'+ filename}
                 id = user.id
                 model.db.update('user',avatarurl=pydic['imgurl'],where='id=$id',vars=locals())
-                user.avatar_url = pydic['imgurl']
+                user.avatarurl = pydic['imgurl']
                 web.header('Content-Type', 'application/json')
                 return lunch.write_json(pydic)
         raise web.seeother('/signin')

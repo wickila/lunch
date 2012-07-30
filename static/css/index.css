@@ -85,7 +85,7 @@ section{
 }
 
 #map-canvas{
-	height: 96%;
+	height: 94%;
 	padding: 5px;
 }
 
@@ -99,7 +99,7 @@ section{
 }
 
 #left-bar{
-	height: 96%;
+	height: 94%;
 	padding: 5px;
 	margin-right: 0;
 }
@@ -257,11 +257,11 @@ section{
 	-moz-transition: -moz-transform 200ms ease-in-out;
 	-o-transition: -o-transform 200ms ease-in-out;
 	-ms-transition: -ms-transform 200ms ease-in-out;
-	transform: translate(0px, 0px);
-	-webkit-transform: translate(0px, 0px);
-	-moz-transform: translate(0px, 0px);
-	-o-transform: translate(0px, 0px);
-	-ms-transform: translate(0px, 0px);
+	transform: translate(0px, -100%);
+	-webkit-transform: translate(0px, -100%);
+	-moz-transform: translate(0px, -100%);
+	-o-transform: translate(0px, -100%);
+	-ms-transform: translate(0px, -100%);
 }
 
 #shoppingCart-container ul{
@@ -287,7 +287,7 @@ section{
 #shoppingCart-container::after{
 	position: fixed;
 	top: -10px;
-	right: 90px;
+	right: 135px;
 	display: inline-block;
 	border-right: 10px solid transparent;
 	border-bottom: 10px solid #444;
@@ -518,6 +518,12 @@ section{
 .message-item td{
 	text-align: center;
 	color: gray;
+}
+
+#rest-detail a{
+	text-decoration: none;
+	cursor:default;
+	color: black;
 }
 
 #contextMenu {

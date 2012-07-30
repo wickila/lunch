@@ -27,7 +27,7 @@ $(function(){
 								td.append($("<span class='label label-warning'>已拒绝</span>"))
 							}
 						}else{
-							lunchAlert(data.message)
+							lunchTip(data.message)
 						}
 	          		},
 	          error: function(){alert('操作失败')}

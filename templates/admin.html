@@ -14,7 +14,7 @@
 	<script type="text/javascript" src="/static/js/admin.js"></script>
 	<script type="text/javascript" src="/static/js/bootstrap.js"></script>
 	<script type="text/javascript">
-		window.lunchAlert = function(message,callback){
+		window.lunchTip = function(message,callback){
 			$('#alert-message').html(message);
 			if(callback){
 				$('#alert-message').find('a').bind('click',callback);

@@ -36,6 +36,19 @@ p,span{
 	cursor: default;
 }
 
+.btn{
+	-webkit-transition: background-color 200ms linear;
+	-moz-transition: background-color 200ms linear;
+	-o-transition: background-color 200ms linear;
+	-ms-transition: background-color 200ms linear;
+	transition: background-color 200ms linear;
+	-webkit-transition: width 200ms linear;
+	-moz-transition: width 200ms linear;
+	-o-transition: width 200ms linear;
+	-ms-transition: width 200ms linear;
+	transition: width 200ms linear;
+}
+
 .container-fluid,.row-fluid,.row,.span3,.span9,.scrollable{
 	height:100%;
 	overflow-y: auto;

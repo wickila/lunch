@@ -80,7 +80,6 @@ $(function(){
 		      selector: "a[rel=tooltip]",
 		      placement: "bottom"
 		});
-		window.hideShoppingCart();
 		updateUserInfoView();
 		initAppEvents();
 	}
@@ -191,7 +190,7 @@ $(function(){
 			var rolls = [];
 			var bounds = map.getBounds();
 			for(var i in window.restuarants){
-				if(bounds.contains(window.restuarants[i].marker.getPosition())){
+				if(bounds.contains(window.restuarants[i].marker.getPosition())&&window.currentRest != window.restuarants[i].info){
 					window.restuarants[i].roll = Math.random();
 					rolls.push(window.restuarants[i])
 				}
@@ -223,7 +222,7 @@ $(function(){
 	        initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
 	        initLocation();
 	      }, function() {
-	        alert('您拒绝了浏览器定位您的位置，我们获取到您的位置可能不太准确。您可以在浏览器设置里面重新设置此选项');
+	        lunchAlert('您拒绝了浏览器定位您的位置，我们获取到您的位置可能不太准确。您可以在浏览器设置里面重新设置此选项');
 	        handleNoGeoLocation();
 	      });
 	    }else if(google.gears) {
@@ -380,7 +379,7 @@ $(function(){
 	    this.marker.setMap(map);
 	    window.restuarants[this.id] = this;
 	    
-	    var headDiv = "<div class='infowindow-div' onclick='changePage(2);'>"+
+	    var headDiv = "<div class='iw'>"+
 		"<table width='100%'>" +
 		"<tr><td rowspan='3'><img class='small-avatar' style='padding: 0 2px 0 0;' src='"+this.info.avatarurl+"'></img></td><td><h4>"+this.info.name+"</h4></td><td align='right' style='font-size: 10pt;'><span class='icon-heart'></span>谢谢:<span style='font-size: 11pt'>"+this.info.thanks+"</span></td></tr>" +
 		"<tr><td colspan='2'><span style='font-size: 10pt;color: gray;'>"+this.info.description+"</span></td></tr>" +
@@ -402,6 +401,7 @@ $(function(){
 	};
 	  
 	Restuarant.prototype.say = function(content){
+		if(window.currentRest == this.info)return;
 		this.infowindow.setContent("<div class='infowindow-div' data-rid='"+this.info.id+"' onclick='synsSetCurrentRest("+this.info.id+")'>"+content+"</div>");
 		this.infowindow.setOptions({disableAutoPan:true});
 		this.infowindow.open(map,this.marker);
@@ -425,7 +425,7 @@ $(function(){
 						}
 						map.setCenter(new google.maps.LatLng(data.rest.lat,data.rest.lng), PERSISSION);
 						$('#myModal').modal('hide');
-						window.lunchAlert("您已经成功新开一家店铺啦，点击<a onclick='changePage(4)'>此处</a>可以修改店铺的基本资料哦");
+						window.lunchTip("您已经成功新开一家店铺啦，点击<a onclick='changePage(4)'>此处</a>可以修改店铺的基本资料哦");
 					}
 				}
 		});
@@ -437,8 +437,8 @@ $(function(){
 	        url: '/api/localrestuarants',
 	        ContentType: "application/json",
 	        callback:callback,
-	        data:{"lat":map.getCenter().lat(),
-	        		"lng":map.getCenter().lng(),
+	        data:{"lat":initialLocation.lat(),
+	        		"lng":initialLocation.lng(),
 	          		"percision":map.getZoom()-6},
 	          		'success': function(data){
 	          			var rest;
@@ -521,7 +521,7 @@ $(function(){
 					window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
 				}
 			}
-			$('#nav-right').html("<li><a onclick='changePage(4)'>"+window.user.username+"</a></li><li><a onclick='logout()'>登出</a></li>");
+			$('#nav-right').html("<li><a onclick='changePage(4)'><i class='icon-user icon-white' style='margin-right: 5px'></i>"+window.user.username+"</a></li><li><a onclick='logout()'>登出</a></li>");
 			$('.user').addClass('user-login');
 			$('.user').removeClass('user');
 			if(user.permission > 0){
@@ -758,7 +758,7 @@ $(function(){
 	
 	window.showShoppingCart = function (){
 		if(window.page==3){
-			lunchAlert('此界面不允许操作购物车');
+			lunchTip('此界面不允许操作购物车');
 			return;
 		}
 		window.shoppingCartShow = true;
@@ -816,8 +816,8 @@ $(function(){
 	}
 	
 	window.startLoad = function(){
-		if(map.getZoom()<PERSISSION){
-			$('#overview-tip').html('您的附近好像还没有餐厅哦，您可以亲自开设一家餐厅或者邀请您最喜爱的餐厅来有米开设一家餐厅')
+		if(map.getZoom()<PERSISSION-3){
+			lunchTip('您的附近好像还没有餐厅哦，您可以亲自开设一家餐厅或者邀请您最喜爱的餐厅来有米开设一家餐厅')
 		}
 		if(map.getZoom() == 1){
 			startApp();
@@ -916,7 +916,6 @@ $(function(){
 				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
 				$('#bottom-nav-orderview').addClass('bottom-nav-orderview-active');
 				$('#bottom-nav-user').addClass('bottom-nav-user-active');
-				$('#navbar-fixed-top-user').addClass('active');
 				$('title').html('Yaammy-管理页面');
 				break;
 		}
@@ -980,9 +979,9 @@ $(function(){
 	window.updateLayout = function(){
 		$('.content').css('height',$(window).height()-$('.navbar-fixed-top').height()-$('.navbar-fixed-bottom').height()-40);
 		$('.content').css('margin-top',$('.navbar-fixed-top').height());
-		overviewHeight = $('.content').height()*0.65;
-		$('#map-canvas').parent().parent().parent().css('height',overviewHeight);
-		$('#main-info-container').css('height',$('.content').height()-$('#map-canvas').height()-$('#overview-tip').height()-40);
+//		overviewHeight = $('.content').height()*0.65;
+//		$('#map-canvas').parent().parent().parent().css('height',overviewHeight);
+//		$('#main-info-container').css('height',$('.content').height()-$('#map-canvas').height()-$('#overview-tip').height()-40);
 		$('.menu').css('height','200px')
 		$('#shoppingCart-container').css('left',($(window).width()-$('#shoppingCart-container').width())*0.5);
 		$('#site-nav-container').css('bottom',$('.navbar-fixed-bottom').height()-$('#site-nav-container').height());
