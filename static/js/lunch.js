@@ -58,20 +58,9 @@ $(function(){
 				changePage(1);
 			}
 		},1000);
-		marker = new google.maps.Marker({
-	      position: initialLocation,
-	      title:window.user?window.user.username+'的位置':'您的位置'
-	    });
-	    circle = new google.maps.Circle({
-	    	  map: map,
-	    	  strokeColor: '#999999',
-	    	  strokeWeight: '1',
-	    	  radius: 1000,
-	    	  fillColor: '#aaaaaa'
-	    	});
-	    circle.bindTo('center', this.marker, 'position');
-	    circle.setVisible(false);
-	    marker.setMap(map);
+		marker = new BMap.Marker(initialLocation);
+		marker.setTitle(window.user?window.user.username+'的位置':'您的位置');
+		map.addOverlay(marker);
 	    window.shoppingCart = new ShoppingCart($('#shoppingCart-container ul'));
 	    $('.tooltip-enable').tooltip({
 		      selector: "a[rel=tooltip]"
@@ -85,10 +74,10 @@ $(function(){
 	}
 	
 	window.initAppEvents = function(){
-		google.maps.event.addListener(map,'dragend',function(e){
+		map.addEventListener('dragend',function(e){
 			getLocalRestuarants();
 		});
-		google.maps.event.addListener(map,'zoom_changed',function(e){
+		map.addEventListener('zoom_changed',function(e){
 			getLocalRestuarants();
 		});
 		$('#main').bind('mousedown',function(evt){
@@ -190,7 +179,7 @@ $(function(){
 			var rolls = [];
 			var bounds = map.getBounds();
 			for(var i in window.restuarants){
-				if(bounds.contains(window.restuarants[i].marker.getPosition())&&window.currentRest != window.restuarants[i].info){
+				if(bounds.containsPoint(window.restuarants[i].marker.getPosition())&&window.currentRest != window.restuarants[i].info){
 					window.restuarants[i].roll = Math.random();
 					rolls.push(window.restuarants[i])
 				}
@@ -208,18 +197,15 @@ $(function(){
 	}
 	
 	window.initialize =  function() {
-		geocoder = new google.maps.Geocoder();
-	    var latlng = new google.maps.LatLng(GEOCHAT_VARS['initial_latitude'], GEOCHAT_VARS['initial_longitude']);
-	    var myOptions = {
-	      zoom: PERSISSION,
-	      mapTypeId: google.maps.MapTypeId.ROADMAP
-	    };
-	    map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+		geocoder = new BMap.Geocoder();
+	    var latlng = new BMap.Point(GEOCHAT_VARS['initial_longitude'],GEOCHAT_VARS['initial_latitude']);
+	    map = new BMap.Map("map-canvas");
+	    map.enableScrollWheelZoom();
 
 	    if(navigator.geolocation) {
 	      $('#loading-tip').html('正在获取您的地理位置，请点击浏览器上方的允许按钮...');
 	      navigator.geolocation.getCurrentPosition(function(position) {
-	        initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+	        initialLocation = new BMap.Point(position.coords.longitude,position.coords.latitude);
 	        initLocation();
 	      }, function() {
 	        lunchAlert('您拒绝了浏览器定位您的位置，我们获取到您的位置可能不太准确。您可以在浏览器设置里面重新设置此选项');
@@ -228,7 +214,7 @@ $(function(){
 	    }else if(google.gears) {
 	      var geo = google.gears.factory.create('beta.geolocation');
 	      geo.getCurrentPosition(function(position) {
-	        initialLocation = new google.maps.LatLng(position.latitude,position.longitude);
+	        initialLocation = new BMap.Point(position.longitude,position.latitude);
 	        initLocation();
 	      }, function() {
 	    	  handleNoGeoLocation();
@@ -239,16 +225,14 @@ $(function(){
 	    function initLocation(){
 	    	complete+=1;
 	    	calcProgress();
-	    	map.setCenter(initialLocation);
+	    	map.centerAndZoom(initialLocation,PERSISSION);
 	    	startLoad();
-	    	geocoder.geocode({'latLng': initialLocation}, function(results, status) {
-		      if (status == google.maps.GeocoderStatus.OK) {
-		        if(results[0]) {
-		        	var adress = results[0].formatted_address;
+	    	geocoder.getLocation(initialLocation, function(results) {
+		      if(results) {
+		        	var adress = results.address;
 					$('#nav-my-location').attr('data-original-title',adress);
-		        }
 		      } else {
-		        alert("Geocoder failed due to: " + status);
+		        lunchAlert("Geocoder failed");
 		      }
 		    });
 	    }
@@ -256,127 +240,72 @@ $(function(){
 	    	initialLocation = latlng;
 	    	initLocation();
 	    }
-	    
-	    var contextMenu = $(document.createElement('ul'))
-			.attr('id', 'contextMenu');
-		contextMenu.append(
-			'<li><a href="#zoomIn">Zoom in</a></li>' +
-			'<li><a href="#zoomOut">Zoom out</a></li>' +
-			'<li><a href="#centerHere">Center map here</a></li>' +
-			'<li><a href="#newRestuarant">在此处开店</a></li>'
-		);
-		contextMenu.bind('contextmenu', function() { return false; });
-		$(map.getDiv()).append(contextMenu);
+	    var menu = new BMap.ContextMenu();
+	    var txtMenuItem = [
+	      {
+	       text:'放大',
+	       callback:function(){map.zoomIn()}
+	      },
+	      {
+	       text:'缩小',
+	       callback:function(){map.zoomOut()}
+	      },
+	      {
+	       text:'在此处开店',
+		   callback:function(){
+	    	  if(!window.user){
+					alert('您尚未登录');
+				}else if(window.user.permission < 1){
+					alert('您的权限不够')
+				}else if(window.user.restuarant){
+					alert('您已经有一家店啦');
+				}else{
+					$('#lat').val(clickedLatLng.lat());
+					$('#lng').val(clickedLatLng.lng());
+					geocoder.geocode(clickedLatLng, function(results) {
+					      if(results) {
+					        	var adress = results.address;
+								$('#new-rest-form-adress').val(adress);
+								$('#myModal').modal('show');
+					      } else {
+					        alert("Geocoder failed due to: " + status);
+					      }
+				    });
+				}
+	      	}
+	      }
+	     ];
 
-		/**
-		 * Menu events
-		 */
-		var clickedLatLng;
-		google.maps.event.addListener(map, 'rightclick', function(e)
-		{
-			contextMenu.hide();
-			var mapDiv = $(map.getDiv()),
-			x = e.pixel.x,
-			y = e.pixel.y;
-			clickedLatLng = e.latLng;
-			if ( x > mapDiv.width() - contextMenu.width() )
-				x -= contextMenu.width();
-			if ( y > mapDiv.height() - contextMenu.height() )
-				y -= contextMenu.height();
-			contextMenu.css({ top: y, left: x }).fadeIn(100);
-		});
-
-		contextMenu.find('a').click( function()
-		{
-			contextMenu.fadeOut(75);
-			var action = $(this).attr('href').substr(1);
-			switch(action)
-			{
-				case 'zoomIn':
-					map.setZoom(
-						map.getZoom() + 1
-					);
-					map.panTo(clickedLatLng);
-					break;
-				case 'zoomOut':
-					map.setZoom(
-						map.getZoom() - 1
-					);
-					map.panTo(clickedLatLng);
-					break;
-				case 'centerHere':
-					map.panTo(clickedLatLng);
-					break;
-				case 'newRestuarant':
-					if(!window.user){
-						alert('您尚未登录');
-					}else if(window.user.permission < 1){
-						alert('您的权限不够')
-					}else if(window.user.restuarant){
-						alert('您已经有一家店啦');
-					}else{
-						$('#lat').val(clickedLatLng.lat());
-						$('#lng').val(clickedLatLng.lng());
-						var latlng = new google.maps.LatLng(clickedLatLng.lat(), clickedLatLng.lng());
-						geocoder.geocode({'latLng': latlng}, function(results, status) {
-						      if (status == google.maps.GeocoderStatus.OK) {
-						        if(results[0]) {
-						        	var adress = results[0].formatted_address;
-									$('#new-rest-form-adress').val(adress);
-						        }
-						      } else {
-						        alert("Geocoder failed due to: " + status);
-						      }
-						    });
-						$('#myModal').modal('show');
-					}
-					break;
-				default:
-					break;
-			}
-			return false;
-		});
-
-		// Hover events for effect
-		contextMenu.find('a').hover( function() {
-			$(this).parent().addClass('hover');
-		}, function() {
-			$(this).parent().removeClass('hover');
-		});
-		// Hide context menu on some events
-		$.each('click dragstart zoom_changed maptypeid_changed'.split(' '), function(i,name){
-			google.maps.event.addListener(map, name, function(){ contextMenu.hide() });
-		});
+	     for(var i=0; i < txtMenuItem.length; i++){
+	      menu.addItem(new BMap.MenuItem(txtMenuItem[i].text,txtMenuItem[i].callback,100));
+	     }
+	     var clickedLatLng;
+	     map.addContextMenu(menu);
+	     menu.addEventListener('open',function(event){
+	    	 clickedLatLng = event.point;
+	     })
   	}
 	
 	var Restuarant =  function(info) {
 		this.id = info.id;
 	    this.info = info;
 	    this.info.orderMenus = [];
-	    this.point = new google.maps.LatLng(info.lat, info.lng);
-	    var image = new google.maps.MarkerImage('/static/img/marker'+(info.rtype+1)+'.png',
-	    	      new google.maps.Size(40, 40),
-	    	      new google.maps.Point(0,0),
-	    	      new google.maps.Point(20, 20));
-	    this.marker = new google.maps.Marker({
-	      id: this.id,
-	      position: this.point,
-	      title:this.info.name,
-	      icon:image
-	    });
-	    this.circle = new google.maps.Circle({
-	    	  map: map,
+	    this.point = new BMap.Point(info.lng,info.lat);
+	    var myIcon = new BMap.Icon('/static/img/marker'+(info.rtype+1)+'.png',
+			    	      new BMap.Size(40, 40),{
+					offset:new BMap.Point(20, 20)});
+	    this.marker = new BMap.Marker(this.point,{icon:myIcon});
+	    this.marker.setTitle(this.info.name);
+	    map.addOverlay(this.marker);    
+	    this.circle = new BMap.Circle(this.point,this.info.maxdistance,{
 	    	  strokeColor: '#999999',
 	    	  strokeWeight: '1',
-	    	  radius: this.info.maxdistance,
 	    	  fillColor: '#aaaaaa',
-	    	  clickable:false,
+	    	  enableClicking:false,
 	    	});
-	    this.circle.bindTo('center', this.marker, 'position');
-	    this.circle.setVisible(false);
+	    map.addOverlay(this.circle);
 	    this.menus = [];
 	    
-	    this.marker.setMap(map);
 	    window.restuarants[this.id] = this;
 	    
 	    var headDiv = "<div class='iw'>"+
@@ -385,17 +314,18 @@ $(function(){
 		"<tr><td colspan='2'><span style='font-size: 10pt;color: gray;'>"+this.info.description+"</span></td></tr>" +
 		"</table></div>";
 
-		this.infowindow = new google.maps.InfoWindow({
+		this.infowindow = new BMap.InfoWindow({
 		    content: headDiv
 		});
-	    google.maps.event.addListener(this.marker, 'click', $.proxy(function() {
+	    this.marker.addEventListener('click', $.proxy(function() {
 		        map.panTo(this.marker.getPosition());
 		        if(window.currentRest != this.info){
-	        		window.restuarants[window.currentRest.id].infowindow.close();
+	        		window.restuarants[window.currentRest.id].marker.closeInfoWindow();
+	        		map.removeOverlay(window.restuarants[window.currentRest.id].circle);
 		        }
-		        this.infowindow.setOptions({disableAutoPan:false});
 		        this.infowindow.setContent(headDiv);
-		        this.infowindow.open(map,this.marker);
+		        this.marker.openInfoWindow(this.infowindow);
+		        map.addOverlay(this.circle);
 		        setCurrentRest(this.info);
 		},this));
 	};
@@ -403,13 +333,12 @@ $(function(){
 	Restuarant.prototype.say = function(content){
 		if(window.currentRest == this.info)return;
 		this.infowindow.setContent("<div class='infowindow-div' data-rid='"+this.info.id+"' onclick='synsSetCurrentRest("+this.info.id+")'>"+content+"</div>");
-		this.infowindow.setOptions({disableAutoPan:true});
-		this.infowindow.open(map,this.marker);
+		this.marker.openInfoWindow(this.infowindow);
 		setTimeout($.proxy(this.shutup,this),3000);
 	}
 	
 	Restuarant.prototype.shutup = function(){
-		this.infowindow.close();
+		this.marker.closeInfoWindow();
 	}
 	
 	window.new_restuarant = function(){
@@ -437,8 +366,8 @@ $(function(){
 	        url: '/api/localrestuarants',
 	        ContentType: "application/json",
 	        callback:callback,
-	        data:{"lat":initialLocation.lat(),
-	        		"lng":initialLocation.lng(),
+	        data:{"lat":initialLocation.lat,
+	        		"lng":initialLocation.lng,
 	          		"percision":map.getZoom()-6},
 	          		'success': function(data){
 	          			var rest;
@@ -553,12 +482,8 @@ $(function(){
 		
 	window.setCurrentRest = function(rest){
 		if(window.currentRest == rest)return;
-		for(var i in window.restuarants){
-	        	window.restuarants[i].circle.setVisible(false);
-	    }
-		window.restuarants[rest.id].circle.setVisible(true);
 		window.currentRest = rest;
-		map.panTo(new google.maps.LatLng(rest.lat,rest.lng), PERSISSION);
+		map.panTo(new BMap.Point(rest.lng,rest.lat));
 	  	$.setSideBarRest(rest);
 	  	if(!window.currentRest.menus){
 	  		$.ajax({

@@ -212,7 +212,7 @@ RestView.prototype.setRest = function(rest){
 	$("#rest-detail").find("#rest-ensurespeed").parent().attr('data-original-title','订单确认速度:'+$("#rest-detail").find("#rest-ensurespeed").html()+'分钟');
 	$("#rest-detail").find("#rest-username").parent().attr('data-original-title','店主:'+rest.username);
 	$("#rest-detail").find("#rest-createdtime").parent().attr('data-original-title','创建时间:'+rest.created_time.split(' ')[0]);
-	$("#rest-detail").find("#rest-telephone").parent().attr('data-original-title','电话:'+rest.username);
+	$("#rest-detail").find("#rest-telephone").parent().attr('data-original-title','电话:'+rest.telephone);
 	$("#rest-detail").find("#rest-description").html(rest.description);
 	$('#rest-detail').find('.rest-thumbnail').attr('src',rest.avatarurl);
 	this.getComments(1);
