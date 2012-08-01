@@ -35,11 +35,12 @@ RestSideBar.prototype.setRest = function(rest){
 	this.head.find('#rsb-thanks').html(rest.thanks);
 };
 
-var Menu = function(menu){
+var Menu = function(menu,index){
+	this.index = index;
 	this.menu = menu;
 };
 
-Menu.prototype.setMenu = function(menu){
+Menu.prototype.setMenu = function(menu,index){
 	this.menu = menu;
 };
 
@@ -51,6 +52,9 @@ Menu.prototype.getDiv = function(){
 							"</div>" +
 							"<table width='96%' data-mid='"+ this.menu.id +"'><tr><td width='100%' style='padding-top: 6px;'><h5>"+this.menu.name+"</h5></td><td align='right' style='padding-top: 6px;'>"+this.menu.price+"￥</td><td align='right'><span class='label label-info'>"+this.menu.discount+"折</span></td></tr><table>" +
 					"</li>");
+	}
+	if(this.index%4==0){
+		this.div.css('margin-left',0);
 	}
 	if(this.menu.discount >= 10){
 		this.div.find('.label').parent().remove();
@@ -76,7 +80,7 @@ Menus.prototype.setMenus = function(menus){
 	for(var i in menus)
 	{
 		m = menus[i];
-		var menu = new Menu(m);
+		var menu = new Menu(m,i);
 		this.mns.push(menu);
 		this.jqueryElement.find('.menus').append(menu.getDiv());
 	}

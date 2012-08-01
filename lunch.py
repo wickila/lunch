@@ -90,7 +90,11 @@ def get_current_user():
 	return web.config._session.user
 
 def render(template,data):
+	web.header("Content-Type","text/html; charset=utf-8")
 	data["user"] = get_current_user()
+	data["version"] = config.version
+	data["location"] = session.location
+	data["rest_types"] = json.dumps(config.REST_TYPES)
 	return env.get_template(template).render(data)
 
 def write_json(obj):
@@ -111,7 +115,7 @@ class Index:
 		"""index page"""
 		if (not session.user) or (not session.location):
 			session.location = self.get_location(web.ctx.ip)
-		return env.get_template('index.html').render({"user":session.user,"location":session.location,"rest_types":json.dumps(config.REST_TYPES)})
+		return render('index.html',{})
 	
 class ViewRest:
 	def get_location(self,ip):
@@ -127,7 +131,7 @@ class ViewRest:
 		rests = model.db.select('restuarant',where='username=$username',vars=locals())
 		if len(rests)>0:
 			rest = rests[0]
-			return env.get_template('index.html').render({"user":session.user,"location":(rest.lat,rest.lng),"current_rest_id":rest.id,"rest_types":json.dumps(config.REST_TYPES)})
+			return render({"current_rest_id":rest.id})
 		return u'对不起，您访问的餐厅不存在'
 
 class Signin:

@@ -4,6 +4,9 @@ Created on 2012-6-14
 
 @author: wicki
 '''
+
+version = '0.9.1.1'
+
 LOCATION_PRECISION = 5
 
 REST_TYPES = {'0':'快餐',

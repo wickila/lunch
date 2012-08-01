@@ -89,7 +89,7 @@ section{
 	padding: 5px;
 }
 
-.infowindow-div{
+.iw{
 	margin-top: 6px;
 	cursor: pointer;
 }
@@ -257,11 +257,11 @@ section{
 	-moz-transition: -moz-transform 200ms ease-in-out;
 	-o-transition: -o-transform 200ms ease-in-out;
 	-ms-transition: -ms-transform 200ms ease-in-out;
-	transform: translate(0px, -100%);
-	-webkit-transform: translate(0px, -100%);
-	-moz-transform: translate(0px, -100%);
-	-o-transform: translate(0px, -100%);
-	-ms-transform: translate(0px, -100%);
+	transform: translate(0px, -120%);
+	-webkit-transform: translate(0px, -120%);
+	-moz-transform: translate(0px, -120%);
+	-o-transform: translate(0px, -120%);
+	-ms-transform: translate(0px, -120%);
 }
 
 #shoppingCart-container ul{
@@ -526,39 +526,8 @@ section{
 	color: black;
 }
 
-#contextMenu {
-position: absolute;
-min-width: 100px;
-z-index: 1000;
-background: #fff;
-border-top: solid 1px #CCC;
-border-left: solid 1px #CCC;
-border-bottom: solid 1px #676767;
-border-right: solid 1px #676767;
-padding: 0px;
-margin: 0px;
-display:none;
-}
-
-#contextMenu a {
-color: #000;
-text-decoration: none;
-display: block;
-line-height: 22px;
-height: 22px;
-padding: 1px 10px;
-}
-
-#contextMenu li {
-list-style: none;
-padding: 1px;
-margin: 0px;
-}
-
-#contextMenu li.hover a {
-background-color: #A7C4FA;
-}
-
-#contextMenu li.separator {
-border-top: solid 1px #ccc;
+#site-nav-container{
+	bottom: 22px;
+	left: 50%;
+	margin-left: -80px;
 }

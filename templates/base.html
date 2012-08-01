@@ -2,19 +2,17 @@
 <html>
 	<head>
 	<title>{% block title %}Yaammy-有米{% endblock %}</title>
-	<meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
-	<link rel="stylesheet" href="/static/css/bootstrap.css" type="text/css" charset="utf-8">
-	<link rel="stylesheet" href="/static/css/bootstrap-responsive.css" type="text/css" charset="utf-8">
-	<link rel="stylesheet" href="/static/css/lunch.css" type="text/css" charset="utf-8">
+	<link rel="stylesheet" href="/static/css/bootstrap.css?v={{version}}">
+	<link rel="stylesheet" href="/static/css/bootstrap-responsive.css?v={{version}}">
+	<link rel="stylesheet" href="/static/css/lunch.css?v={{version}}">
 	{% block style%}
 	{% endblock %}
 	<script type="text/javascript" src="/static/js/jquery.js"></script>
 	<script type="text/javascript" src="/static/js/jquery.form.js"></script>
-	<script type="text/javascript" src="/static/js/components.js"></script>
-	<!-- <script type="text/javascript" src="https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=false"></script> -->
+	<script type="text/javascript" src="/static/js/components.js?v={{version}}"></script>
 	<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.3"></script>
-	<script type="text/javascript" src="/static/js/lunch.js"></script>
-	<script type="text/javascript" src="/static/js/bootstrap.js"></script>
+	<script type="text/javascript" src="/static/js/lunch.js?v={{version}}"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.js?v={{version}}"></script>
 	{% block script %}
 	{% endblock %}
 	<script type="text/javascript">
@@ -43,7 +41,7 @@
 	</head>
 	<body onload="initialize()">
 		<div class="navbar navbar-fixed-top">
-			<div class="navbar-inner">
+			<div class="navbar-inner" style="height: 40px">
 				<div class="container">
 					<ul class="nav">
 					  <li id="navbar-fixed-top-index" class="active"><a class="brand active" onclick="changePage(1)">有米</a></li>

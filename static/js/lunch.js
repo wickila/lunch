@@ -312,6 +312,7 @@ $(function(){
 		"<table width='100%'>" +
 		"<tr><td rowspan='3'><img class='small-avatar' style='padding: 0 2px 0 0;' src='"+this.info.avatarurl+"'></img></td><td><h4>"+this.info.name+"</h4></td><td align='right' style='font-size: 10pt;'><span class='icon-heart'></span>谢谢:<span style='font-size: 11pt'>"+this.info.thanks+"</span></td></tr>" +
 		"<tr><td colspan='2'><span style='font-size: 10pt;color: gray;'>"+this.info.description+"</span></td></tr>" +
+		"<tr><td colspan='2'><a onclick='changePage(2)'>了解更多>></a></td></tr>" +
 		"</table></div>";
 
 		this.infowindow = new BMap.InfoWindow({
@@ -692,7 +693,7 @@ $(function(){
 	
 	window.hideShoppingCart = function (){
 		window.shoppingCartShow = false;
-		setTransform($('#shoppingCart-container'),'-110%');
+		setTransform($('#shoppingCart-container'),'-120%');
 	}
 	
 	window.toggleShoppingCart = function(){
@@ -904,13 +905,8 @@ $(function(){
 	window.updateLayout = function(){
 		$('.content').css('height',$(window).height()-$('.navbar-fixed-top').height()-$('.navbar-fixed-bottom').height()-40);
 		$('.content').css('margin-top',$('.navbar-fixed-top').height());
-//		overviewHeight = $('.content').height()*0.65;
-//		$('#map-canvas').parent().parent().parent().css('height',overviewHeight);
-//		$('#main-info-container').css('height',$('.content').height()-$('#map-canvas').height()-$('#overview-tip').height()-40);
 		$('.menu').css('height','200px')
 		$('#shoppingCart-container').css('left',($(window).width()-$('#shoppingCart-container').width())*0.5);
-		$('#site-nav-container').css('bottom',$('.navbar-fixed-bottom').height()-$('#site-nav-container').height());
-		$('#site-nav-container').css('left',($(window).width()-$('#site-nav-container').width())*0.5);
 		$('#view-order-item-container,#boss-order-item-container,#setting-menus-container,#menus-wrapper').css('height',$('.content').height()-$('.navbar-fixed-top').height()-80);
 	}
 	
