@@ -75,7 +75,7 @@ $(function(){
 		map.addEventListener('dragend',function(e){
 			getLocalRestuarants();
 		});
-		map.addEventListener('zoom_changed',function(e){
+		map.addEventListener('zoomend',function(e){
 			getLocalRestuarants();
 		});
 		$('#main').bind('mousedown',function(evt){
@@ -377,7 +377,11 @@ $(function(){
 		});
 	}
 	
-	window.getLocalRestuarants = function(callback){
+	window.getLocalRestuarants = function(percision,callback){
+		if(percision==undefined){
+			percision = map.getZoom()-6;
+		}
+		console.log(percision);
 	    $.ajax({
 	    	type: 'GET',
 	        url: '/api/localrestuarants',
@@ -385,7 +389,7 @@ $(function(){
 	        callback:callback,
 	        data:{"lat":map.getCenter().lat,
 	        		"lng":map.getCenter().lng,
-	          		"percision":map.getZoom()-6},
+	          		"percision":percision},
 	          		'success': function(data){
 	          			var rest;
 	          			var r;
@@ -757,15 +761,16 @@ $(function(){
 		return timestr;
 	}
 	
+	window.loadtimes = 0;
 	window.startLoad = function(){
-		if(map.getZoom()<PERSISSION-3){
+		if(loadtimes==3){
 			lunchTip('您的附近好像还没有餐厅哦，您可以亲自开设一家餐厅或者邀请您最喜爱的餐厅来有米开设一家餐厅')
 		}
 		if(map.getZoom() == 6){
 			startApp();
 			return;
 		}
-		getLocalRestuarants(function(){
+		getLocalRestuarants(PERSISSION-loadtimes-6,function(){
 			var hasRest = false;
 			for(var i in window.restuarants) {
 			    if(window.restuarants.hasOwnProperty(i)) {
@@ -819,7 +824,7 @@ $(function(){
 					}
 				}
 			}else{
-				map.setZoom(map.getZoom()-1)
+				loadtimes++;
 				startLoad();
 			}
 		});
