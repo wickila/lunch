@@ -276,8 +276,8 @@ $(function(){
 				}else if(window.user.restuarant){
 					alert('您已经有一家店啦');
 				}else{
-					$('#lat').val(clickedLatLng.lat());
-					$('#lng').val(clickedLatLng.lng());
+					$('#lat').val(clickedLatLng.lat);
+					$('#lng').val(clickedLatLng.lng);
 					geocoder.geocode(clickedLatLng, function(results) {
 					      if(results) {
 					        	var adress = results.address;
