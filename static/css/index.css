@@ -23,25 +23,21 @@ body{
 	width: 100%;
 	height: 100%;
 	position: absolute;
-	transition: -webkit-transform 200ms ease-in-out;
-	-webkit-transition: -webkit-transform 200ms ease-in-out;
-	-moz-transition: -moz-transform 200ms ease-in-out;
-	-o-transition: -o-transform 200ms ease-in-out;
-	-ms-transition: -ms-transform 200ms ease-in-out;
-	transform: translate(-100%, 0px);
-	-webkit-transform: translate(-100%, 0px);
-	-moz-transform: translate(-100%, 0px);
-	-o-transform: translate(-100%, 0px);
-	-ms-transform: translate(-100%, 0px);
+	transition: left 200ms ease-in-out;
+	-webkit-transition: left 200ms ease-in-out;
+	-moz-transition: left 200ms ease-in-out;
+	-o-transition: left 200ms ease-in-out;
+	-ms-transition: left 200ms ease-in-out;
+	left: -100%;
 	cursor: move;
 }
 
 #loading{
-	transition: -webkit-transform 200ms ease-in-out;
-	-webkit-transition: -webkit-transform 200ms ease-in-out;
-	-moz-transition: -moz-transform 200ms ease-in-out;
-	-o-transition: -o-transform 200ms ease-in-out;
-	-ms-transition: -ms-transform 200ms ease-in-out;
+	transition: left 200ms ease-in-out;
+	-webkit-transition: left 200ms ease-in-out;
+	-moz-transition: left 200ms ease-in-out;
+	-o-transition: left 200ms ease-in-out;
+	-ms-transition: left 200ms ease-in-out;
 	position: absolute;
 	width: 20%;
 	left: 40%;
@@ -57,17 +53,22 @@ body{
 }
 
 section{
+	transition: opacity 200ms ease-in-out;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
 	height: 100%;
 	position: absolute;
 	width: 100%;
 }
 
 .content{
-	transition: -webkit-transform 200ms ease-in-out;
-	-webkit-transition: -webkit-transform 200ms ease-in-out;
-	-moz-transition: -moz-transform 200ms ease-in-out;
-	-o-transition: -o-transform 200ms ease-in-out;
-	-ms-transition: -ms-transform 200ms ease-in-out;
+	transition: left 200ms ease-in-out;
+	-webkit-transition: left 200ms ease-in-out;
+	-moz-transition: left 200ms ease-in-out;
+	-o-transition: left 200ms ease-in-out;
+	-ms-transition: left 200ms ease-in-out;
 }
 
 .radius-border{
@@ -252,16 +253,12 @@ section{
 	background-color: white;
 	position: fixed;
 	top: 50px;
-	transition: -webkit-transform 200ms ease-in-out;
-	-webkit-transition: -webkit-transform 200ms ease-in-out;
-	-moz-transition: -moz-transform 200ms ease-in-out;
-	-o-transition: -o-transform 200ms ease-in-out;
-	-ms-transition: -ms-transform 200ms ease-in-out;
-	transform: translate(0px, -120%);
-	-webkit-transform: translate(0px, -120%);
-	-moz-transform: translate(0px, -120%);
-	-o-transform: translate(0px, -120%);
-	-ms-transform: translate(0px, -120%);
+	transition: top 200ms ease-in-out;
+	-webkit-transition: top 200ms ease-in-out;
+	-moz-transition: top 200ms ease-in-out;
+	-o-transition: top 200ms ease-in-out;
+	-ms-transition: top 200ms ease-in-out;
+	top -120%;
 }
 
 #shoppingCart-container ul{

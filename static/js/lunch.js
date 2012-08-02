@@ -43,11 +43,7 @@ $(function(){
 	window.startApp = function(){
 		$('#loading .bar').css('width','100%');
 		setTimeout(function(){
-			$('#loading').css('transform','translate(500%,0px)');
-			$('#loading').css('-webkit-transform','translate(500%,0px)');
-			$('#loading').css('-moz-transform','translate(500%,0px)');
-			$('#loading').css('-o-transform','translate(500%,0px)');
-			$('#loading').css('-ms-transform','translate(500%,0px)');
+			$('#loading').css('left','500%');
 		},200);
 		setTimeout(function(){
 			$('#content,.navbar-fixed-top').css('opacity',1);
@@ -106,13 +102,14 @@ $(function(){
 				window.speed = Math.abs(evt.clientX - window.orignClientX)/((new Date()).getTime()-window.dragStartTime);
 				window.maxSpeed = window.maxSpeed<window.speed?window.speed:window.maxSpeed;
 				var x = ((1-page)+(evt.clientX - window.orignClientX)/$(window).width())*100;
-				$('#main').css('transform','translate('+ x +'%, 0px)');
-				$('#main').css('-webkit-transform','translate('+ x +'%, 0px)');
-				$('#main').css('-moz-transform','translate('+ x +'%, 0px)');
-				$('#main').css('-o-transform','translate('+ x +'%, 0px)');
-				$('#main').css('-ms-transform','translate('+ x +'%, 0px)');
+				$('section').each(function(){
+					var section = $(this);
+					var op = Math.abs(Math.abs((evt.clientX - window.orignClientX)/$(window).width())-section.css('opacity'));
+					section.css('opacity',op);
+				});
+				$('#main').css('left',x +'%');
 				x = (evt.clientX - window.orignClientX)/$(window).width()*100;
-				if(Math.abs(x)>60||window.maxSpeed>1){
+				if(Math.abs(x)>80||window.maxSpeed>2){
 					window.changePage(window.page-(x/Math.abs(x)));
 					window.isDragging = false;
 				}
@@ -121,11 +118,31 @@ $(function(){
 		});
 		$('#main').bind('mouseup',function(evt){
 			window.isDragging = false;
-			$('#main').css('transform','translate('+ (1-page) +'00%, 0px)');
-			$('#main').css('-webkit-transform','translate('+ (1-page) +'00%, 0px)');
-			$('#main').css('-moz-transform','translate('+ (1-page) +'00%, 0px)');
-			$('#main').css('-o-transform','translate('+ (1-page) +'00%, 0px)');
-			$('#main').css('-ms-transform','translate('+ (1-page) +'00%, 0px)');
+			$('#main').css('left',(1-page) +'00%');
+			switch(page){
+				case 1:
+					$('#overview').css('opacity',1);
+					$('#restview').css('opacity',0);
+					break;
+				case 2:
+					$('#restview').css('opacity',1);
+					$('#overview').css('opacity',0);
+					$('#orderview').css('opacity',0);
+					$('#userview').css('opacity',0);
+					break;
+				case 3:
+					$('#restview').css('opacity',0);
+					$('#overview').css('opacity',0);
+					$('#orderview').css('opacity',1);
+					$('#userview').css('opacity',0);
+					break;
+				case 4:
+					$('#restview').css('opacity',0);
+					$('#overview').css('opacity',0);
+					$('#orderview').css('opacity',0);
+					$('#userview').css('opacity',1);
+					break;
+			}
 		});
 		$('.modal').on('shown',function(){
 			$(this).find('input:first').focus();
@@ -704,11 +721,7 @@ $(function(){
 	}
 	
 	window.setTransform = function(element,num){
-		element.css('transform','translate(0px,'+ num +')');
-		element.css('-webkit-transform','translate(0px,'+ num +')');
-		element.css('-moz-transform','translate(0px,'+ num +')');
-		element.css('-o-transform','translate(0px,'+ num +')');
-		element.css('-ms-transform','translate(0px,'+ num +')');
+		element.css('top',num);
 	}
 	
 	window.getTimeStr = function(time){
@@ -821,12 +834,18 @@ $(function(){
 			case 1:
 				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
 				$('#navbar-fixed-top-index').addClass('active');
+				$('#overview').css('opacity',1);
+				$('#restview').css('opacity',0);
 				$('title').html('Yaammy-首页');
 				break;
 			case 2:
 				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
 				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
 				$('#navbar-fixed-top-rest').addClass('active');
+				$('#restview').css('opacity',1);
+				$('#overview').css('opacity',0);
+				$('#orderview').css('opacity',0);
+				$('#userview').css('opacity',0);
 				$('title').html('Yaammy-'+window.currentRest.name);
 				break;
 			case 3:
@@ -834,6 +853,10 @@ $(function(){
 				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
 				$('#bottom-nav-orderview').addClass('bottom-nav-orderview-active');
 				$('#navbar-fixed-top-order').addClass('active');
+				$('#restview').css('opacity',0);
+				$('#overview').css('opacity',0);
+				$('#orderview').css('opacity',1);
+				$('#userview').css('opacity',0);
 				$('title').html('Yaammy-订单页面');
 				break;
 			case 4:
@@ -841,16 +864,16 @@ $(function(){
 				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
 				$('#bottom-nav-orderview').addClass('bottom-nav-orderview-active');
 				$('#bottom-nav-user').addClass('bottom-nav-user-active');
+				$('#restview').css('opacity',0);
+				$('#overview').css('opacity',0);
+				$('#orderview').css('opacity',0);
+				$('#userview').css('opacity',1);
 				$('title').html('Yaammy-管理页面');
 				break;
 		}
 		window.page = page;
 		window.hideShoppingCart();
-		$('#main').css('transform','translate('+ (1-page) +'00%, 0px)');
-		$('#main').css('-webkit-transform','translate('+ (1-page) +'00%, 0px)');
-		$('#main').css('-moz-transform','translate('+ (1-page) +'00%, 0px)');
-		$('#main').css('-o-transform','translate('+ (1-page) +'00%, 0px)');
-		$('#main').css('-ms-transform','translate('+ (1-page) +'00%, 0px)');
+		$('#main').css('left',(1-page) +'00%');
 		window.updateView();
 	}
 	
