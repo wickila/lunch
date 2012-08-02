@@ -20,6 +20,7 @@ $(function(){
 	window.settingMenus = null;
 	window.orderView = null;;
 	window.shoppintCart = null;
+	window.page = 0;
 	PERSISSION = 15;
 	window.orderMenus = [];//购物车里面的条目
 	
@@ -50,6 +51,7 @@ $(function(){
 		},200);
 		setTimeout(function(){
 			$('#content,.navbar-fixed-top').css('opacity',1);
+			$('#loading').remove();
 		},400);
 		setTimeout(function(){
 			if(CURRENT_REST_ID){
@@ -211,14 +213,11 @@ $(function(){
 	        lunchAlert('您拒绝了浏览器定位您的位置，我们获取到您的位置可能不太准确。您可以在浏览器设置里面重新设置此选项');
 	        handleNoGeoLocation();
 	      });
-	    }else if(google.gears) {
-	      var geo = google.gears.factory.create('beta.geolocation');
-	      geo.getCurrentPosition(function(position) {
-	        initialLocation = new BMap.Point(position.longitude,position.latitude);
-	        initLocation();
-	      }, function() {
-	    	  handleNoGeoLocation();
-	      });
+	      setTimeout(function(){
+	    	  if(!window.initialLocation){
+	    		  handleNoGeoLocation();
+	    	  }
+	      },5000);
 	    }else{
 	    	handleNoGeoLocation();
 	    }
@@ -301,7 +300,7 @@ $(function(){
 	    	  strokeColor: '#999999',
 	    	  strokeWeight: '1',
 	    	  fillColor: '#aaaaaa',
-	    	  enableClicking:false,
+	    	  enableClicking:false
 	    	});
 	    map.addOverlay(this.circle);
 	    this.menus = [];
@@ -367,8 +366,8 @@ $(function(){
 	        url: '/api/localrestuarants',
 	        ContentType: "application/json",
 	        callback:callback,
-	        data:{"lat":initialLocation.lat,
-	        		"lng":initialLocation.lng,
+	        data:{"lat":map.getCenter().lat,
+	        		"lng":map.getCenter().lng,
 	          		"percision":map.getZoom()-6},
 	          		'success': function(data){
 	          			var rest;
@@ -745,7 +744,7 @@ $(function(){
 		if(map.getZoom()<PERSISSION-3){
 			lunchTip('您的附近好像还没有餐厅哦，您可以亲自开设一家餐厅或者邀请您最喜爱的餐厅来有米开设一家餐厅')
 		}
-		if(map.getZoom() == 1){
+		if(map.getZoom() == 6){
 			startApp();
 			return;
 		}

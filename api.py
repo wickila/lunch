@@ -93,8 +93,8 @@ class LocalRestaurants:
             percision = int(data.percision)
         if percision>11:
             percision = 11
-        elif percision<3:
-            percision = 3
+        elif percision<1:
+            percision = 1
         hash_location = geohash.encode(lat, lng, 12)
         hash_location = hash_location[0:percision]
         neighbors = self.get_neighbors(hash_location,config.LOCATION_PRECISION)

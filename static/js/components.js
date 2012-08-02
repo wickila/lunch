@@ -1331,7 +1331,6 @@ Message.prototype = {
 			this.element.find('.message-item-content').html(message.content);
 			this.element.find('.message-item-time').html(message.createdtime);
 		}
-	  ,
 }
 
 var Messages = function(){
