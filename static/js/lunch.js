@@ -845,7 +845,7 @@ $(function(){
 				$('#navbar-fixed-top-index').addClass('active');
 				$('#overview').css('opacity',1);
 				$('#restview').css('opacity',0);
-				$('title').html('Yaammy-首页');
+				document.title = 'Yaammy-首页';
 				break;
 			case 2:
 				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
@@ -855,7 +855,7 @@ $(function(){
 				$('#overview').css('opacity',0);
 				$('#orderview').css('opacity',0);
 				$('#userview').css('opacity',0);
-				$('title').html('Yaammy-'+window.currentRest.name);
+				document.title = 'Yaammy-'+window.currentRest.name;
 				break;
 			case 3:
 				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
@@ -866,7 +866,7 @@ $(function(){
 				$('#overview').css('opacity',0);
 				$('#orderview').css('opacity',1);
 				$('#userview').css('opacity',0);
-				$('title').html('Yaammy-订单页面');
+				document.title = 'Yaammy-订单';
 				break;
 			case 4:
 				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
@@ -877,7 +877,7 @@ $(function(){
 				$('#overview').css('opacity',0);
 				$('#orderview').css('opacity',0);
 				$('#userview').css('opacity',1);
-				$('title').html('Yaammy-管理页面');
+				document.title = 'Yaammy-管理';
 				break;
 		}
 		window.page = page;
