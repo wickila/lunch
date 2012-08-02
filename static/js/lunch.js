@@ -59,7 +59,7 @@ $(function(){
 		marker = new BMap.Marker(initialLocation);
 		marker.setTitle(window.user?window.user.username+'的位置':'您的位置');
 		map.addOverlay(marker);
-	    window.shoppingCart = new ShoppingCart($('#shoppingCart-container ul'));
+	    window.shoppingCart = new ShoppingCart($('#shoppingCart-container .accordion'));
 	    $('.tooltip-enable').tooltip({
 		      selector: "a[rel=tooltip]"
 		});
@@ -672,6 +672,9 @@ $(function(){
 			window.orderMenus.push(m);
 		}
 		window.shoppingCart.addMenu(m);
+		if(!window.shoppingCartShow){
+			$('#shoppingCart-container').css('top','-'+$('#shoppingCart-container').css('height'));
+		}
 		window.updateShoppingCartNum();
 	}
 	
@@ -684,6 +687,9 @@ $(function(){
 			window.orderMenus.splice(window.orderMenus.indexOf(m),1);
 		}
 		window.shoppingCart.removeMenu(m);
+		if(!window.shoppingCartShow){
+			$('#shoppingCart-container').css('top','-'+$('#shoppingCart-container').css('height'));
+		}
 		window.updateShoppingCartNum();
 		if(window.orderMenus.length == 0){
 			hideShoppingCart();
@@ -704,12 +710,14 @@ $(function(){
 			return;
 		}
 		window.shoppingCartShow = true;
-		setTransform($('#shoppingCart-container'),'0px');
+		$('#shoppingCart-container').animate({'top':'50px',
+												'opacity':1},{duration:200});
 	}
 	
 	window.hideShoppingCart = function (){
 		window.shoppingCartShow = false;
-		setTransform($('#shoppingCart-container'),'-120%');
+		$('#shoppingCart-container').animate({'top':'-'+$('#shoppingCart-container').css('height'),
+			'opacity':0},{duration:200});
 	}
 	
 	window.toggleShoppingCart = function(){
@@ -718,10 +726,6 @@ $(function(){
 		}else{
 			window.hideShoppingCart();
 		}
-	}
-	
-	window.setTransform = function(element,num){
-		element.css('top',num);
 	}
 	
 	window.getTimeStr = function(time){

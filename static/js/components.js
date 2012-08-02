@@ -255,19 +255,38 @@ RestView.prototype.getRest = function(){
 
 var ShoppingCartRest = function(rest){
 	this.rest = rest;
-	var head = "<li data-rid='"+ rest.id +"'><a style='cursor: pointer;'>"+ rest.name + "(<span class='shopping-cart-rest-order-menus-num'>" + getOrderMenusNum(rest.orderMenus) + "</span>份)<i class='shopping-cart-close icon-remove-sign' style='float: right;'></i><button class='btn btn-primary btn-mini'>取消</button><button class='btn btn-danger btn-mini'>删除"+rest.name+"家的所有订餐</button></a></li>";
+	this.element = $('<div class="accordion-group">'+
+					    '<div class="accordion-heading">'+
+					      '<div class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" data-target="#collapse'+this.rest.id+'"></div>'+
+					    '</div>'+
+					    '<div id="collapse'+this.rest.id+'" class="accordion-body collapse" style="height: 0px; ">'+
+					      '<div class="accordion-inner">'+
+					      '</div>'+
+					    '</div>'+
+				    '</div>')
+	var head = "<div data-rid='"+this.rest.id+"'>"+rest.name + "(<span class='shopping-cart-rest-order-menus-num'>" + getOrderMenusNum(rest.orderMenus) + "</span>份)<i class='shopping-cart-close icon-remove-sign' style='float: right;'></i><button class='btn btn-primary btn-mini'>取消</button><button class='btn btn-danger btn-mini'>删除"+rest.name+"家的所有订餐</button></div>";
 	var body = "<table width='99%' class='shopping-cart-menus' id='shopping-cart-menus-"+ rest.id +"'></table>";
 	this.head = $(head);
 	this.body = $(body);
-	this.body.hide();
-	this.head.find('.shopping-cart-close').bind('click',$.proxy(function(){
+	this.head.find('.btn').css('height',20);
+	this.element.find('.accordion-toggle').append(this.head);
+	this.element.find('.accordion-inner').append(this.body);
+	this.head.find('.shopping-cart-close').click($.proxy(function(event){
 		this.head.find('.shopping-cart-close').hide(100);
-		this.head.find('.btn').show(100);
+		this.head.find('.btn').css('width','');
+		setTimeout($.proxy(function(){
+			this.head.find('.btn').show();
+		},this),100)
+		event.stopImmediatePropagation();
 	},this));
 	this.head.find('.btn-danger').bind('click',this.onClose);
-	this.head.find('.btn-primary').bind('click',$.proxy(function(){
+	this.head.find('.btn-primary').bind('click',$.proxy(function(event){
 		this.head.find('.shopping-cart-close').show(100);
-		this.head.find('.btn').hide(100);
+		event.stopImmediatePropagation();
+		this.head.find('.btn').css('width',0);
+		setTimeout($.proxy(function(){
+			this.head.find('.btn').hide();
+		},this),30)
 	},this));
 	for(var i in rest.orderMenus){
 		var m = rest.orderMenus[i];
@@ -324,8 +343,9 @@ ShoppingCartRest.prototype.removeOrderMenu = function(m){
 	this.head.find('.shopping-cart-rest-order-menus-num').html(getOrderMenusNum(this.rest.orderMenus));
 }
 
-ShoppingCartRest.prototype.onClose = function(){
-	var rest = window.restuarants[$(this).parent().parent().data('rid')].info;
+ShoppingCartRest.prototype.onClose = function(event){
+	event.stopImmediatePropagation();
+	var rest = window.restuarants[$(this).parent().data('rid')].info;
 	var menus = []
 	for(var i in rest.orderMenus){
 		rest.orderMenus[i].num = 1;
@@ -376,15 +396,12 @@ ShoppingCartRest.prototype.onMenuReduce = function(){
 var ShoppingCart = function(jqueryElement){
 	this.jqueryElement = jqueryElement;
 	this.rests = [];
-	$('#shoppingCart-container').css('top',$('.navbar-fixed-top').height()+10);
-	$('#shoppingCart-container').css('left',($(window).width()-$('#shoppingCart-container').width())*0.5);
-	
-	$('#shoppingCart-container li').live('click',function(e){
-		var link = $(this);
-		link.addClass('active').siblings().removeClass('active');
-		$('.shopping-cart-menus').hide();
-		$('#shopping-cart-menus-'+link.data('rid')).show();
-	});
+//	$('#shoppingCart-container li').live('click',function(e){
+//		var link = $(this);
+//		link.addClass('active').siblings().removeClass('active');
+//		$('.shopping-cart-menus').hide();
+//		$('#shopping-cart-menus-'+link.data('rid')).show();
+//	});
 	
 	$('#shoppingCart-container')[0].ondragover = function(ev) {
 		ev.preventDefault();
@@ -422,12 +439,7 @@ ShoppingCart.prototype.addMenu = function(m){
 		rest.addOrderMenu(m);
 	}else{
 		rest = new ShoppingCartRest(window.restuarants[m.rid].info);
-		if(this.rests.length == 0){
-			rest.head.addClass('active');
-			rest.body.show();
-		}
-		this.jqueryElement.append(rest.head);
-		this.jqueryElement.append(rest.body);
+		this.jqueryElement.append(rest.element);
 		this.rests.push(rest);
 	}
 	$('#shopping-cart-settle').show();
@@ -447,8 +459,7 @@ ShoppingCart.prototype.removeMenu = function(m){
 		rest.removeOrderMenu(m);
 	}
 	if(rest.rest.orderMenus.length == 0){
-		rest.head.remove();
-		rest.body.remove();
+		rest.element.remove();
 		this.rests.splice(this.rests.indexOf(rest),1);
 	}
 	if(window.orderMenus.length == 0){

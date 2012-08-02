@@ -252,26 +252,25 @@ section{
 #shoppingCart-container{
 	background-color: white;
 	position: fixed;
-	top: 50px;
-	transition: top 200ms ease-in-out;
-	-webkit-transition: top 200ms ease-in-out;
-	-moz-transition: top 200ms ease-in-out;
-	-o-transition: top 200ms ease-in-out;
-	-ms-transition: top 200ms ease-in-out;
-	top -120%;
+	top: -65px;
 }
 
-#shoppingCart-container ul{
+#shoppingCart-container .accordion{
 	margin: 10px;
 }
 
-#shoppingCart-container ul li button{
+#shoppingCart-container .accordion-toggle button{
 	float: right;
 	display: none;
 	margin: -1px -2px 0 7px;
+	transition: width 100ms ease-in-out;
+	-webkit-transition: width 100ms ease-in-out;
+	-moz-transition: width 100ms ease-in-out;
+	-o-transition: width 100ms ease-in-out;
+	-ms-transition: width 100ms ease-in-out;
 }
 
-#shoppingCart-container ul li a{
+#shoppingCart-container .accordion-toggle{
 	font-weight: bold;
 }
 
@@ -281,10 +280,10 @@ section{
 	font-size: 10pt;
 }
 
-#shoppingCart-container::after{
-	position: fixed;
-	top: -10px;
-	right: 135px;
+#shoppingCart-container::BEFORE{
+	position: relative;
+	top: -13px;
+	left: 87%;
 	display: inline-block;
 	border-right: 10px solid transparent;
 	border-bottom: 10px solid #444;
@@ -293,6 +292,8 @@ section{
 }
 
 #shoppingCart-head{
+	position: relative;
+	top: -17px;
 	color: white;
 	padding-left: 10px;
 	height: 2.5em;
