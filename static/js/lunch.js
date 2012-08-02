@@ -381,7 +381,6 @@ $(function(){
 		if(percision==undefined){
 			percision = map.getZoom()-6;
 		}
-		console.log(percision);
 	    $.ajax({
 	    	type: 'GET',
 	        url: '/api/localrestuarants',
@@ -433,11 +432,11 @@ $(function(){
 		    						new Restuarant(data.restuarant);
 		    					}
 		    					window.user.restuarant = data.restuarant;
-		    					if(callback){
-		    						callback();
-		    					}
 		    				}
 	    				}
+						if(callback){
+							callback();
+						}
 	    			}else{
 	    				alert(data.message);
 	    			}

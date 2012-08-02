@@ -37,6 +37,14 @@
 			$("#lunch-alert").fadeIn();
 			$('#alert-message').html(message);
 		}
+		if (!Array.prototype.indexOf) {
+			Array.prototype.indexOf = function(obj, start) {
+				 for (var i = (start || 0), j = this.length; i < j; i++) {
+					 if (this[i] === obj) { return i; }
+				 }
+				 return -1;
+			}
+		}
 	</script>
 	</head>
 	<body onload="initialize()">
