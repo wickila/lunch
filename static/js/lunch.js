@@ -278,7 +278,7 @@ $(function(){
 				}else{
 					$('#lat').val(clickedLatLng.lat);
 					$('#lng').val(clickedLatLng.lng);
-					geocoder.geocode(clickedLatLng, function(results) {
+					geocoder.getLocation(clickedLatLng, function(results) {
 					      if(results) {
 					        	var adress = results.address;
 								$('#new-rest-form-adress').val(adress);
