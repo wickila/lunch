@@ -336,7 +336,7 @@ $(function(){
 		});
 	    this.marker.addEventListener('click', $.proxy(function() {
 		        map.panTo(this.marker.getPosition());
-		        if(window.currentRest != this.info){
+		        if(window.currentRest && window.currentRest != this.info){
 	        		window.restuarants[window.currentRest.id].marker.closeInfoWindow();
 	        		map.removeOverlay(window.restuarants[window.currentRest.id].circle);
 		        }
@@ -773,6 +773,7 @@ $(function(){
 			var hasRest = false;
 			for(var i in window.restuarants) {
 			    if(window.restuarants.hasOwnProperty(i)) {
+					window.setCurrentRest(window.restuarants[i].info);
 			    	hasRest = true;
 			    	complete+=1;
 			    	calcProgress();
