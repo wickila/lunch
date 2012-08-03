@@ -389,6 +389,7 @@ $(function(){
 						if(!window.user.restuarant){
 							window.user.restuarant = data.rest;
 						}
+						window.user.restnum = 1;
 						window.updateUserInfoView();
 						map.setCenter(new BMap.Point(data.rest.lng,data.rest.lat), PERSISSION);
 						$('#myModal').modal('hide');
@@ -494,7 +495,7 @@ $(function(){
 			$('#nav-right').html("<li><a onclick='changePage(4)'><i class='icon-user icon-white' style='margin-right: 5px'></i>"+window.user.username+"</a></li><li><a onclick='logout()'>登出</a></li>");
 			$('.user').addClass('user-login');
 			$('.user').removeClass('user');
-			if(user.permission > 0){
+			if(user.permission > 0 && user.restnum>0){
 				$('.boss').addClass('boss-login');
 				$('.boss').removeClass('boss');
 			}
@@ -793,7 +794,6 @@ $(function(){
 			var hasRest = false;
 			for(var i in window.restuarants) {
 			    if(window.restuarants.hasOwnProperty(i)) {
-					window.setCurrentRest(window.restuarants[i].info);
 			    	hasRest = true;
 			    	complete+=1;
 			    	calcProgress();
@@ -970,28 +970,26 @@ $(function(){
 	}
 	
 	$.setSideBarMenus = function(menus){
-		$('#overview-side-info-menus').slideUp(20,function(){
-			$('#overview-side-info-menus').empty();
-			for(var i=0;i<menus.length;i++)
-			{
-				var menu = new SmallMenu(menus[i]);
-				$('#overview-side-info-menus').append($(menu.getDiv()));
-			}
-			$('#overview-side-info-menus').find('button').bind('click',onCheckClick);
-			function onCheckClick(){
-				var mid = parseInt($(this).data('mid'));
-				var m;
-				for(var i=0;i<menus.length;i++){
-					if(menus[i].id == mid){
-						m = menus[i];
-						break;
-					}
+		$('#overview-side-info-menus').empty();
+		for(var i=0;i<menus.length;i++)
+		{
+			var menu = new SmallMenu(menus[i]);
+			$('#overview-side-info-menus').append($(menu.getDiv()));
+		}
+		$('#overview-side-info-menus').find('button').bind('click',onCheckClick);
+		function onCheckClick(){
+			var mid = parseInt($(this).data('mid'));
+			var m;
+			for(var i=0;i<menus.length;i++){
+				if(menus[i].id == mid){
+					m = menus[i];
+					break;
 				}
-				window.showAddOrderAnimation($('#small-menu-'+mid),m.name,function(){window.addOrderMenu(m);})
 			}
-			$('#overview-side-info-menus').css('max-height',$('#overview-side-info-head').parent().height()-$('#overview-side-info-head').find('table').height());
-			$('#overview-side-info-menus').slideDown(400);
-		});
+			window.showAddOrderAnimation($('#small-menu-'+mid),m.name,function(){window.addOrderMenu(m);})
+		}
+		$('#overview-side-info-menus').css('max-height',$('#overview-side-info-head').parent().height()-$('#overview-side-info-head').find('table').height());
+		$('#overview-side-info-menus').slideDown(400);
 	}
 	
 	updateLayout();

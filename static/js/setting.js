@@ -148,7 +148,10 @@ $(function(){
 									break;
 								}
 							}
-							if(!isOld)window.user.restuarant.menus.push(m);
+							if(!isOld){
+								m.num = 0;
+								window.user.restuarant.menus.push(m);
+							}
 							updateMenus(window.user.restuarant.menus);
 							$('#setting-menus-form-container').slideUp();
 							$('#settting-menus-view').slideDown();
@@ -202,6 +205,7 @@ $(function(){
 				'dataType': 'json',
 				'success':function(data){
 					$("#avatar_img").attr('src',data.imgurl);
+					lunchTip('修改头像成功')
 				},
 				'error':function(){lunchAlert('修改头像失败')}
 			});

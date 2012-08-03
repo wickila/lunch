@@ -48,6 +48,7 @@ $(function(){
 				}
 		});
 	}
+	
 	window.postIndexMessage = function(){
 		$('#index-message-form').ajaxForm({
 			'dataType': 'json',
@@ -60,6 +61,29 @@ $(function(){
 			'error':function(){
 					alert('由于服务器繁忙，提交申请失败，请稍后再试');
 				}
+		});
+	}
+	
+	window.onOrderComment = function(){
+		if($('#order-comment-btn').hasClass('disabled')){
+			return;
+		}
+		$('#order-comment-btn').addClass('disabled');
+		$('#order-comment-form').ajaxForm({
+			'dataType': 'json',
+			'success':function(data){
+				if(data.result){
+					$('#commentOrderModal').modal('hide');
+					window.currentComentOrder.order.state = 4;
+					window.currentComentOrder.updateView();
+					lunchTip('评论成功');
+				}else{
+					lunchTip(data.message);
+				}
+			},
+			'error':function(){
+				alert('由于服务器繁忙，评论失败，请稍后再试');
+			}
 		});
 	}
 	/**

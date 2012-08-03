@@ -318,7 +318,7 @@ class NewOrder():
                     rs = model.db.select('restuarant',where='id=$rid',vars=locals())
                     if len(rs)>0:
                         rest = rs[0]
-                        oid = model.db.insert('lunchorder',username=user.username,concact=concact,bossusername=rest.username,message=message,menus=post_data.menus,price=price,restname=rest.name)
+                        oid = model.db.insert('lunchorder',username=user.username,concact=concact,bossusername=rest.username,message=message,menus=post_data.menus,price=price,restname=rest.name,modifiedtime=str(datetime.datetime.now()).split('.')[0])
                         order = model.db.select('lunchorder',where='id=$oid',vars=locals())[0]
                         order.createdtime = str(order.createdtime)
                         return lunch.write_json({'result':True,'message':'order success','order':order,'rid':rest.id})
@@ -340,14 +340,16 @@ class EditOrder():
             order = model.db.select('lunchorder',where='id=$id',vars=locals())
             if len(order)>0:
                 order = order[0]
+                t = datetime.datetime.strptime(order.modifiedtime,'%Y-%m-%d %H:%M:%S')
                 if (order.bossusername == user.username and (not state == 3)) or (order.username == user.username and state == 3):
+                    sql = None
                     if state == 1:
-                        sql = 'update restuarant set totalensure = totalensure+1,totalensuretime = totalensuretime+%d where id=%d;'%((datetime.datetime.now()-order.modifiedtime).seconds,order.rid)
+                        sql = "update restuarant set totalensure = totalensure+1,totalensuretime = totalensuretime+%d where username='%s';"%((datetime.datetime.now()-datetime.datetime.strptime(order.modifiedtime,'%Y-%m-%d %H:%M:%S')).seconds,order.bossusername)
                     elif state == 2:
-                        sql = 'update restuarant set totalensure = totalensure+1,totalensuretime = totalensuretime+%d where id=%d;'%((datetime.datetime.now()-order.modifiedtime).seconds,order.rid)
+                        sql = "update restuarant set totaldelivery = totaldelivery+1,totaldeliverytime = totaldeliverytime+%d where username='%s';"%((datetime.datetime.now()-datetime.datetime.strptime(order.modifiedtime,'%Y-%m-%d %H:%M:%S')).seconds,order.bossusername)
                     if sql:
                         model.db.query(sql)
-                    model.db.update('lunchorder',where='id=$id',state=state, cancelreason=cancelreason,modifiedtime = datetime.datetime.now(),vars=locals())
+                    model.db.update('lunchorder',where='id=$id',state=state, cancelreason=cancelreason,modifiedtime = str(datetime.datetime.now()).split('.')[0],vars=locals())
                     order.state = state
                     order.createdtime = str(order.createdtime).split('.')[0]
                     order.modifiedtime = str(datetime.datetime.now()).split('.')[0]

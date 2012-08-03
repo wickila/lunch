@@ -874,6 +874,39 @@ var ViewOrderItem = function(type,expanded){
 			this.hideDetail();
 		}
 	},this));
+	this.element.find('.order-option-btn').click($.proxy(this.onButtonClick,this));
+	this.element.find('.order-cancel-btn').click($.proxy(function(){
+		$('#cancelOrderModal').modal('show');
+		window.cancelOrder = $.proxy(function(){
+			var cancelreason = $('#roder-cancel-form-reason').val();
+			if(!cancelreason){
+				alert('不能无理由取消订单');
+				return;
+			}
+			$.ajax({
+			      type: 'POST',
+			      url: '/api/order/edit/'+this.order.id,
+			      ContentType: "application/json",
+			      data:{
+		    				'state':-1,
+		    				'cancelreason':cancelreason
+		    			},
+		    	  scope:this,
+				  success: function(data){
+			    				if(data.result){
+			    					this.scope.order = data.order;
+			    					data.order.concact = JSON.parse(data.order.concact);
+			    					data.order.menus = JSON.parse(data.order.menus);
+			    					this.scope.updateView();
+			    				}else{
+			    					window.lunchTip(data.message)
+			    				}
+			    				$('#cancelOrderModal').modal('hide');
+			    		    },
+			      error: function(){alert('修改取消失败');}
+			    });
+		},this);
+	},this));
 }
 
 ViewOrderItem.prototype.showDetail = function(){
@@ -922,40 +955,7 @@ ViewOrderItem.prototype.setOrder = function(order){
 	}else{
 		this.hideDetail();
 	}
-	this.element.find('.order-option-btn').click($.proxy(this.onButtonClick,this));
 	this.updateTip();
-	this.element.find('.order-cancel-btn').click($.proxy(function(){
-		$('#cancelOrderModal').modal('show');
-		window.cancelOrder = $.proxy(function(){
-			var cancelreason = $('#roder-cancel-form-reason').val();
-			if(!cancelreason){
-				alert('不能无理由取消订单');
-				return;
-			}
-			$.ajax({
-			      type: 'POST',
-			      url: '/api/order/edit/'+this.order.id,
-			      ContentType: "application/json",
-			      data:{
-		    				'state':-1,
-		    				'cancelreason':cancelreason
-		    			},
-		    	  scope:this,
-				  success: function(data){
-			    				if(data.result){
-			    					this.scope.order = data.order;
-			    					data.order.concact = JSON.parse(data.order.concact);
-			    					data.order.menus = JSON.parse(data.order.menus);
-			    					this.scope.updateView();
-			    				}else{
-			    					window.lunchTip(data.message)
-			    				}
-			    				$('#cancelOrderModal').modal('hide');
-			    		    },
-			      error: function(){alert('修改取消失败');}
-			    });
-		},this);
-	},this));
 }
 
 ViewOrderItem.prototype.onButtonClick = function(){
@@ -974,23 +974,11 @@ ViewOrderItem.prototype.onButtonClick = function(){
 			case '评论':
 				option = 4;
 				$('#commentOrderModal').modal('show');
+				$('#order-comment-btn').removeClass('disabled');
 				$('#order-commment-orderid').val(this.order.id);
 				$('#order-comment-thanks').attr('max',Math.ceil(this.order.price/10));
 				$('#order-comment-thanks').val(Math.ceil(this.order.price/10));
-				window.onOrderComment = function(){
-					$('#order-comment-form').ajaxForm({
-						'scope':this,
-						'dataType': 'json',
-						'success':function(data){
-							if(data.result){
-								$('#commentOrderModal').modal('hide');
-								lunchTip('评论成功');
-							}else{
-								lunchTip(data.message);
-							}
-						}
-					});
-				}
+				window.currentComentOrder = this;
 				return;
 				break;
 		}
