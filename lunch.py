@@ -267,9 +267,9 @@ class AdminSignOut:
 		session.user = None
 		raise web.seeother('/admin/signin')
 
-#if __name__ == '__main__': #for local
-#	getSession()
-#	app.run()
+if __name__ == '__main__': #for local
+	getSession()
+	app.run()
 
-getSession()  #for remote 
-application = app.wsgifunc() #for remote 
+#getSession()  #for remote 
+#application = app.wsgifunc() #for remote 

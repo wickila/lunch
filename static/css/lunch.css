@@ -19,7 +19,7 @@ body{
 	height:100%;
 }
 
-.navbar-fixed-top{
+.navbar-fixed-top,.alert{
 	opacity:0;
 	transition: opacity 500ms ease-in-out;
 	-webkit-transition: opacity 500ms ease-in-out;

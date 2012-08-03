@@ -156,3 +156,5 @@ ALTER TABLE `lunch`.`restuarant` ADD COLUMN `totalensure` INT UNSIGNED NOT NULL 
  ADD COLUMN `totalensuretime` DOUBLE UNSIGNED NOT NULL AFTER `totalensure`,
  ADD COLUMN `totaldelivery` INT UNSIGNED NOT NULL AFTER `totalensuretime`,
  ADD COLUMN `totaldeliverytime` DOUBLE UNSIGNED NOT NULL AFTER `totaldelivery`;
+ALTER TABLE `lunch`.`restuarant` MODIFY COLUMN `lat` DOUBLE UNSIGNED NOT NULL,
+ MODIFY COLUMN `lng` DOUBLE UNSIGNED NOT NULL;

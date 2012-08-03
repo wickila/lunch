@@ -41,7 +41,7 @@ $(function(){
 			var menu = $(this);
 			mid = menu.data('mid');
 			var m_info;
-			for(var i in window.user.restuarant.menus)
+			for(var i=0;i<window.user.restuarant.menus.length;i++)
 			{
 				if(window.user.restuarant.menus[i].id==mid){
 					m_info = window.user.restuarant.menus[i];
@@ -140,7 +140,7 @@ $(function(){
 							var m = data.menu;
 							$('#setting-menu-form')[0].reset();
 							var isOld = false;
-							for(var i in window.user.restuarant.menus)
+							for(var i=0;i<window.user.restuarant.menus.length;i++)
 							{
 								if(window.user.restuarant.menus[i].id==mid){
 									window.user.restuarant.menus[i] = m;
@@ -162,7 +162,7 @@ $(function(){
 					$('#setting-menu-img').attr('src',m.thumbnail);
 					$('#setting-menu-form')[0].reset();
 					var isOld = false;
-					for(var i in window.user.restuarant.menus)
+					for(var i=0;i<window.user.restuarant.menus.length;i++)
 					{
 						if(window.user.restuarant.menus[i].id==m.id){
 							window.user.restuarant.menus[i] = m;
