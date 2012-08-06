@@ -5,7 +5,7 @@ Created on 2012-6-14
 @author: wicki
 '''
 
-version = '0.9.1.7'
+version = '0.9.1.8'
 
 LOCATION_PRECISION = 5
 

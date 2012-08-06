@@ -84,8 +84,7 @@ $(function(){
 		      placement: "bottom"
 		});
 		updateUserInfoView();
-		$(".menu-img,.msb-avatar").lazyload({
-		     placeholder : "/static/img/ajax-loader.gif", //加载图片前的占位图片
+		$("img.lazy").lazyload();({
 		     effect      : "fadeIn" //加载图片使用的效果(淡入)
 		});
 		initAppEvents();
@@ -981,6 +980,9 @@ $(function(){
 			var menu = new SmallMenu(menus[i]);
 			$('#overview-side-info-menus').append($(menu.getDiv()));
 		}
+		$('#overview-side-info-menus').find('.lazy').lazyload({
+			effect : "fadeIn"
+		});
 		$('#overview-side-info-menus').find('button').bind('click',onCheckClick);
 		function onCheckClick(){
 			var mid = parseInt($(this).data('mid'));
