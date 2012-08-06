@@ -136,7 +136,6 @@ $(function(){
 						'dataType': 'json',
 						'success':function(data){
 							lunchTip('操作成功');
-							close_menu_form();
 							var m = data.menu;
 							$('#setting-menu-form')[0].reset();
 							var isOld = false;
