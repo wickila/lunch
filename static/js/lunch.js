@@ -84,6 +84,10 @@ $(function(){
 		      placement: "bottom"
 		});
 		updateUserInfoView();
+		$(".menu-img,.msb-avatar").lazyload({
+		     placeholder : "/static/img/ajax-loader.gif", //加载图片前的占位图片
+		     effect      : "fadeIn" //加载图片使用的效果(淡入)
+		});
 		initAppEvents();
 	}
 	
@@ -174,7 +178,7 @@ $(function(){
 			  						window.thumbnails = data.thumbnails;
 			  						for(var i in window.thumbnails){
 			  							$('#thumb-lib').find('.thumbnails').append($("<li>"+
-			  																		"<a href='#' class='thumbnail'><img style='width:160px;height:160px' src='"+window.thumbnails[i].src+"' alt='"+window.thumbnails[i].name+"'></a>"+
+			  																		"<a class='thumbnail'><img style='width:160px;height:160px' src='"+window.thumbnails[i].src+"' alt='"+window.thumbnails[i].name+"'></a>"+
 			  																		"<h5>"+window.thumbnails[i].name+"</h5>"+
 			  																		"</li>"));
 			  						}
@@ -346,7 +350,7 @@ $(function(){
 	    
 	    var headDiv = "<div class='iw'>"+
 		"<table width='100%'>" +
-		"<tr><td rowspan='3'><img class='small-avatar' style='padding: 0 2px 0 0;' src='"+this.info.avatarurl+"'></img></td><td><h4>"+this.info.name+"</h4></td><td align='right' style='font-size: 10pt;'><span class='icon-heart'></span>谢谢:<span style='font-size: 11pt'>"+this.info.thanks+"</span></td></tr>" +
+		"<tr valign='top'><td rowspan='3'><img class='small-avatar' style='padding: 0 2px 0 0;' src='"+this.info.avatarurl+"'></img></td><td><h4>"+this.info.name+"</h4></td><td align='right' style='font-size: 10pt;'><span class='icon-heart'></span>谢谢:<span style='font-size: 11pt'>"+this.info.thanks+"</span></td></tr>" +
 		"<tr><td colspan='2'><span style='font-size: 10pt;color: gray;'>"+this.info.description+"</span></td></tr>" +
 		"<tr><td colspan='2'><a onclick='changePage(2)'>了解更多>></a></td></tr>" +
 		"</table></div>";
@@ -369,7 +373,8 @@ $(function(){
 	  
 	Restuarant.prototype.say = function(content){
 		if(window.currentRest == this.info)return;
-		this.infowindow.setContent("<div class='infowindow-div' data-rid='"+this.info.id+"' onclick='synsSetCurrentRest("+this.info.id+")'>"+content+"</div>");
+		if(!content)return;
+		this.infowindow.setContent("<div class='iw' data-rid='"+this.info.id+"' onclick='synsSetCurrentRest("+this.info.id+")'>"+content+"</div>");
 		this.marker.openInfoWindow(this.infowindow);
 		setTimeout($.proxy(this.shutup,this),3000);
 	}

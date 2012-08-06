@@ -7,11 +7,11 @@
 	<form class="form" id="login-form" action="/signin" method="post">
     	<fieldset id="inputs">
 	        <input name="username" type="text" placeholder="Username" required><span id="login-message"></span><br/>
-	        <input name="password" type="password" placeholder="Password" required>
+	        <input name="password" type="password" placeholder="Password" required><br/>
 	        <input type="submit" class="btn" value="登录" onclick="login()">
-	        <a href="/forgetpwd" target="_blank">忘记密码?</a>
 	    </fieldset>
 	</form>
+	<a href="/forgetpwd" target="_blank">忘记密码?</a>
   </div>
 </div>
 
@@ -113,6 +113,6 @@
 	</div>
   </div>
   <div class="modal-footer">
-    <a href="#" id="select-thumbnail-btn" class="btn btn-primary">确定</a>
+    <a id="select-thumbnail-btn" class="btn btn-primary">确定</a>
   </div>
 </div>

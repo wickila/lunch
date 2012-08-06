@@ -1208,19 +1208,29 @@ ViewOrderView.prototype.dispose = function(){
  */
 var MenuTypeSetting = function(){
 	this.element = $('#rest-menutype-setting');
-	this.element.append($("<tr><td></td><td></td><td><span id='show-new-menutype-btn' class='icon-plus' style='float:right'></span></td></tr>"));
-	this.newMenuType = $("<tr class='rest-menutype-setting-item'><td>名称:</td><td><input type='text' id='new-menu-name'></input></td><td><span id='new-menutype-btn' class='icon-ok' style='float:right'></span></td></tr>");
+	this.element.append($("<tr><td></td><td></td><td><span id='show-new-menutype-btn' data-original-title='新建类别' class='icon-plus' style='float:right'></span></td></tr>"));
+	this.newMenuType = $("<tr class='rest-menutype-setting-item'><td>名称:</td><td><input type='text' id='new-menu-name'></input></td><td><span id='new-menutype-btn' data-original-title='保存类别' class='icon-ok' style='float:right'></span></td></tr>");
 	this.newMenuType.hide();
 	this.element.append(this.newMenuType);
 	this.element.find('#show-new-menutype-btn').click($.proxy(function(){
 		if(this.element.find('#show-new-menutype-btn').hasClass('icon-plus')){
 			this.newMenuType.show();
 			this.element.find('#show-new-menutype-btn').addClass('icon-minus').removeClass('icon-plus');
+			this.element.find('#show-new-menutype-btn').attr('data-original-title','取消新建');
 		}else{
 			this.newMenuType.hide();
 			this.element.find('#show-new-menutype-btn').addClass('icon-plus').removeClass('icon-minus');
+			this.element.find('#show-new-menutype-btn').attr('data-original-title','新建类别');
 		}
 	},this));
+	this.newMenuType.find('input').keydown($.proxy(function(event){
+		if(event.keyCode == 13){
+			this.element.find('#new-menutype-btn').click();
+		}
+	},this));
+	this.element.tooltip({
+	      selector: "span"
+    });
 	this.element.find('#new-menutype-btn').click($.proxy(function(){
 		$.ajax({
 		      type: 'POST',
@@ -1252,7 +1262,7 @@ var MenuTypeSetting = function(){
 }
 
 MenuTypeSetting.prototype.addType = function(menutype){
-	var div = $("<tr valign='middle' class='rest-menutype-setting-item' id='rest-menutype-setting-item-"+menutype.id+"' data-id='"+menutype.id+"'><td>名称:</td><td><input type='text' value='"+menutype.name+"' disabled='true'></input></td><td valign='middle'></span><span class='icon-remove'></span><span class='icon-ok'></span><span class='icon-edit'></td><tr>");
+	var div = $("<tr valign='middle' class='rest-menutype-setting-item' id='rest-menutype-setting-item-"+menutype.id+"' data-id='"+menutype.id+"'><td>名称:</td><td><input type='text' value='"+menutype.name+"' disabled='true'></input></td><td valign='middle'></span><span class='icon-remove' data-original-title='删除类别'></span><span class='icon-ok' data-original-title='保存类别'></span><span class='icon-edit' data-original-title='编辑类别'></td><tr>");
 	this.element.append(div);
 	div.find('.icon-ok').hide();
 	div.find('span').css('float','right');
@@ -1291,6 +1301,11 @@ MenuTypeSetting.prototype.addType = function(menutype){
 		      error: function(){alert('失败');}
 		    });
 	},div));
+	div.find('input').keydown($.proxy(function(event){
+		if(event.keyCode == 13){
+			div.find('.icon-ok').click();
+		}
+	},this));
 	div.find('.icon-remove').click($.proxy(function(){
 		$.ajax({
 		      type: 'POST',

@@ -131,7 +131,7 @@ class ViewRest:
 		rests = model.db.select('restuarant',where='username=$username',vars=locals())
 		if len(rests)>0:
 			rest = rests[0]
-			return render({"current_rest_id":rest.id})
+			return render('index.html',{"current_rest_id":rest.id})
 		return u'对不起，您访问的餐厅不存在'
 
 class Signin:
@@ -267,9 +267,9 @@ class AdminSignOut:
 		session.user = None
 		raise web.seeother('/admin/signin')
 
-#if __name__ == '__main__': #for local
-#	getSession()
-#	app.run()
+if __name__ == '__main__': #for local
+	getSession()
+	app.run()
 
-getSession()  #for remote 
-application = app.wsgifunc() #for remote 
+#getSession()  #for remote 
+#application = app.wsgifunc() #for remote 

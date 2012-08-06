@@ -86,7 +86,7 @@ section{
 }
 
 #map-canvas{
-	height: 94%;
+	height: 97%;
 	padding: 5px;
 }
 
@@ -100,7 +100,7 @@ section{
 }
 
 #left-bar{
-	height: 94%;
+	height: 97%;
 	padding: 5px;
 	margin-right: 0;
 }
@@ -375,6 +375,10 @@ section{
 
 #rest-menutype-setting tr{
 	border-bottom: 1px solid #DDD;
+}
+
+#rest-menutype-setting span{
+	margin-left: 10px;
 }
 
 #rest-menutype-setting input{
