@@ -797,7 +797,7 @@ var OrderView = function(jqueryElement){
 }
 
 OrderView.prototype.setMenus = function(menus){
-	for(var o in this.orderItems){
+	for(var o=0;o<this.orderItems.length;o++){
 		this.orderItems[o].dispose();
 	}
 	this.orderItems = [];

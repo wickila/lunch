@@ -18,6 +18,12 @@
 	{% block script %}
 	{% endblock %}
 	<script type="text/javascript">
+		if(!JSON){
+			var script = document.createElement("script");
+	　　　　script.type = "text/javascript";
+	　　　　script.src = '/static/js/json.js';
+	　　　　document.body.appendChild(script);
+		}
 		window.initialize = function(){}
 		window.lunchTip = function(message,callback){
 			$('#tip-message').html(message);
