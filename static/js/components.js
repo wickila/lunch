@@ -804,7 +804,7 @@ OrderView.prototype.setMenus = function(menus){
 	this.element.empty();
 	if(menus.length>0){
 		var rests = [];
-		for(var i=0;i<menus.length){
+		for(var i=0;i<menus.length;i++){
 			var rest = window.restuarants[menus[i].rid].info;
 			if(rest && rests.indexOf(rest)==-1){
 				rests.push(rest);
