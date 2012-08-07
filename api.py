@@ -275,9 +275,8 @@ class DeleteMenuType():
     
 class GetMenuTypes():
     def GET(self,id):
-        user = lunch.get_current_user()
-		menutypes = [menutype for menutype in model.db.select('menutype',where='rid=$id',vars=locals())]
-		return lunch.write_json({'result':True,'message':'success','menutypes':menutypes})
+        menutypes = [menutype for menutype in model.db.select('menutype',where='rid=$id',vars=locals())]
+        return lunch.write_json({'result':True,'message':'success','menutypes':menutypes})
     
 class NewOrder():
     def POST(self):

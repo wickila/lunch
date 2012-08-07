@@ -1,65 +1,170 @@
-{% extends 'base.html' %}
-{% block script %}
-<script type="text/javascript">
-      GEOCHAT_VARS = {
-        'user_email': '{{ email }}',
-        'user_nickname': '{{ nickname }}',
-        'default_location': '{{ location }}',
-        'initial_latitude': '{{ location[0] }}',
-        'initial_longitude': '{{ location[1] }}',
-        'update_interval': 5000,
-        'error_interval': 300000
-      };
-      GEOCHAT_IMAGES = {
-        'marker': '/static/images/marker.png',
-        'marker-restuarant': '/static/images/marker-lime.png'
-      };
-      CURRENT_REST_ID = null;
-      {% if current_rest_id %}
-      	CURRENT_REST_ID = {{current_rest_id}}
-      {% endif %}
-      REST_TYPES = {{rest_types}};
-      {% if user %}
-		window.user = {{user|dumps}};
-      {% endif %}
-</script>
-<script type="text/javascript" src="/static/js/index.js"></script>
-{% endblock %}
-{% block style %}
-	<link rel="stylesheet" href="/static/css/index.css" type="text/css" charset="utf-8">
-{% endblock %}
-{% block content %}
-	<div id="main">
-		<section id="overview" style="left:0;">
-			{% include 'overview.html' %}
-		</section>
-		<section id="restview" style="left:100%;">
-			{% include 'restuarant.html' %}
-		</section>
-		<section id="orderview" style="left:200%;">
-			{% include 'order.html' %}
-		</section>
-		<section id="userview" style="left:300%;">
-			{% include 'setting.html' %}
-		</section>
-	</div>
-	<div id="shoppingCart-container" class="container radius-border">
-		<div id="shoppingCart-head">购物车(<span class="order-num">0</span>)<a class='icon-remove icon-white' style="float: right;margin: 10px;" onclick="hideShoppingCart();"></a></div>
-		<div id="shoppingCart-container-empty-tip">您还没有点选任何食物哦</div>
-		<div class="accordion">
-	  	</div>
-	  	<a id="shopping-cart-settle" class="btn btn-success" onclick="gotoCharge(false);"><i class="icon-shopping-cart icon-white"></i>结算</a>
-	  	<a id="shopping-cart-ride" class="btn" onclick="gotoCharge(true);"><i class="icon-share-alt"></i>顺风车</a>
-	</div>
-	<div class="navbar navbar-fixed-bottom">
-		<div class="navbar-inner">
-			<div class="container" style="padding-top: 5px;">
-				<div>
-						<a>关于无物</a>
-						<a>联系我们</a>
-						<a>申请开店</a>
+<!DOCTYPE HTML>
+<html>
+	<head>
+	<title>Yaammy-有米</title>
+	<link rel="stylesheet" href="/static/css/bootstrap.css">
+	<link rel="stylesheet" href="/static/css/lunch.css?v={{version}}">
+	<link rel="stylesheet" href="/static/css/index.css?v={{version}}">
+	<script type="text/javascript" src="/static/js/jquery.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.form.js"></script>
+	<script type="text/javascript" src="/static/js/components.js?v={{version}}"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.3"></script>
+	<script type="text/javascript" src="/static/js/lunch.js?v={{version}}"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.js?v={{version}}"></script>
+	<script type="text/javascript" src="/static/js/index.js"></script>
+	<!--[if lte IE 9]>
+	<script type="text/javascript" src="/static/js/json.js"></script>
+	<![endif]-->
+	<script type="text/javascript">
+		GEOCHAT_VARS = {
+		        'user_email': '{{ email }}',
+		        'user_nickname': '{{ nickname }}',
+		        'default_location': '{{ location }}',
+		        'initial_latitude': '{{ location[0] }}',
+		        'initial_longitude': '{{ location[1] }}',
+		        'update_interval': 5000,
+		        'error_interval': 300000
+		      };
+		      GEOCHAT_IMAGES = {
+		        'marker': '/static/images/marker.png',
+		        'marker-restuarant': '/static/images/marker-lime.png'
+		      };
+		      CURRENT_REST_ID = null;
+		      {% if current_rest_id %}
+		      	CURRENT_REST_ID = {{current_rest_id}}
+		      {% endif %}
+		      REST_TYPES = {{rest_types}};
+		      {% if user %}
+				window.user = {{user|dumps}};
+		      {% endif %}
+		window.initialize = function(){}
+		
+		window.lunchTip = function(message,callback){
+			$('#tip-message').html(message);
+			if(callback){
+				$('#tip-message').find('a').bind('click',callback);
+			}
+			$('#lunch-tip').slideDown(200);
+			setTimeout(function(){$('#lunch-tip').slideUp(200);},10000);
+		}
+		window.closeTip = function(){
+			$('.alert').hide();
+		}
+		function playSound(){
+			var sound=$('#new-order-sound');
+			$('#new-order-sound').get(0).play();
+		}
+		
+		window.lunchAlert = function(message){
+			$("#lunch-alert").fadeIn();
+			$('#alert-message').html(message);
+		}
+		if (!Array.prototype.indexOf) {
+			Array.prototype.indexOf = function(obj, start) {
+				 for (var i = (start || 0), j = this.length; i < j; i++) {
+					 if (this[i] === obj) { return i; }
+				 }
+				 return -1;
+			}
+		}
+	</script>
+	</head>
+	<body onload="initialize()">
+		<div class="navbar navbar-fixed-top">
+			<div class="navbar-inner" style="height: 40px">
+				<div class="container">
+					<ul class="nav">
+					  <li id="navbar-fixed-top-index" class="active"><a class="brand active" onclick="changePage(1)">有米</a></li>
+	                  <li id="navbar-fixed-top-rest"><a onclick="changePage(2)">餐厅</a></li>
+	                  <li id="navbar-fixed-top-order"><a onclick="changePage(3)">订单</a></li>
+	                </ul>
+					<form class="navbar-search pull-left">
+			            <input type="text" class="search-query span2" placeholder="Search"  onkeypress="if(event.keyCode == 13){search('adress');return false}return true">
+			        </form>
+					<ul class="nav pull-right">
+						<li><a id="nav-shopping-cart-btn" onclick="toggleShoppingCart()"><i class="icon-shopping-cart icon-white" style="margin-right: 5px"></i>购物车(<span class="order-num">0</span>)</a></li>
+						<li class="tooltip-enable-bottom"><a id="nav-my-location" onclick="relocal();" rel='tooltip' data-original-title=""><i class="icon-screenshot icon-white"></i>我的位置</a></li>
+					</ul>
+					<ul id="nav-right" class="nav pull-right">
+						{% if user %}
+							<li><a onclick='changePage(4)'><i class="icon-user icon-white" style="margin-right: 5px"></i>{{user.username}}</a></li>
+							<li><a onclick="logout()">登出</a></li>
+						{% else %}
+							<li><a data-toggle="modal" data-target="#login">登录</a></li>
+							<li><a data-toggle="modal" data-target="#signup">注册</a></li>
+						{% endif %}
+					</ul>
 				</div>
 			</div>
-		  </div>
-	</div>
-{% endblock %}
+		</div>
+		<div id="content">
+			<div id="main">
+				<div id="module-navigator">
+					<div id="handler">
+						<section style="left:0;">
+							<div style="position: relative;
+										top: 5%;
+										left: 50%;
+										margin-left: -200px;
+										width: 400px;">
+								<div class="progress progress-striped active">
+								  <div class="bar" style="width: 1%;"></div>
+								</div>
+								<div id="loading-tip">正在加载地图...</div>
+							</div>
+						</section>
+						<section id="overview" style="left:100%;">
+							{% include 'overview.html' %}
+						</section>
+						<section id="restview" style="left:200%;">
+							{% include 'restuarant.html' %}
+						</section>
+						<section id="orderview" style="left:300%;">
+							{% include 'order.html' %}
+						</section>
+						<section id="userview" style="left:400%;">
+							{% include 'setting.html' %}
+						</section>
+					</div>
+				</div>
+			</div>
+		</div>
+		<audio id="new-order-sound" src="/static/sound/neworder.mp3"></audio>
+		<div id="shoppingCart-container" class="container radius-border">
+				<div id="shoppingCart-head">购物车(<span class="order-num">0</span>)<a class='icon-remove icon-white' style="float: right;margin: 10px;" onclick="hideShoppingCart();"></a></div>
+				<div id="shoppingCart-container-empty-tip">您还没有点选任何食物哦</div>
+				<div class="accordion">
+			  	</div>
+			  	<a id="shopping-cart-settle" class="btn btn-success" onclick="gotoCharge(false);"><i class="icon-shopping-cart icon-white"></i>结算</a>
+			  	<a id="shopping-cart-ride" class="btn" onclick="gotoCharge(true);"><i class="icon-share-alt"></i>顺风车</a>
+			</div>
+			<div class="navbar navbar-fixed-bottom">
+				<div class="navbar-inner">
+					<div class="container" style="padding-top: 5px;">
+						<div>
+								<a>关于无物</a>
+								<a>联系我们</a>
+								<a>申请开店</a>
+						</div>
+					</div>
+				  </div>
+			</div>
+			<div id="site-nav-container" class="nav-collapse tooltip-enable">
+				<a id="bottom-nav-overview" class="bottom-nav-a" onclick="changePage(1);" rel="tooltip" data-original-title="首页"></a>
+				<a id="bottom-nav-restview" class="bottom-nav-a" onclick="changePage(2);" rel="tooltip" data-original-title="店铺"></a>
+				<a id="bottom-nav-orderview" class="bottom-nav-a" onclick="changePage(3);" rel="tooltip" data-original-title="订单"></a>
+				<a id="bottom-nav-user"  class="bottom-nav-a" onclick="changePage(4);" rel="tooltip" data-original-title="管理"></a>
+			</div>
+		<div class="subnav subnav-fixed">
+			<div class="alert fade in container" style="display: none;" id="lunch-tip">
+           		<a class="close" onclick="closeTip()">×</a>
+            	<strong id="tip-message"></strong>
+			</div>
+		</div>
+		<div class="alert alert-block alert-error" id="lunch-alert" style="display:none;width:360px;position:fixed;left:50%;top:50%;margin-left:-180px;margin-top:-50px;">
+            <a type="button" class="close" data-dismiss="alert">×</a>
+            <h4 class="alert-heading">噢，不好意思，老兄！有点意外！</h4>
+            <p id="alert-message">Change this and that and try again. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum.</p>
+    	</div>
+	</body>
+</html>

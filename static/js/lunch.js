@@ -84,9 +84,6 @@ $(function(){
 		      placement: "bottom"
 		});
 		updateUserInfoView();
-		$("img.lazy").lazyload();({
-		     effect      : "fadeIn" //加载图片使用的效果(淡入)
-		});
 		initAppEvents();
 	}
 	
@@ -96,72 +93,6 @@ $(function(){
 		});
 		map.addEventListener('zoomend',function(e){
 			getLocalRestuarants();
-		});
-		$('#main').bind('mousedown',function(evt){
-			var canmove = false;
-			if($(evt.target).parent().attr('id')=='main' ||
-					$(evt.target).hasClass('container') ||
-					$(evt.target).hasClass('content') ||
-					$(evt.target).hasClass('radius-border') ||
-					$(evt.target).hasClass('span3') ||
-					$(evt.target).hasClass('span9')){
-				canmove = true;
-			}
-			if(evt.which == 1&&canmove){
-				window.isDragging = true;
-				window.orignClientX = evt.clientX;
-				window.speed = 0;
-				window.maxSpeed = 0;
-				window.dragStartTime = (new Date()).getTime();
-				evt.preventDefault();
-			}
-		});
-		$('#main').bind('mousemove',function(evt){
-			if(window.isDragging){
-				window.speed = Math.abs(evt.clientX - window.orignClientX)/((new Date()).getTime()-window.dragStartTime);
-				window.maxSpeed = window.maxSpeed<window.speed?window.speed:window.maxSpeed;
-				var x = ((1-page)+(evt.clientX - window.orignClientX)/$(window).width())*100;
-				$('section').each(function(){
-					var section = $(this);
-					var op = Math.abs(Math.abs((evt.clientX - window.orignClientX)/$(window).width())-section.css('opacity'));
-					section.css('opacity',op);
-				});
-				$('#main').css('left',x +'%');
-				x = (evt.clientX - window.orignClientX)/$(window).width()*100;
-				if(Math.abs(x)>80||window.maxSpeed>2){
-					window.changePage(window.page-(x/Math.abs(x)));
-					window.isDragging = false;
-				}
-				evt.preventDefault();
-			}
-		});
-		$('#main').bind('mouseup',function(evt){
-			window.isDragging = false;
-			$('#main').css('left',(1-page) +'00%');
-			switch(page){
-				case 1:
-					$('#overview').css('opacity',1);
-					$('#restview').css('opacity',0);
-					break;
-				case 2:
-					$('#restview').css('opacity',1);
-					$('#overview').css('opacity',0);
-					$('#orderview').css('opacity',0);
-					$('#userview').css('opacity',0);
-					break;
-				case 3:
-					$('#restview').css('opacity',0);
-					$('#overview').css('opacity',0);
-					$('#orderview').css('opacity',1);
-					$('#userview').css('opacity',0);
-					break;
-				case 4:
-					$('#restview').css('opacity',0);
-					$('#overview').css('opacity',0);
-					$('#orderview').css('opacity',0);
-					$('#userview').css('opacity',1);
-					break;
-			}
 		});
 		$('.modal').on('shown',function(){
 			$(this).find('input:first').focus();
@@ -738,6 +669,7 @@ $(function(){
 			return;
 		}
 		window.shoppingCartShow = true;
+		$('#shoppingCart-container').show();
 		$('#shoppingCart-container').animate({'top':'50px',
 												'opacity':1},{duration:200});
 	}
@@ -867,18 +799,12 @@ $(function(){
 			case 1:
 				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
 				$('#navbar-fixed-top-index').addClass('active');
-				$('#overview').css('opacity',1);
-				$('#restview').css('opacity',0);
 				document.title = 'Yaammy-首页';
 				break;
 			case 2:
 				$('#bottom-nav-overview').addClass('bottom-nav-overview-active');
 				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
 				$('#navbar-fixed-top-rest').addClass('active');
-				$('#restview').css('opacity',1);
-				$('#overview').css('opacity',0);
-				$('#orderview').css('opacity',0);
-				$('#userview').css('opacity',0);
 				document.title = 'Yaammy-'+window.currentRest.name;
 				break;
 			case 3:
@@ -886,10 +812,6 @@ $(function(){
 				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
 				$('#bottom-nav-orderview').addClass('bottom-nav-orderview-active');
 				$('#navbar-fixed-top-order').addClass('active');
-				$('#restview').css('opacity',0);
-				$('#overview').css('opacity',0);
-				$('#orderview').css('opacity',1);
-				$('#userview').css('opacity',0);
 				document.title = 'Yaammy-订单';
 				break;
 			case 4:
@@ -897,16 +819,12 @@ $(function(){
 				$('#bottom-nav-restview').addClass('bottom-nav-restview-active');
 				$('#bottom-nav-orderview').addClass('bottom-nav-orderview-active');
 				$('#bottom-nav-user').addClass('bottom-nav-user-active');
-				$('#restview').css('opacity',0);
-				$('#overview').css('opacity',0);
-				$('#orderview').css('opacity',0);
-				$('#userview').css('opacity',1);
 				document.title = 'Yaammy-管理';
 				break;
 		}
 		window.page = page;
 		window.hideShoppingCart();
-		$('#main').css('left',(1-page) +'00%');
+		$('#handler').css('left',(-page) +'00%');
 		window.updateView();
 	}
 	
