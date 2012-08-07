@@ -101,7 +101,7 @@
 			<div id="main">
 				<div id="module-navigator">
 					<div id="handler">
-						<section style="left:0;">
+						<div class="module" id="loading" style="left:0;">
 							<div style="position: relative;
 										top: 5%;
 										left: 50%;
@@ -112,19 +112,19 @@
 								</div>
 								<div id="loading-tip">正在加载地图...</div>
 							</div>
-						</section>
-						<section id="overview" style="left:100%;">
+						</div>
+						<div class="module" id="overview" style="left:100%;">
 							{% include 'overview.html' %}
-						</section>
-						<section id="restview" style="left:200%;">
+						</div>
+						<div class="module" id="restview" style="left:200%;">
 							{% include 'restuarant.html' %}
-						</section>
-						<section id="orderview" style="left:300%;">
+						</div>
+						<div class="module" id="orderview" style="left:300%;">
 							{% include 'order.html' %}
-						</section>
-						<section id="userview" style="left:400%;">
+						</div>
+						<div class="module" id="userview" style="left:400%;">
 							{% include 'setting.html' %}
-						</section>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -166,5 +166,6 @@
             <h4 class="alert-heading">噢，不好意思，老兄！有点意外！</h4>
             <p id="alert-message">Change this and that and try again. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum.</p>
     	</div>
+    	{% include 'modal.html' %}
 	</body>
 </html>

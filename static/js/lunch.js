@@ -824,7 +824,7 @@ $(function(){
 		}
 		window.page = page;
 		window.hideShoppingCart();
-		$('#handler').css('left',(-page) +'00%');
+		$('#handler').css('left',(-page)*$(window).width());
 		window.updateView();
 	}
 	

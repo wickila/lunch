@@ -61,7 +61,7 @@ body{
 	-ms-transition: width 200ms ease-in-out;
 }
 
-section{
+.module{
 	height: 100%;
 	width: 100%;
 	position: absolute;
