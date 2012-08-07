@@ -18,7 +18,9 @@
 	{% block script %}
 	{% endblock %}
 	<script type="text/javascript">
-		if(!JSON){
+		try{
+			JSON
+		}catch(e){
 			var script = document.createElement("script");
 	　　　　script.type = "text/javascript";
 	　　　　script.src = '/static/js/json.js';
