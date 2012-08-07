@@ -7,6 +7,9 @@
 	<link rel="stylesheet" href="/static/css/lunch.css?v={{version}}">
 	{% block style%}
 	{% endblock %}
+	<!--[if lte IE 9]>
+	<script type="text/javascript" src="/static/js/json.js"></script>
+	<![endif]-->
 	<script type="text/javascript" src="/static/js/jquery.js"></script>
 	<script type="text/javascript" src="/static/js/jquery.form.js"></script>
 	<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
@@ -107,15 +110,5 @@
 		<!-- <button class="change-page-btn" id="left-btn" onclick="changePage(window.page-1)"><</button>
 		<button class="change-page-btn" id="right-btn" onclick="changePage(window.page+1)">></button> -->
 		<audio id="new-order-sound" src="/static/sound/neworder.mp3"></audio>
-		<script type="text/javascript">
-			try{
-				JSON
-			}catch(e){
-				var script = document.createElement("script");
-		　　　　script.type = "text/javascript";
-		　　　　script.src = '/static/js/json.js';
-		　　　　document.head.appendChild(script);
-			}
-		</script>
 	</body>
 </html>
