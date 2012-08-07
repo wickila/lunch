@@ -48,7 +48,7 @@ Menu.prototype.getDiv = function(){
 	if(!this.div){
 		this.div = $("<li class='span3' data-mid='"+ this.menu.id +"'>" +
 							"<div class='thumbnail menu' data-mid='"+ this.menu.id +"'>" +
-							"<img class='menu-img lazy' src='/static/img/ajax-loader.gif' data-original='"+this.menu.thumbnail+"' alt='"+this.menu.name+"' data-mid='"+ this.menu.id +"'>" +
+							"<img class='menu-img lazy' src='' data-original='"+this.menu.thumbnail+"' alt='"+this.menu.name+"' data-mid='"+ this.menu.id +"'>" +
 							"</div>" +
 							"<table width='96%' data-mid='"+ this.menu.id +"'><tr><td width='100%' style='padding-top: 6px;'><h5>"+this.menu.name+"</h5></td><td align='right' style='padding-top: 6px;'>"+this.menu.price+"￥</td><td align='right'><span class='label label-info'>"+this.menu.discount+"折</span></td></tr><table>" +
 					"</li>");
@@ -180,7 +180,7 @@ var SmallMenu = function(menu){
 SmallMenu.prototype.getDiv = function(){
 	var div="<div id='small-menu-"+ this.menu.id + "' data-mid='"+this.menu.id+"'>"+
 			"<table class='msb-item' width='100%'>" +
-			"<tr><td valign='middle' rowspan='2' width='42'><img class='msb-avatar lazy' src='/static/img/ajax-loader.gif' data-original='"+ this.menu.thumbnail +"'></img></td><td><span id='msb-name'>"+ this.menu.name +"</span></td></tr>" +
+			"<tr><td valign='middle' rowspan='2' width='42'><img class='msb-avatar lazy' src='' data-original='"+ this.menu.thumbnail +"'></img></td><td><span id='msb-name'>"+ this.menu.name +"</span></td></tr>" +
 			"<tr><td><span class='msb-price'>"+ this.menu.price +"￥</span></td><td align='right'><button style='margin-right:4px' class='btn btn-mini btn-success' data-mid='"+this.menu.id+"'>点选</td></tr>" +
 			"</table></div>";
 	return div;
