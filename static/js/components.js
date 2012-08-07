@@ -80,7 +80,7 @@ Menus.prototype.setMenus = function(menus){
 	this.jqueryElement.find('.menus').empty();
 	var m;
 	this.mns = [];
-	for(var i in menus)
+	for(var i=0;i<menus.length;i++)
 	{
 		m = menus[i];
 		var menu = new Menu(m,i);
@@ -104,7 +104,7 @@ Menus.prototype.setMenus = function(menus){
 			this.onclick = function(){
 				var mid = menu.data('mid');
 				var m;
-				for(var i in window.currentRest.menus){
+				for(var i=0;i<window.currentRest.menus.length;i++){
 					if(window.currentRest.menus[i].id == mid){
 						m = window.currentRest.menus[i];
 						break;
@@ -117,7 +117,7 @@ Menus.prototype.setMenus = function(menus){
 };
 
 Menus.prototype.filter = function(filters){
-	for(var i in this.mns){
+	for(var i=0;i<this.mns.length;i++){
 		var menu = this.mns[i];
 		var canshow = true;
 		for(var f in filters){
@@ -145,7 +145,7 @@ var MenuFilter = function(element,rest,menus){
 	this.element.append(this.tastefilter);
 	this.element.append(this.typefilter);
 	var types = "";
-	for(var i in rest.menutypes){
+	for(var i=0;i<rest.menutypes.length;i++){
 		menutype = rest.menutypes[i];
 		types += "<a data-filter-key='mtype' data-filter-value='"+menutype.id+"'>"+menutype.name+"</a>";
 	}
@@ -237,7 +237,7 @@ RestView.prototype.getComments = function(page){
 			},
 		  success: function(data){
 						if(data.result){
-							for(var i in data.comments){
+							for(var i=0;i<data.comments.length;i++){
 								comment = $(this.scope.createComment(data.comments[i]));
 								$('#comments_container').append(comment);
 								comment.show(500);
@@ -291,7 +291,7 @@ var ShoppingCartRest = function(rest){
 			this.head.find('.btn').hide();
 		},this),30)
 	},this));
-	for(var i in rest.orderMenus){
+	for(var i=0;i<rest.orderMenus.length;i++){
 		var m = rest.orderMenus[i];
 		this.creatMenuElement(m);
 	}
@@ -338,7 +338,7 @@ ShoppingCartRest.prototype.removeOrderMenu = function(m){
 		$(id).find('.shopping-cart-menu-num').html(m.num);
 	}
 	this.head.css('color','');
-	for(var i in this.rest.orderMenus){
+	for(var i=0;i<this.rest.orderMenus.length;i++){
 		if(this.rest.orderMenus[i].soldout<=0){
 			this.head.css('color','red');
 		}
@@ -350,11 +350,11 @@ ShoppingCartRest.prototype.onClose = function(event){
 	event.stopImmediatePropagation();
 	var rest = window.restuarants[$(this).parent().data('rid')].info;
 	var menus = []
-	for(var i in rest.orderMenus){
+	for(var i=0;i<rest.orderMenus.length;i++){
 		rest.orderMenus[i].num = 1;
 		menus.push(rest.orderMenus[i]);
 	}
-	for(var j in menus){
+	for(var j=0;j<menus.length;j++){
 		window.removeOrderMenu(menus[j]);
 	}
 }
@@ -363,7 +363,7 @@ ShoppingCartRest.prototype.onMenuClose = function(){
 	var a = $(this);
 	var div = a.parent().parent();
 	var mid = parseInt(div.data('mid'));
-	for(var i in window.orderMenus){
+	for(var i=0;i<window.orderMenus.length;i++){
 		if(mid == window.orderMenus[i].id){
 			window.orderMenus[i].num = 1;
 			window.removeOrderMenu(window.orderMenus[i]);
@@ -376,7 +376,7 @@ ShoppingCartRest.prototype.onMenuPlus = function(){
 	var a = $(this);
 	var div = a.parent().parent();
 	var mid = parseInt(div.data('mid'));
-	for(var i in window.orderMenus){
+	for(var i=0;i<window.orderMenus.length;i++){
 		if(mid == window.orderMenus[i].id){
 			window.addOrderMenu(window.orderMenus[i]);
 			break;
@@ -388,7 +388,7 @@ ShoppingCartRest.prototype.onMenuReduce = function(){
 	var a = $(this);
 	var div = a.parent().parent();
 	var mid = parseInt(div.data('mid'));
-	for(var i in window.orderMenus){
+	for(var i=0;i<window.orderMenus.length;i++){
 		if(mid == window.orderMenus[i].id){
 			window.removeOrderMenu(window.orderMenus[i]);
 			break;
@@ -418,7 +418,7 @@ var ShoppingCart = function(jqueryElement){
 	$('#shoppingCart-container')[0].ondrop = function(ev) {
 		var mid = ev.dataTransfer.getData('mid');
 		var m;
-		for(var i in window.currentRest.menus){
+		for(var i=0;i<window.currentRest.menus.length;i++){
 			if(window.currentRest.menus[i].id == mid){
 				m = window.currentRest.menus[i];
 				break;
@@ -432,7 +432,7 @@ var ShoppingCart = function(jqueryElement){
 
 ShoppingCart.prototype.addMenu = function(m){
 	var rest = null;
-	for(var i in this.rests){
+	for(var i=0;i<this.rests.length;i++){
 		if(this.rests[i].rest.id == m.rid){
 			rest = this.rests[i];
 			break;
@@ -452,7 +452,7 @@ ShoppingCart.prototype.addMenu = function(m){
 
 ShoppingCart.prototype.removeMenu = function(m){
 	var rest = null;
-	for(var i in this.rests){
+	for(var i=0;i<this.rests.length;i++){
 		if(this.rests[i].rest.id == m.rid){
 			rest = this.rests[i];
 			break;
@@ -495,7 +495,7 @@ var Concacts = function(user,rid){
 	}
 	
 	function setConcacts(concacts){
-		for(var i in concacts){
+		for(var i=0;i<concacts.length;i++){
 			var concact = concacts[i];
 			var elm = $("<p class='concact-item' style='display:none'><input class='concact-item-input' type='radio' name='concact-"+rid+"' value='"+JSON.stringify(concact)+"'><span>"+concact.adress+"</span><span>"+concact.concactname+"收</span><span>电话:"+concact.phone+"</span></p>");
 			elm.append($("<div class='btn-group' style='float:right;margin-top: -5px;'>" +
@@ -563,7 +563,7 @@ function initEvents(){
 								item.attr('checked',false);
 							});
 							element2.append(elm);
-							for(var i in elements){
+							for(var i=0;i<elements.length;i++){
 								element2.append(elements[i]);
 							}
 							elm.find('input').attr('checked',true);
@@ -646,7 +646,7 @@ function initEvents(){
 				item.find('.concact-item-minus').hide();
 			}
 		})
-		for(var i in elements){
+		for(var i=0;i<elements.length;i++){
 			ccts.append(elements[i]);
 		}
 	});
@@ -670,7 +670,7 @@ Concacts.prototype.dispose = function(){
 
 function getOrderMenusNum(menus){
 	var result = 0;
-	for(var i in menus){
+	for(var i=0;i<menus.length;i++){
 		result += menus[i].num;
 	}
 	return result;
@@ -678,7 +678,7 @@ function getOrderMenusNum(menus){
 
 function getOrderMenusPrice(menus){
 	var result = 0;
-	for(var i in menus){
+	for(var i=0;i<menus.length;i++){
 		result += menus[i].num * menus[i].price * (menus[i].discount*0.1);
 	}
 	return Math.round(result*100)/100;
@@ -714,7 +714,7 @@ var NewOrderItem = function(rest,index){
 		changePage(2);
 		$('#rest-left-menus-view').click();
 	});
-	for(var i in rest.orderMenus){
+	for(var i=0;i<rest.orderMenus.length;i++){
 		var menu = "<tr "+ (rest.orderMenus[i].soldout<1?"style='color:red'":"") +"><td width='50%'>"+rest.orderMenus[i].name+((rest.orderMenus[i].soldout<1?"(已卖完)":""))+"</td><td width='30%'>"+rest.orderMenus[i].num+"</td><td align='right'>"+rest.orderMenus[i].price+"￥</td><td align='right'>"+(rest.orderMenus[i].discount<10?(""+rest.orderMenus[i].discount+"折"):"")+"</td></tr>";
 		this.body.append($(menu));
 	}
@@ -727,7 +727,7 @@ NewOrderItem.prototype.postOrder = function(){
 		return;
 	}
 	var msg = ''
-	for(var i in this.rest.orderMenus){
+	for(var i=0;i<this.rest.orderMenus.length;i++){
 		if(this.rest.orderMenus[i].soldout<1){
 			msg+=(this.rest.orderMenus[i].name+',');
 		}
@@ -744,7 +744,7 @@ NewOrderItem.prototype.postOrder = function(){
 	var m = this.element.find('#order-message');
     var message = this.element.find('#order-message').val();
     var items = [];
-    for(var i in this.rest.orderMenus){
+    for(var i=0;i<this.rest.orderMenus.length;i++){
     	items.push({
     		'id':this.rest.orderMenus[i].id,
     		'name':this.rest.orderMenus[i].name,
@@ -804,13 +804,13 @@ OrderView.prototype.setMenus = function(menus){
 	this.element.empty();
 	if(menus.length>0){
 		var rests = [];
-		for(var i in menus){
+		for(var i=0;i<menus.length){
 			var rest = window.restuarants[menus[i].rid].info;
 			if(rest && rests.indexOf(rest)==-1){
 				rests.push(rest);
 			}
 		}
-		for(var j in rests){
+		for(var j=0;j<rests.length;j++){
 			var orderItem = new NewOrderItem(rests[j],parseInt(j)+1);
 			this.orderItems.push(orderItem);
 			this.element.append(orderItem.element);
@@ -821,7 +821,7 @@ OrderView.prototype.setMenus = function(menus){
 }
 
 OrderView.prototype.postOrder = function(rid){
-	for(var i in this.orderItems){
+	for(var i=0;i<this.orderItems.length;i++){
 		if(this.orderItems[i].rest.id == rid){
 			this.orderItems[i].postOrder();
 			return;
@@ -831,7 +831,7 @@ OrderView.prototype.postOrder = function(rid){
 
 OrderView.prototype.removeRest = function(rid){
 	var orderItem = null;
-	for(var i in this.orderItems){
+	for(var i=0;i<this.orderItems.length;i++){
 		if(this.orderItems[i].rest.id == rid){
 			orderItem = this.orderItems[i];
 			this.orderItems.splice(i,1);
@@ -840,7 +840,7 @@ OrderView.prototype.removeRest = function(rid){
 	}
 	if(orderItem){
 		var mns = orderItem.rest.orderMenus.concat();
-		for(var j in mns){
+		for(var j=0;j<mns.length;j++){
 			mns[j].num = 1;
 			window.removeOrderMenu(mns[j]);
 		}
@@ -917,7 +917,7 @@ ViewOrderItem.prototype.showDetail = function(){
 	this.element.find('#show-order-detail-btn').removeClass('icon-list').addClass('icon-minus');
 	this.element.find('#order-detail-info').find('table').empty();
 	this.element.find('#order-detail-info').find('table').append("<tr><td>名称</td><td>数量</td><td>单价</td><td>折扣</td><td>实价</td></tr>")
-	for(var i in this.order.menus){
+	for(var i=0;i<this.order.menus.length;i++){
 		var menu = this.order.menus[i];
 		var e = "<tr><td>"+menu.name+"</td><td>"+menu.num+"</td><td>"+menu.price+"￥</td><td>"+menu.discount+"</td><td>"+menu.num*menu.price*menu.discount*0.1+"￥</td></tr>";
 		this.element.find('#order-detail-info').find('table').append($(e));
@@ -1149,12 +1149,12 @@ ViewOrderView.prototype.setPage = function(scope){
 		  success: function(data){
 	    				if(data.result){
 	    					this.scope.currentOffset = this.scope.element[0].offsetTop;
-	    					for(var i in data.orders){
+	    					for(var i=0;i<data.orders.length;i++){
 	    						var order = data.orders[i];
 	    						order.concact = JSON.parse(order.concact);
 	    						order.menus = JSON.parse(order.menus);
 	    						order.menunum = 0;
-	    						for(var j in order.menus){
+	    						for(var j=0;j<order.menus.length;j++){
 	    							order.menunum += order.menus[j].num;
 	    						}
 	    						var orderItem = null;
@@ -1198,7 +1198,7 @@ ViewOrderView.prototype.setPage = function(scope){
 }
 
 ViewOrderView.prototype.dispose = function(){
-	for(var j in this.items){
+	for(var j=0;j<this.items.length;j++){
 		var item = this.items[j];
 		item.dispose();
 	}
@@ -1258,7 +1258,7 @@ var MenuTypeSetting = function(){
 		      error: function(){alert('失败');}
 		    });
 	},this));
-	for(var i in window.user.restuarant.menutypes){
+	for(var i=0;i<window.user.restuarant.menutypes.length;i++){
 		var menutype = window.user.restuarant.menutypes[i];
 		this.addType(menutype);
 	}
@@ -1320,7 +1320,7 @@ MenuTypeSetting.prototype.addType = function(menutype){
 		    					this.scope.hide(200,$.proxy(function(){
 		    						this.remove();
 		    					},this.scope));
-		    					for(var i in window.user.restuarant.menutypes){
+		    					for(var i=0;i<window.user.restuarant.menutypes.length;i++){
 		    						if(window.user.restuarant.menutypes[i].id == this.scope.data('id')){
 		    							window.user.restuarant.menutypes.splice(i,1);
 		    							window.lunchTip('删除成功');
@@ -1382,7 +1382,7 @@ Messages.prototype = {
 								}
 								total = Math.ceil(data.total / this.scope.pagecount);
 								total = total == 0?1:total;
-								for(var i in data.messages){
+								for(var i=0;i<data.messages.length;i++){
 									message = new Message();
 									message.setMessage(data.messages[i]);
 									this.scope.element.append(message.element);
