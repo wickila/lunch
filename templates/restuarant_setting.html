@@ -8,6 +8,10 @@
 		<tr><td>地址:</td><td><input type="text" name="adress" id="rest-setting-addres" required></input></td></tr>
 		<tr><td>类型:</td><td><select name="rtype" id="rest-setting-rtype"></select></td></tr>
 		<tr><td>电话:</td><td><input type="text" name="phone" id="rest-setting-phone" required></input></td></tr>
+		<tr><td>是否接受网上订餐:</td><td><select name="enabled" id="rest-setting-enabled">
+										<option value="true" selected="selected">是
+									    <option value="false">否
+										</select></td></tr>
 		<tr><td>起送金额:</td><td><input type="number" name="minprice" value="10" id="rest-setting-minprice" required></input></td></tr>
 		<tr><td>配送范围:</td><td><input type="number" max="10000" value="500" min="100" placeholder="单位:米" step="100" name="maxdistance" id="rest-setting-maxdistance" required></input></td></tr>
 		<tr><td>配送时间:</td><td><input type="time" name="starttime" placeholder="格式：12：00：00" id="rest-setting-starttime" required></input>至<input type="time" name="endtime" placeholder="格式：12：00：00" id="rest-setting-endtime" required></input></td></tr>

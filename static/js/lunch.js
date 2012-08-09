@@ -56,7 +56,9 @@ $(function(){
 			}
 		},1000);
 		marker = new BMap.Marker(initialLocation);
-		marker.setTitle(window.user?window.user.username+'的位置':'您的位置');
+		var t = window.user?window.user.username+'的位置':'您的位置';
+		t+='(拖动重新定位)'
+		marker.setTitle(t);
 		marker.enableDragging();
 		marker.addEventListener('dragend',function(event){
 			initialLocation = event.point;
@@ -72,7 +74,7 @@ $(function(){
 		        lunchAlert("Geocoder failed");
 		      }
 		    });
-			$.cookie('location',initialLocation.lng+','+initialLocation.lat);
+			$.cookie('location',initialLocation.lng+','+initialLocation.lat,{expires:1000});
 		});
 		map.addOverlay(marker);
 	    window.shoppingCart = new ShoppingCart($('#shoppingCart-container .accordion'));
@@ -423,6 +425,14 @@ $(function(){
 				$('#rest-setting-minprice').val(window.user.restuarant.minprice);
 				$('#rest-avatar-img').attr('src',window.user.restuarant.avatarurl);
 				$('#setting-avatar-img').attr('src',window.user.avatarurl);
+				$('#rest-setting-starttime').val(window.user.restuarant.starttime);
+				$('#rest-setting-endtime').val(window.user.restuarant.endtime);
+				$('#rest-setting-enabled').find('option').each(function(){
+					var option = $(this);
+					if(parseBoolean(option.val())==window.user.restuarant.enabled){
+						option.attr('selected',true);
+					}
+				});
 				if(!window.bossOrderView){
 					window.bossOrderView =new ViewOrderView($('#boss-order-item-container'),'boss');
 				}

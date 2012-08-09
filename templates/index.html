@@ -67,6 +67,9 @@
 				 return -1;
 			}
 		}
+		function parseBoolean(str) {
+			  return /^true$/i.test(str);
+		}
 	</script>
 	</head>
 	<body onload="initialize()">
@@ -98,34 +101,30 @@
 			</div>
 		</div>
 		<div id="content">
-			<div id="main">
-				<div id="module-navigator">
-					<div id="handler">
-						<div class="module" id="loading" style="left:0;">
-							<div style="position: relative;
-										top: 5%;
-										left: 50%;
-										margin-left: -200px;
-										width: 400px;">
-								<div class="progress progress-striped active">
-								  <div class="bar" style="width: 1%;"></div>
-								</div>
-								<div id="loading-tip">正在加载地图...</div>
-							</div>
+			<div id="handler">
+				<div class="module" id="loading" style="left:0;">
+					<div style="position: relative;
+								top: 45%;
+								left: 50%;
+								margin-left: -200px;
+								width: 400px;">
+						<div class="progress progress-striped active">
+						  <div class="bar" style="width: 1%;"></div>
 						</div>
-						<div class="module" id="overview" style="left:100%;">
-							{% include 'overview.html' %}
-						</div>
-						<div class="module" id="restview" style="left:200%;">
-							{% include 'restuarant.html' %}
-						</div>
-						<div class="module" id="orderview" style="left:300%;">
-							{% include 'order.html' %}
-						</div>
-						<div class="module" id="userview" style="left:400%;">
-							{% include 'setting.html' %}
-						</div>
+						<div id="loading-tip">正在加载地图...</div>
 					</div>
+				</div>
+				<div class="module" id="overview" style="left:100%;">
+					{% include 'overview.html' %}
+				</div>
+				<div class="module" id="restview" style="left:200%;">
+					{% include 'restuarant.html' %}
+				</div>
+				<div class="module" id="orderview" style="left:300%;">
+					{% include 'order.html' %}
+				</div>
+				<div class="module" id="userview" style="left:400%;">
+					{% include 'setting.html' %}
 				</div>
 			</div>
 		</div>
@@ -142,7 +141,7 @@
 				<div class="navbar-inner">
 					<div class="container" style="padding-top: 5px;">
 						<div>
-								<a>关于无物</a>
+								<a>关于有米</a>
 								<a>联系我们</a>
 								<a>申请开店</a>
 						</div>

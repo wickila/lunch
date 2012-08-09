@@ -158,3 +158,4 @@ ALTER TABLE `lunch`.`restuarant` ADD COLUMN `totalensure` INT UNSIGNED NOT NULL 
  ADD COLUMN `totaldeliverytime` DOUBLE UNSIGNED NOT NULL AFTER `totaldelivery`;
 ALTER TABLE `lunch`.`restuarant` MODIFY COLUMN `lat` DOUBLE UNSIGNED NOT NULL,
  MODIFY COLUMN `lng` DOUBLE UNSIGNED NOT NULL;
+ALTER TABLE `lunch`.`restuarant` ADD COLUMN `enabled` BOOL  NOT NULL AFTER `totaldeliverytime`;

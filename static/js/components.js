@@ -203,6 +203,13 @@ RestView.prototype.setRest = function(rest){
 	$('#rest-menus-head').html(rest.name+'家的所有美味');
 	$('.rest-comment-title').html(rest.name+'家的所有评论')
 	$("#rest-detail").find("#rest-name").html(rest.name);
+	if(this.rest.enabled){
+		$('.rest-enabled').show();
+		$('.rest-disabled').hide();
+	}else{
+		$('.rest-disabled').show();
+		$('.rest-enabled').hide();
+	}
 	$("#rest-detail").find("#rest-username").html(rest.username);
 	$("#rest-detail").find("#rest-createdtime").html(rest.created_time.split(' ')[0]);
 	$("#rest-detail").find("#rest-telephone").html(rest.telephone);
@@ -210,13 +217,21 @@ RestView.prototype.setRest = function(rest){
 	$("#rest-detail").find("#rest-maxdistance").html(rest.maxdistance);
 	$("#rest-detail").find("#rest-starttime").html(rest.starttime);
 	$("#rest-detail").find("#rest-endtime").html(rest.endtime);
-	$("#rest-detail").find("#rest-ensurespeed").html(Math.ceil(rest.totalensuretime/rest.totalensure/60));
-	$("#rest-detail").find("#rest-deliveryspeed").html(Math.ceil(rest.totaldeliverytime/rest.totaldelivery/60));
+	if(rest.totalensure==0){
+		$("#rest-detail").find("#rest-ensurespeed").html('暂无数据');
+	}else{
+		$("#rest-detail").find("#rest-ensurespeed").html(Math.ceil(rest.totalensuretime/rest.totalensure/60)+'分钟');
+	}
+	if(rest.totaldelivery==0){
+		$("#rest-detail").find("#rest-deliveryspeed").html('暂无数据');
+	}else{
+		$("#rest-detail").find("#rest-deliveryspeed").html(Math.ceil(rest.totaldeliverytime/rest.totaldelivery/60)+'分钟');
+	}
 	$("#rest-minprice").parent().attr('data-original-title','起送金额:'+rest.minprice+'￥');
 	$("#rest-maxdistance").parent().attr('data-original-title','配送范围:'+rest.maxdistance+'米');
 	$("#rest-starttime").parent().attr('data-original-title','送餐时间:'+rest.starttime+'至'+rest.endtime);
-	$("#rest-detail").find("#rest-deliveryspeed").parent().attr('data-original-title','发货速度:'+$("#rest-detail").find("#rest-deliveryspeed").html()+'分钟');
-	$("#rest-detail").find("#rest-ensurespeed").parent().attr('data-original-title','订单确认速度:'+$("#rest-detail").find("#rest-ensurespeed").html()+'分钟');
+	$("#rest-detail").find("#rest-deliveryspeed").parent().attr('data-original-title','发货速度:'+$("#rest-detail").find("#rest-deliveryspeed").html());
+	$("#rest-detail").find("#rest-ensurespeed").parent().attr('data-original-title','订单确认速度:'+$("#rest-detail").find("#rest-ensurespeed").html());
 	$("#rest-detail").find("#rest-username").parent().attr('data-original-title','店主:'+rest.username);
 	$("#rest-detail").find("#rest-createdtime").parent().attr('data-original-title','创建时间:'+rest.created_time.split(' ')[0]);
 	$("#rest-detail").find("#rest-telephone").parent().attr('data-original-title','电话:'+rest.telephone);
@@ -709,7 +724,14 @@ var NewOrderItem = function(rest,index){
 		this.element.append(this.btn);
 	}
 	this.element.append(this.cancelBtn);
-	this.btn.bind('click',this.ensureOrder);
+	if(this.rest.enabled){
+		this.btn.bind('click',this.ensureOrder);
+	}else{
+		this.btn.addClass('disabled');
+		this.btn.tooltip({
+		    });
+		this.btn.attr('data-original-title','该餐厅不支持网上订餐，请电话订餐:'+this.rest.telephone);
+	}
 	this.cancelBtn.bind('click',function(){
 		changePage(2);
 		$('#rest-left-menus-view').click();
@@ -867,6 +889,8 @@ var ViewOrderItem = function(type,expanded){
 							"<tr><td>详细信息:<span class='view-order-item-num'></span><span class='view-order-item-price'></span></td><td align='right'><span id='show-order-detail-btn' class='icon-list'></span></td></tr>" +
 							"<tr id='order-detail-info' style='display:none'><td colspan='3'><table width='100%' class='order-detail-info-table'></table></td></tr>" +
 							"<tr><td>联系方式:<span class='view-order-item-concact-adress'></span><span class='view-order-item-concact-name'></span><span class='view-order-item-concact-phone'></span></td></tr>" +
+							"<tr><td>顾客留言:<span class='view-order-item-message'></span></td></tr>" +
+							"<tr><td>取消理由:<span class='view-order-item-cancle-reason'></span></td></tr>" +
 							"<tr><td></td><td aligin='right' class='tooltip-enable'><a rel='tooltip' class='btn btn-mini btn-primary order-cancel-btn'>取消</a><a rel='tooltip' class='btn btn-mini order-option-btn'>待确认</a></td></tr>" +
 						"</table>" +
 					"</div>");
@@ -941,6 +965,19 @@ ViewOrderItem.prototype.setOrder = function(order){
 	}else{
 		this.element.find('.view-order-item-restname').hide();
 	}
+	if(order.message){
+		this.element.find('.view-order-item-message').html(order.message);
+		this.element.find('.view-order-item-message').parent().show();
+	}else{
+		this.element.find('.view-order-item-message').parent().hide();
+	}
+	if(order.cancelreason){
+		this.element.find('.view-order-item-cancle-reason').parent().show();
+		this.element.find('.view-order-item-cancle-reason').html(order.cancelreason);
+	}else{
+		this.element.find('.view-order-item-cancle-reason').parent().hide();
+	}
+	
 	this.element.find('.view-order-item-id').html(order.id);
 	this.element.find('.view-order-item-createdtime').html(order.createdtime);
 	this.element.find('.view-order-item-username').html(order.username);
